@@ -11,6 +11,7 @@ OBJECTS=\
 
 # Add the source directory
 OBJECTS := $(OBJECTS:%=src/%)
+SOURCES := $(OBJECTS:%.o=%.cpp)
 
 
 
@@ -32,6 +33,22 @@ $(PROGRAM): $(OBJECTS)
 %.yy.cpp: %.l
 	flex --header-file=$(@:%.cpp=%.h) -o $@ $<
 
+
+
+# Run the linters
+# Add targets for linting the code
+ALL_SOURCE_FILES = $(shell find ./ -regex '.*\.\(c\|cpp\|h\|hpp\)$$')
+
+.PHONY: lint
+lint: format tidy
+
+.PHONY: format
+format:
+	clang-format -i -style=file $(ALL_SOURCE_FILES)
+
+.PHONY: tidy
+tidy:
+	clang-tidy $(ALL_SOURCE_FILES) -config='' -fix-errors -- -Iinclude
 
 
 # Run the file
