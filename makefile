@@ -7,6 +7,9 @@ PROGRAM=scc.out
 OBJECTS=\
 	parser/c.tab.o \
 	parser/c.yy.o \
+	expression/Expression.o \
+	expression/UnaryExpression.o \
+	expression/BinaryExpression.o \
 	scc.o \
 
 # Add the source directory
