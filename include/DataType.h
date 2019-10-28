@@ -1,6 +1,8 @@
 #ifndef DATA_TYPE_HEADER
 #define DATA_TYPE_HEADER
 
+#include <cstddef> /* For size_t */
+
 // List of all concrete data types
 enum class ConcreteDataType { PRIMITIVE, POINTER };
 
@@ -15,6 +17,15 @@ enum class PrimitiveType {
   DOUBLE,
 };
 
+// List of all type qualifiers
+enum class TypeQualifier { CONST, RESTRICT, VOLATILE, ATOMIC };
+
+// List of function specifiers
+enum class FunctionSpecifier { INLINE, NORETURN };
+
+/**
+ * Generic Data Type
+ */
 class DataType {
 
 protected:
@@ -58,6 +69,21 @@ public:
 
 private:
   DataType* type;
+};
+
+//
+// Represents an array
+//
+class ArrayDataType: public DataType {
+
+  ArrayDataType(DataType* type);
+  ArrayDataType(DataType* type, size_t size);
+
+  DataType* get_array_type() const;
+
+private:
+  DataType* type;
+  size_t size;
 };
 
 #endif /* Data Type Header Included */

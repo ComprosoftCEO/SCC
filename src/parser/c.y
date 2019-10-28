@@ -24,14 +24,12 @@
 
 
 %union {
-	std::string* str;		// Identifier, string, type, etc.
-	//char cmd;				// Single character command
-	//Statement* stmt;		//
-	//StatementList* list;	//
-	Expression* expr; // Expression interface
+  std::string* str;                     // Identifier, string, type, etc.
+  Expression* expr;                     // Expression interface
+  std::vector<Expression*>* expr_list;  // List of expressions
 }
 
-//%destructor {delete($$);} <label> <stmt> <list>
+%destructor {delete($$);} <expr> <str> <expr_list>
 
 
 //Terminal types
@@ -75,12 +73,16 @@
 
 //Nonterminal types
 
+%type <str> string
+
 // Expressions
 %type <expr> primary_expression postfix_expression unary_expression cast_expression
 %type <expr> multiplicative_expression additive_expression shift_expression
-%type <expr> relational_expression equality_expression and_expression inclusive_or_expression
+%type <expr> relational_expression equality_expression
+%type <expr> and_expression exclusive_or_expression inclusive_or_expression
 %type <expr> logical_and_expression logical_or_expression conditional_expression
 %type <expr> assignment_expression expression constant_expression
+%type <expr_list> argument_expression_list
 
 
 //%type <list> insanity if
@@ -91,10 +93,10 @@
 %%
 
 primary_expression
-	: IDENTIFIER
-	| constant
-	| string
-	| '(' expression ')'
+	: IDENTIFIER					{ $$ = new IdentifierExpression(*$1); delete($1); }
+	| constant						{ $$ = nullptr; /* TODO: Implement constants */ }
+	| string							{ $$ = nullptr;	/* TODO: Implement this */}
+	| '(' expression ')'	{ $$ = $2; }
 	;
 
 constant
@@ -113,128 +115,128 @@ string
 	;
 
 postfix_expression
-	: primary_expression
-	| postfix_expression '[' expression ']'
-	| postfix_expression '(' ')'
-	| postfix_expression '(' argument_expression_list ')'
+	: primary_expression																		{ $$ = $1; }
+	| postfix_expression '[' expression ']'									{ $$ = new BracketExpression($1, $3); }
+	| postfix_expression '(' ')'                            { $$ = new FunctionCallExpression($1); }
+	| postfix_expression '(' argument_expression_list ')'   { $$ = new FunctionCallExpression($1, *$3); }
 	// | postfix_expression '.' IDENTIFIER
 	// | postfix_expression "->" IDENTIFIER
-	| postfix_expression "++"
-	| postfix_expression "--"
+	// | postfix_expression "++"
+	// | postfix_expression "--"
 	// | '(' type_name ')' '{' initializer_list '}'
 	// | '(' type_name ')' '{' initializer_list ',' '}'
 	;
 
 argument_expression_list
-	: assignment_expression
-	| argument_expression_list ',' assignment_expression
+	: assignment_expression                               { $$ = new std::vector<Expression*>{$1}; }
+	| argument_expression_list ',' assignment_expression  { $$ = $1; $1->push_back($3); }
 	;
 
 unary_expression
-	: postfix_expression
-	| "++" unary_expression
-	| "--" unary_expression
-	| '&' cast_expression
-	| '*' cast_expression
-	| '+' cast_expression
-	| '-' cast_expression
-	| '~' cast_expression
-	| '!' cast_expression
-	| SIZEOF unary_expression
-	| SIZEOF '(' type_name ')'
-	| ALIGNOF '(' type_name ')'
+	: postfix_expression          { $$ = $1; }
+	// | "++" unary_expression
+	// | "--" unary_expression
+	| '&' cast_expression         { $$ = new AddressOfExpression($2); }
+	| '*' cast_expression         { $$ = new DereferenceExpression($2); }
+	| '+' cast_expression         { $$ = $2; /* TODO: Upcast to integer */ }
+	| '-' cast_expression         { $$ = new MinusExpression($2); }
+	| '~' cast_expression         { $$ = new ComplementExpression($2); }
+	| '!' cast_expression         { $$ = new NotExpression($2); }
+	| SIZEOF unary_expression     { $$ = new SizeofExpression($2); }
+//	| SIZEOF '(' type_name ')'    { $$ = new SizeofExpression($3); }
+//	| ALIGNOF '(' type_name ')'   { $$ = new AlignofExpression($3); }
 	;
 
 cast_expression
-	: unary_expression
-	| '(' type_name ')' cast_expression
+	: unary_expression                    { $$ = $1; }
+	| '(' type_name ')' cast_expression   { $$ = $4; /* TODO: Cast expression */}
 	;
 
 multiplicative_expression
-	: cast_expression
-	| multiplicative_expression '*' cast_expression
-	| multiplicative_expression '/' cast_expression
-	| multiplicative_expression '%' cast_expression
+	: cast_expression                                 { $$ = $1; }
+	| multiplicative_expression '*' cast_expression   { $$ = new MultiplicationExpression($1, $3); }
+	| multiplicative_expression '/' cast_expression   { $$ = new DivisionExpression($1, $3); }
+	| multiplicative_expression '%' cast_expression   { $$ = new ModulusExpression($1, $3); }
 	;
 
 additive_expression
-	: multiplicative_expression
-	| additive_expression '+' multiplicative_expression
-	| additive_expression '-' multiplicative_expression
+	: multiplicative_expression                           { $$ = $1; }
+	| additive_expression '+' multiplicative_expression   { $$ = new AdditionExpression($1, $3); }
+	| additive_expression '-' multiplicative_expression   { $$ = new SubtractionExpression($1, $3); }
 	;
 
 shift_expression
-	: additive_expression
-	| shift_expression "<<" additive_expression
-	| shift_expression ">>" additive_expression
+	: additive_expression                         { $$ = $1; }
+	| shift_expression "<<" additive_expression   { $$ = new LeftShiftExpression($1, $3); }
+	| shift_expression ">>" additive_expression   { $$ = new RightShiftExpression($1, $3); }
 	;
 
 relational_expression
-	: shift_expression
-	| relational_expression '<' shift_expression
-	| relational_expression '>' shift_expression
-	| relational_expression "<=" shift_expression
-	| relational_expression ">=" shift_expression
+	: shift_expression                              { $$ = $1; }
+	| relational_expression '<' shift_expression    { $$ = new LessThanExpression($1, $3); }
+	| relational_expression '>' shift_expression    { $$ = new GreaterThanExpression($1, $3); }
+	| relational_expression "<=" shift_expression   { $$ = new LessThanOrEqualExpression($1, $3); }
+	| relational_expression ">=" shift_expression   { $$ = new GreaterThanOrEqualExpression($1, $3); }
 	;
 
 equality_expression
-	: relational_expression
-	| equality_expression "==" relational_expression
-	| equality_expression "!=" relational_expression
+	: relational_expression                           { $$ = $1; }
+	| equality_expression "==" relational_expression  { $$ = new EqualsExpression($1, $3); }
+	| equality_expression "!=" relational_expression  { $$ = new NotEqualsExpression($1, $3); }
 	;
 
 and_expression
-	: equality_expression
-	| and_expression '&' equality_expression
+	: equality_expression                     { $$ = $1; }
+	| and_expression '&' equality_expression  { $$ = new BitwiseAndExpression($1, $3); }
 	;
 
 exclusive_or_expression
-	: and_expression
-	| exclusive_or_expression '^' and_expression
+	: and_expression                              { $$ = $1; }
+	| exclusive_or_expression '^' and_expression  { $$ = new BitwiseXorExpression($1, $3); }
 	;
 
 inclusive_or_expression
-	: exclusive_or_expression
-	| inclusive_or_expression '|' exclusive_or_expression
+	: exclusive_or_expression                               { $$ = $1; }
+	| inclusive_or_expression '|' exclusive_or_expression   { $$ = new BitwiseOrExpression($1, $3); }
 	;
 
 logical_and_expression
-	: inclusive_or_expression
-	| logical_and_expression "&&" inclusive_or_expression
+	: inclusive_or_expression                               { $$ = $1; }
+	| logical_and_expression "&&" inclusive_or_expression   { $$ = new LogicalAndExpression($1, $3); }
 	;
 
 logical_or_expression
-	: logical_and_expression
-	| logical_or_expression "||" logical_and_expression
+	: logical_and_expression                              { $$ = $1; }
+	| logical_or_expression "||" logical_and_expression   { $$ = new LogicalOrExpression($1, $3); }
 	;
 
 conditional_expression
-	: logical_or_expression
-	| logical_or_expression '?' expression ':' conditional_expression
+	: logical_or_expression                                             { $$ = $1; }
+	| logical_or_expression '?' expression ':' conditional_expression   { $$ = new ConditionalExpression($1, $3, $5); }
 	;
 
 assignment_expression
-	: conditional_expression
-	| unary_expression '=' assignment_expression
-	| unary_expression "*=" assignment_expression
-	| unary_expression "/=" assignment_expression
-	| unary_expression "%=" assignment_expression
-	| unary_expression "+=" assignment_expression
-	| unary_expression "-=" assignment_expression
-	| unary_expression "<<=" assignment_expression
-	| unary_expression ">>=" assignment_expression
-	| unary_expression "&=" assignment_expression
-	| unary_expression "^=" assignment_expression
-	| unary_expression "|=" assignment_expression
+	: conditional_expression                        { $$ = $1; }
+	| unary_expression '=' assignment_expression    { $$ = new AssignmentExpression($1, $3); }
+	// | unary_expression "*=" assignment_expression
+	// | unary_expression "/=" assignment_expression
+	// | unary_expression "%=" assignment_expression
+	// | unary_expression "+=" assignment_expression
+	// | unary_expression "-=" assignment_expression
+	// | unary_expression "<<=" assignment_expression
+	// | unary_expression ">>=" assignment_expression
+	// | unary_expression "&=" assignment_expression
+	// | unary_expression "^=" assignment_expression
+	// | unary_expression "|=" assignment_expression
 	;
 
 expression
-	: assignment_expression
-	| expression ',' assignment_expression
+	: assignment_expression                 { $$ = new CommaExpression(); ((CommaExpression*) $$)->add_expression($1); }
+	| expression ',' assignment_expression  { $$ = $1; ((CommaExpression*) $$)->add_expression($3); }
 	;
 
 constant_expression
-	: conditional_expression	/* with constraints */
+	: conditional_expression	{ $$ = $1; /* with constraints */ }
 	;
 
 declaration
