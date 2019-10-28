@@ -18,7 +18,8 @@ WHTSP 		[ \t\v\n\f]
 
 
 %{
-	//#include "InsanityParser.h"
+	#include <Expression.h>
+	#include <string>
 	#include "c.tab.h"
 
 	//Track line numbers for parsed tokens

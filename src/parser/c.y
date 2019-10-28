@@ -9,7 +9,7 @@
 	#include <cstdio>
 	#include <cstdlib>
 	#include <string>
-	//#include <InsanityParser.h>
+	#include <Expression.h>
 }
 
 %code requires {
@@ -24,38 +24,65 @@
 
 
 %union {
-	//std::string* label;		// Label name
+	std::string* str;		// Identifier, string, type, etc.
 	//char cmd;				// Single character command
 	//Statement* stmt;		//
 	//StatementList* list;	//
+	Expression* expr; // Expression interface
 }
 
 //%destructor {delete($$);} <label> <stmt> <list>
 
 
 //Terminal types
-%token	IDENTIFIER I_CONSTANT F_CONSTANT STRING_LITERAL FUNC_NAME SIZEOF
-%token	PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
-%token	AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
-%token	SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
-%token	XOR_ASSIGN OR_ASSIGN
-%token	TYPEDEF_NAME ENUMERATION_CONSTANT
+%token <str> IDENTIFIER STRING_LITERAL FUNC_NAME TYPEDEF_NAME ENUMERATION_CONSTANT
+%token I_CONSTANT F_CONSTANT
 
-%token	TYPEDEF EXTERN STATIC AUTO REGISTER INLINE
-%token	CONST RESTRICT VOLATILE
-%token	BOOL CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE VOID
-%token	COMPLEX IMAGINARY 
-%token	STRUCT UNION ENUM ELLIPSIS
+%token SIZEOF
+%token PTR_OP "->"
+%token INC_OP "++"
+%token DEC_OP "--"
+%token LEFT_OP "<<" 
+%token RIGHT_OP ">>"
+%token LE_OP "<="
+%token GE_OP ">="
+%token EQ_OP "=="
+%token NE_OP "!="
 
-%token	CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
+%token AND_OP "&&"
+%token OR_OP "||"
 
-%token	ALIGNAS ALIGNOF ATOMIC GENERIC NORETURN STATIC_ASSERT THREAD_LOCAL
+%token MUL_ASSIGN "*="
+%token DIV_ASSIGN "/="
+%token MOD_ASSIGN "%="
+%token ADD_ASSIGN "+="
+%token SUB_ASSIGN "-="
+%token LEFT_ASSIGN "<<="
+%token RIGHT_ASSIGN ">>="
+%token AND_ASSIGN "&="
+%token XOR_ASSIGN "^="
+%token OR_ASSIGN "|="
 
-//%token <label> LABEL
-//%token <cmd> COMMAND
+%token TYPEDEF EXTERN STATIC AUTO REGISTER INLINE
+%token CONST RESTRICT VOLATILE
+%token BOOL CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE VOID
+%token COMPLEX IMAGINARY 
+%token STRUCT UNION ENUM ELLIPSIS
+
+%token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
+%token ALIGNAS ALIGNOF ATOMIC GENERIC NORETURN STATIC_ASSERT THREAD_LOCAL
 
 
 //Nonterminal types
+
+// Expressions
+%type <expr> primary_expression postfix_expression unary_expression cast_expression
+%type <expr> multiplicative_expression additive_expression shift_expression
+%type <expr> relational_expression equality_expression and_expression inclusive_or_expression
+%type <expr> logical_and_expression logical_or_expression conditional_expression
+%type <expr> assignment_expression expression constant_expression
+
+
 //%type <list> insanity if
 //%type <stmt> statement
 //%type <label> lblName label jump subroutine libraryLabel libraryCall
@@ -91,9 +118,9 @@ postfix_expression
 	| postfix_expression '(' ')'
 	| postfix_expression '(' argument_expression_list ')'
 	// | postfix_expression '.' IDENTIFIER
-	// | postfix_expression PTR_OP IDENTIFIER
-	| postfix_expression INC_OP
-	| postfix_expression DEC_OP
+	// | postfix_expression "->" IDENTIFIER
+	| postfix_expression "++"
+	| postfix_expression "--"
 	// | '(' type_name ')' '{' initializer_list '}'
 	// | '(' type_name ')' '{' initializer_list ',' '}'
 	;
@@ -105,8 +132,8 @@ argument_expression_list
 
 unary_expression
 	: postfix_expression
-	| INC_OP unary_expression
-	| DEC_OP unary_expression
+	| "++" unary_expression
+	| "--" unary_expression
 	| '&' cast_expression
 	| '*' cast_expression
 	| '+' cast_expression
@@ -138,22 +165,22 @@ additive_expression
 
 shift_expression
 	: additive_expression
-	| shift_expression LEFT_OP additive_expression
-	| shift_expression RIGHT_OP additive_expression
+	| shift_expression "<<" additive_expression
+	| shift_expression ">>" additive_expression
 	;
 
 relational_expression
 	: shift_expression
 	| relational_expression '<' shift_expression
 	| relational_expression '>' shift_expression
-	| relational_expression LE_OP shift_expression
-	| relational_expression GE_OP shift_expression
+	| relational_expression "<=" shift_expression
+	| relational_expression ">=" shift_expression
 	;
 
 equality_expression
 	: relational_expression
-	| equality_expression EQ_OP relational_expression
-	| equality_expression NE_OP relational_expression
+	| equality_expression "==" relational_expression
+	| equality_expression "!=" relational_expression
 	;
 
 and_expression
@@ -173,12 +200,12 @@ inclusive_or_expression
 
 logical_and_expression
 	: inclusive_or_expression
-	| logical_and_expression AND_OP inclusive_or_expression
+	| logical_and_expression "&&" inclusive_or_expression
 	;
 
 logical_or_expression
 	: logical_and_expression
-	| logical_or_expression OR_OP logical_and_expression
+	| logical_or_expression "||" logical_and_expression
 	;
 
 conditional_expression
@@ -189,16 +216,16 @@ conditional_expression
 assignment_expression
 	: conditional_expression
 	| unary_expression '=' assignment_expression
-	| unary_expression MUL_ASSIGN assignment_expression
-	| unary_expression DIV_ASSIGN assignment_expression
-	| unary_expression MOD_ASSIGN assignment_expression
-	| unary_expression ADD_ASSIGN assignment_expression
-	| unary_expression SUB_ASSIGN assignment_expression
-	| unary_expression LEFT_ASSIGN assignment_expression
-	| unary_expression RIGHT_ASSIGN assignment_expression
-	| unary_expression AND_ASSIGN assignment_expression
-	| unary_expression XOR_ASSIGN assignment_expression
-	| unary_expression OR_ASSIGN assignment_expression
+	| unary_expression "*=" assignment_expression
+	| unary_expression "/=" assignment_expression
+	| unary_expression "%=" assignment_expression
+	| unary_expression "+=" assignment_expression
+	| unary_expression "-=" assignment_expression
+	| unary_expression "<<=" assignment_expression
+	| unary_expression ">>=" assignment_expression
+	| unary_expression "&=" assignment_expression
+	| unary_expression "^=" assignment_expression
+	| unary_expression "|=" assignment_expression
 	;
 
 expression
@@ -359,11 +386,6 @@ direct_declarator
 	: IDENTIFIER
 	| '(' declarator ')'
 	| direct_declarator '[' ']'
-	// | direct_declarator '[' '*' ']'
-	// | direct_declarator '[' STATIC type_qualifier_list assignment_expression ']'
-	// | direct_declarator '[' STATIC assignment_expression ']'
-	// | direct_declarator '[' type_qualifier_list '*' ']'
-	// | direct_declarator '[' type_qualifier_list STATIC assignment_expression ']'
 	| direct_declarator '[' type_qualifier_list assignment_expression ']'
 	| direct_declarator '[' type_qualifier_list ']'
 	| direct_declarator '[' assignment_expression ']'
@@ -413,19 +435,11 @@ abstract_declarator
 direct_abstract_declarator
 	: '(' abstract_declarator ')'
 	| '[' ']'
-	// | '[' '*' ']'
-	// | '[' STATIC type_qualifier_list assignment_expression ']'
-	// | '[' STATIC assignment_expression ']'
-	// | '[' type_qualifier_list STATIC assignment_expression ']'
 	| '[' type_qualifier_list assignment_expression ']'
 	| '[' type_qualifier_list ']'
 	| '[' assignment_expression ']'
 	| direct_abstract_declarator '[' ']'
-	// | direct_abstract_declarator '[' '*' ']'
-	// | direct_abstract_declarator '[' STATIC type_qualifier_list assignment_expression ']'
-	// | direct_abstract_declarator '[' STATIC assignment_expression ']'
 	| direct_abstract_declarator '[' type_qualifier_list assignment_expression ']'
-	// | direct_abstract_declarator '[' type_qualifier_list STATIC assignment_expression ']'
 	| direct_abstract_declarator '[' type_qualifier_list ']'
 	| direct_abstract_declarator '[' assignment_expression ']'
 	| '(' ')'
@@ -468,6 +482,7 @@ function_declarator
 
 direct_function_declarator
 	: IDENTIFIER '(' ')'
+	| IDENTIFIER '(' VOID ')'
 	| IDENTIFIER '(' named_parameter_type_list ')'
 	| '(' function_declarator ')'
 	| direct_function_declarator'[' ']'
