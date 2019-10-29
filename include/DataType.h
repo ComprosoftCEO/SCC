@@ -26,7 +26,8 @@ enum class TypeQualifier { CONST, RESTRICT, VOLATILE, ATOMIC };
 enum class FunctionSpecifier { INLINE, NORETURN };
 
 /**
- * Generic Data Type
+ * @class DataType
+ * Generic interface for working with any C type
  */
 class DataType {
 
@@ -43,6 +44,7 @@ private:
 };
 
 /**
+ * @class PrimitiveDataType
  * Represents a primitive data type (like int, float, etc.)
  */
 class PrimitiveDataType: public DataType {
@@ -58,6 +60,7 @@ private:
 };
 
 /**
+ * @class PointerDataType
  * Represents a pointer data type
  */
 class PointerDataType final: public DataType {
@@ -73,9 +76,10 @@ private:
   DataType* type;
 };
 
-//
-// Represents an array
-//
+/**
+ * @class ArrayDataType
+ * Stores an Array definition
+ */
 class ArrayDataType final: public DataType {
 
   ArrayDataType(DataType* type);
@@ -89,6 +93,7 @@ private:
 };
 
 /**
+ * @class Parameter
  * Stores a single parameter in a function
  */
 class Parameter final {
@@ -111,9 +116,10 @@ private:
 
 typedef std::vector<Parameter*> ParameterList;
 
-//
-// Function definition
-//
+/**
+ * @class FunctionDataType
+ * Stores a function definition
+ */
 class FunctionDataType final: public DataType {
 
 public:

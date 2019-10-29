@@ -10,6 +10,10 @@ OBJECTS=\
 	expression/Expression.o \
 	expression/UnaryExpression.o \
 	expression/BinaryExpression.o \
+	\
+	Declarator.o \
+	\
+	factory/DataTypeFactory.o \
 	scc.o \
 
 # Add the source directory
