@@ -3,7 +3,7 @@
 
 #include <vector>
 
-// Forward declare classes
+// Forward declare several classes
 class DataType;
 class Expression;
 class Parameter;
@@ -12,7 +12,8 @@ typedef std::vector<Parameter*> ParameterList;
 
 /**
  * @class DataTypeFactory
- * Factory that builds a data type object
+ * Factory that builds a data type object. The build_data_type() function
+ *  should ONLY be called once, as resources might get moved by subtypes.
  */
 class DataTypeFactory {
 
@@ -86,7 +87,7 @@ class DataTypeFactoryFactory {
 public:
   virtual ~DataTypeFactoryFactory() = default;
 
-  virtual DataTypeFactory* build_factory(DataTypeFactory* parent) const = 0;
+  virtual DataTypeFactory* build_factory(DataTypeFactory* parent) = 0;
 };
 
 /**
@@ -96,7 +97,7 @@ public:
 class PointerFactoryFactory final: public DataTypeFactory {
 
 public:
-  DataTypeFactory* build_factory(DataTypeFactory* parent) const;
+  DataTypeFactory* build_factory(DataTypeFactory* parent);
 };
 
 /**
@@ -110,10 +111,11 @@ public:
   ArrayFactoryFactory(Expression* size);
   ~ArrayFactoryFactory();
 
-  DataTypeFactory* build_factory(DataTypeFactory* parent) const;
+  DataTypeFactory* build_factory(DataTypeFactory* parent);
 
 private:
-  Expression* size;
+  Expression* size; // Ownership is moved to first object
+  bool used;        // True if no longer has ownership of internal objects
 };
 
 /**
@@ -126,10 +128,11 @@ public:
   FunctionFactoryFactory(const ParameterList& parameters);
   ~FunctionFactoryFactory();
 
-  DataTypeFactory* build_factory(DataTypeFactory* parent) const;
+  DataTypeFactory* build_factory(DataTypeFactory* parent);
 
 private:
-  ParameterList parameters;
+  ParameterList parameters; // Ownership is moved to first object
+  bool used;                // True if no longer has ownership of internal objects
 };
 
 #endif /* Data Type Factory Header Included */

@@ -127,6 +127,7 @@ public:
 
   DataType* get_return_type() const;
   const ParameterList& get_parameter_list() const;
+  size_t size() const;
 
 private:
   ParameterList parameters;

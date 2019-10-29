@@ -1,11 +1,13 @@
 #ifndef DECLARATOR_HEADER
 #define DECLARATOR_HEADER
 
+#include <functional>
 #include <string>
 
 // Forward declare classes
 class DataTypeFactory;
-class DataTypeFactoryFactory;
+
+typedef std::function<DataTypeFactory*(DataTypeFactory*)> DataTypeFactoryFactory;
 
 /**
  * @class AbstractDeclarator
