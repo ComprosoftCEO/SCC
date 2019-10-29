@@ -10,6 +10,7 @@
 	#include <cstdlib>
 	#include <string>
 	#include <Expression.h>
+	#include <DataType.h>
 }
 
 %code requires {
@@ -27,9 +28,16 @@
   std::string* str;                     // Identifier, string, type, etc.
   Expression* expr;                     // Expression interface
   std::vector<Expression*>* expr_list;  // List of expressions
+	ParameterList* param_list;						// List of parameters
 }
 
-%destructor {delete($$);} <expr> <str> <expr_list>
+%destructor {delete($$);} <expr> <str>
+%destructor {
+	for (auto el : *($$)) {
+		delete(el);
+	}
+	delete($$);
+} <expr_list> <param_list>
 
 
 //Terminal types
