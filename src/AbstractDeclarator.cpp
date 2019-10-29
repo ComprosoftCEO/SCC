@@ -17,7 +17,7 @@ AbstractDeclarator::~AbstractDeclarator() {
 // Add a factory to the set of factories
 //
 void AbstractDeclarator::add_factory(const DataTypeFactoryFactory& build_factory) {
-  this->factory = build_factory.build_factory(this->factory);
+  this->factory = build_factory(this->factory);
 }
 
 //

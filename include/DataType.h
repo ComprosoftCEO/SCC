@@ -82,14 +82,16 @@ private:
  */
 class ArrayDataType final: public DataType {
 
+public:
   ArrayDataType(DataType* type);
   ArrayDataType(DataType* type, class Expression* size);
 
   DataType* get_array_type() const;
+  size_t size() const;
 
 private:
   DataType* type;
-  size_t size;
+  class Expression* array_size;
 };
 
 /**

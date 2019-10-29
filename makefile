@@ -14,6 +14,9 @@ OBJECTS=\
 	Declarator.o \
 	\
 	factory/DataTypeFactory.o \
+	factory/PointerFactory.o \
+	factory/ArrayFactory.o \
+	factory/FunctionFactory.o \
 	scc.o \
 
 # Add the source directory

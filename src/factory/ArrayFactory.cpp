@@ -1,12 +1,13 @@
 #include <DataType.h>
 #include <DataTypeFactory.h>
+#include <Expression.h>
 
 //
 // Constructor
 //
 ArrayFactory::ArrayFactory(DataTypeFactory* sub_factory): ArrayFactory(sub_factory, nullptr) {}
 
-ArrayFactory(DataTypeFactory* sub_factory, Expression* size):
+ArrayFactory::ArrayFactory(DataTypeFactory* sub_factory, Expression* size):
   DataTypeFactory(sub_factory), size(size) {}
 
 //
