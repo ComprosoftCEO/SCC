@@ -16,18 +16,24 @@ public:
   // Attempt to do compile-time evaluation of the expression
   //  Throws an exception on error
   //  virtual ConstantValue evaluate() = 0;
+
+  virtual void visit(ExpressionVisitor& visitor) = 0;
+
+  virtual Expression* clone() const = 0;
 };
 
 /**
  * Comma-separated list of expressions
  */
-class CommaExpression: public Expression {
+class CommaExpression final: public Expression {
 
 public:
   CommaExpression();
   ~CommaExpression();
 
   void add_expression(Expression* expr);
+
+  const std::vector<Expression*>& get_expression_list() const;
 
 private:
   std::vector<Expression*> expr_list;
@@ -36,10 +42,13 @@ private:
 /**
  * Expression that stores an assignment
  */
-class AssignmentExpression: public Expression {
+class AssignmentExpression final: public Expression {
 
 public:
   AssignmentExpression(Expression* dest, Expression* src);
+
+  Expression* get_source() const;
+  Expression* get_destination() const;
 
 private:
   Expression* dest;
@@ -49,17 +58,17 @@ private:
 /**
  * Casting from one data type to another
  */
-class CastExpression: public Expression {};
+class CastExpression final: public Expression {};
 
 /**
  * Represents a string literal, like "Hello World!"
  */
-class StringExpression: public Expression {};
+class StringExpression final: public Expression {};
 
 /**
  * Expression that represents a variable, like "i", "j", or "k"
  */
-class IdentifierExpression: public Expression {
+class IdentifierExpression final: public Expression {
 
 public:
   IdentifierExpression(const std::string& identifier);
@@ -74,10 +83,13 @@ private:
 /**
  * Accessing element in an array or from a pointer
  */
-class BracketExpression: public Expression {
+class BracketExpression final: public Expression {
 
 public:
   BracketExpression(Expression* expr, Expression* index);
+
+  Expression* get_expression() const;
+  Expression* get_index() const;
 
 private:
   Expression* expr;
@@ -87,11 +99,14 @@ private:
 /**
  * Represents calling a function
  */
-class FunctionCallExpression: public Expression {
+class FunctionCallExpression final: public Expression {
 
 public:
   FunctionCallExpression(Expression* expr); // No arguments
   FunctionCallExpression(Expression* expr, const std::vector<Expression*>& parameters);
+
+  Expression* get_expression() const;
+  const std::vector<Expression*>& get_parameters_list() const;
 
 private:
   Expression* expr;
@@ -107,6 +122,7 @@ public:
   UnaryExpression(Expression* expr);
 
   // ConstantValue evaluate();
+  Expression* get_expression() const;
 
 private:
   //  virtual ConstantValue unary_operator(ConstantValue value) = 0;
@@ -118,7 +134,7 @@ private:
 /**
  * Putting the minus symbol in front of a number
  */
-class MinusExpression: public UnaryExpression {
+class MinusExpression final: public UnaryExpression {
 
 public:
   MinusExpression(Expression* expr);
@@ -127,7 +143,7 @@ public:
 /**
  * Boolean not (!)
  */
-class NotExpression: public UnaryExpression {
+class NotExpression final: public UnaryExpression {
 
 public:
   NotExpression(Expression* expr);
@@ -136,7 +152,7 @@ public:
 /**
  * Bitwise Complement (~)
  */
-class ComplementExpression: public UnaryExpression {
+class ComplementExpression final: public UnaryExpression {
 
 public:
   ComplementExpression(Expression* expr);
@@ -145,7 +161,7 @@ public:
 /**
  * Dereferencing a pointer
  */
-class DereferenceExpression: public UnaryExpression {
+class DereferenceExpression final: public UnaryExpression {
 
 public:
   DereferenceExpression(Expression* expr);
@@ -154,7 +170,7 @@ public:
 /**
  * Get the address of a given variable
  */
-class AddressOfExpression: public UnaryExpression {
+class AddressOfExpression final: public UnaryExpression {
 
 public:
   AddressOfExpression(Expression* expr);
@@ -163,7 +179,7 @@ public:
 /**
  * Get the size of a variable
  */
-class SizeofExpression: public UnaryExpression {
+class SizeofExpression final: public UnaryExpression {
 
 public:
   SizeofExpression(Expression* expr);
@@ -172,7 +188,7 @@ public:
 /**
  * Get the alignment of a variable
  */
-class AlignofExpression: public UnaryExpression {
+class AlignofExpression final: public UnaryExpression {
 
 public:
   AlignofExpression(Expression* expr);
@@ -185,8 +201,12 @@ class BinaryExpression: public Expression {
 
 public:
   BinaryExpression(Expression* left, Expression* right);
+  ~BinaryExpression();
 
-  ConstantValue evaluate();
+  Expression* get_left_expression() const;
+  Expression* get_right_expression() const;
+
+  //  ConstantValue evaluate();
 
 private:
   // Compute a stored binary operator at runtime
@@ -200,7 +220,7 @@ private:
 /**
  * Store an addition operator (+)
  */
-class AdditionExpression: public BinaryExpression {
+class AdditionExpression final: public BinaryExpression {
 
 public:
   AdditionExpression(Expression* left, Expression* right);
@@ -209,7 +229,7 @@ public:
 /**
  * Store a subtraction operator (-)
  */
-class SubtractionExpression: public BinaryExpression {
+class SubtractionExpression final: public BinaryExpression {
 
 public:
   SubtractionExpression(Expression* left, Expression* right);
@@ -218,7 +238,7 @@ public:
 /**
  * Store a multiplication operator (*)
  */
-class MultiplicationExpression: public BinaryExpression {
+class MultiplicationExpression final: public BinaryExpression {
 
 public:
   MultiplicationExpression(Expression* left, Expression* right);
@@ -227,7 +247,7 @@ public:
 /**
  * Store a division operator (/)
  */
-class DivisionExpression: public BinaryExpression {
+class DivisionExpression final: public BinaryExpression {
 
 public:
   DivisionExpression(Expression* left, Expression* right);
@@ -236,7 +256,7 @@ public:
 /**
  * Store a modulus expression (%)
  */
-class ModulusExpression: public BinaryExpression {
+class ModulusExpression final: public BinaryExpression {
 
 public:
   ModulusExpression(Expression* left, Expression* right);
@@ -245,7 +265,7 @@ public:
 /**
  * Store a left bit shift expression (<<)
  */
-class LeftShiftExpression: public BinaryExpression {
+class LeftShiftExpression final: public BinaryExpression {
 
 public:
   LeftShiftExpression(Expression* left, Expression* right);
@@ -254,7 +274,7 @@ public:
 /**
  * Store a right bit shift expression
  */
-class RightShiftExpression: public BinaryExpression {
+class RightShiftExpression final: public BinaryExpression {
 
 public:
   RightShiftExpression(Expression* left, Expression* right);
@@ -263,7 +283,7 @@ public:
 /**
  * Test for less than (<)
  */
-class LessThanExpression: public BinaryExpression {
+class LessThanExpression final: public BinaryExpression {
 
 public:
   LessThanExpression(Expression* left, Expression* right);
@@ -272,7 +292,7 @@ public:
 /**
  * Test for greater than (>)
  */
-class GreaterThanExpression: public BinaryExpression {
+class GreaterThanExpression final: public BinaryExpression {
 
 public:
   GreaterThanExpression(Expression* left, Expression* right);
@@ -281,7 +301,7 @@ public:
 /**
  * Test for less than or equal to (<=)
  */
-class LessThanOrEqualExpression: public BinaryExpression {
+class LessThanOrEqualExpression final: public BinaryExpression {
 
 public:
   LessThanOrEqualExpression(Expression* left, Expression* right);
@@ -290,7 +310,7 @@ public:
 /**
  * Test for greater than or equal to (>=)
  */
-class GreaterThanOrEqualExpression: public BinaryExpression {
+class GreaterThanOrEqualExpression final: public BinaryExpression {
 
 public:
   GreaterThanOrEqualExpression(Expression* left, Expression* right);
@@ -299,7 +319,7 @@ public:
 /**
  * Test for equality (==)
  */
-class EqualsExpression: public BinaryExpression {
+class EqualsExpression final: public BinaryExpression {
 
 public:
   EqualsExpression(Expression* left, Expression* right);
@@ -308,7 +328,7 @@ public:
 /**
  * Test for inequality (!=)
  */
-class NotEqualsExpression: public BinaryExpression {
+class NotEqualsExpression final: public BinaryExpression {
 
 public:
   NotEqualsExpression(Expression* left, Expression* right);
@@ -317,7 +337,7 @@ public:
 /**
  * Bitwise and (&)
  */
-class BitwiseAndExpression: public BinaryExpression {
+class BitwiseAndExpression final: public BinaryExpression {
 
 public:
   BitwiseAndExpression(Expression* left, Expression* right);
@@ -326,7 +346,7 @@ public:
 /**
  * Bitwise or expression (|)
  */
-class BitwiseOrExpression: public BinaryExpression {
+class BitwiseOrExpression final: public BinaryExpression {
 
 public:
   BitwiseOrExpression(Expression* left, Expression* right);
@@ -335,7 +355,7 @@ public:
 /**
  * Bitwise exclusive or (^)
  */
-class BitwiseXorExpression: public BinaryExpression {
+class BitwiseXorExpression final: public BinaryExpression {
 
 public:
   BitwiseXorExpression(Expression* left, Expression* right);
@@ -344,7 +364,7 @@ public:
 /**
  * And expression used in an if statement (&&)
  */
-class LogicalAndExpression: public BinaryExpression {
+class LogicalAndExpression final: public BinaryExpression {
 
 public:
   LogicalAndExpression(Expression* left, Expression* right);
@@ -353,7 +373,7 @@ public:
 /**
  * Or logical expression used in an if statement (||)
  */
-class LogicalOrExpression: public BinaryExpression {
+class LogicalOrExpression final: public BinaryExpression {
 
 public:
   LogicalOrExpression(Expression* left, Expression* right);
@@ -362,10 +382,14 @@ public:
 /**
  * Stores expressions of the form (a ? b : c)
  */
-class ConditionalExpression: public Expression {
+class ConditionalExpression final: public Expression {
 
 public:
   ConditionalExpression(Expression* condition, Expression* cond_true, Expression* cond_false);
+
+  Expression* get_condition() const;
+  Expression* get_true_expression() const;
+  Expression* get_false_expression() const;
 
 private:
   Expression* condition;

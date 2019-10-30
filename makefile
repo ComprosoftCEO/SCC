@@ -44,6 +44,8 @@ OBJECTS=\
 	expression/LogicalOrExpression.o \
 	expression/ConditionalExpression.o \
 	\
+	visitor/ExpressionVisitor.o \
+	\
 	Declarator.o \
 	\
 	factory/DataTypeFactory.o \
