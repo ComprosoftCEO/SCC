@@ -8,11 +8,6 @@
 // Forward declare classes
 class ExpressionVisitor;
 
-class Expression;
-class AssignmentExpression;
-class BinaryExpression;
-class ConstantExpression;
-
 class Expression {
 
 public:
@@ -21,8 +16,6 @@ public:
   // Attempt to do compile-time evaluation of the expression
   //  Throws an exception on error
   //  virtual ConstantValue evaluate() = 0;
-
-  //  virtual void visit(ExpressionVisitor& visitor) = 0;
 };
 
 /**
@@ -32,6 +25,7 @@ class CommaExpression: public Expression {
 
 public:
   CommaExpression();
+  ~CommaExpression();
 
   void add_expression(Expression* expr);
 
@@ -75,6 +69,19 @@ public:
 
 private:
   std::string identifier;
+};
+
+/**
+ * Accessing element in an array or from a pointer
+ */
+class BracketExpression: public Expression {
+
+public:
+  BracketExpression(Expression* expr, Expression* index);
+
+private:
+  Expression* expr;
+  Expression* index;
 };
 
 /**
@@ -188,15 +195,6 @@ private:
 private:
   Expression* left;
   Expression* right;
-};
-
-/**
- * Accessing element in an array or from a pointer
- */
-class BracketExpression: public BinaryExpression {
-
-public:
-  BracketExpression(Expression* expr, Expression* index);
 };
 
 /**

@@ -8,9 +8,41 @@ OBJECTS=\
 	parser/c.tab.o \
 	parser/c.yy.o \
 	parser/specifiers.tab.o \
+	\
 	expression/Expression.o \
+	expression/CommaExpression.o \
+	expression/AssignmentExpression.o \
+	expression/IdentifierExpression.o \
+	expression/BracketExpression.o \
+	expression/FunctionCallExpression.o \
 	expression/UnaryExpression.o \
+	expression/MinusExpression.o \
+	expression/NotExpression.o \
+	expression/ComplementExpression.o \
+	expression/DereferenceExpression.o \
+	expression/AddressOfExpression.o \
+	expression/SizeofExpression.o \
+	expression/AlignofExpression.o \
 	expression/BinaryExpression.o \
+	expression/AdditionExpression.o \
+	expression/SubtractionExpression.o \
+	expression/MultiplicationExpression.o \
+	expression/DivisionExpression.o \
+	expression/ModulusExpression.o \
+	expression/LeftShiftExpression.o \
+	expression/RightShiftExpression.o \
+	expression/LessThanExpression.o \
+	expression/GreaterThanExpression.o \
+	expression/LessThanOrEqualExpression.o \
+	expression/GreaterThanOrEqualExpression.o \
+	expression/EqualsExpression.o \
+	expression/NotEqualsExpression.o \
+	expression/BitwiseAndExpression.o \
+	expression/BitwiseOrExpression.o \
+	expression/BitwiseXorExpression.o \
+	expression/LogicalAndExpression.o \
+	expression/LogicalOrExpression.o \
+	expression/ConditionalExpression.o \
 	\
 	Declarator.o \
 	\
