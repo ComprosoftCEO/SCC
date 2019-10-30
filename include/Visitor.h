@@ -44,6 +44,8 @@ class ConditionalExpression;
 class ExpressionVisitor {
 
 public:
+  virtual ~ExpressionVisitor() = default;
+
   virtual void accept(CommaExpression& expr);
   virtual void accept(AssignmentExpression& expr);
   virtual void accept(CastExpression& expr);

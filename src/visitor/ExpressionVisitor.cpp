@@ -22,7 +22,9 @@ void ExpressionVisitor::accept(AssignmentExpression& expr) {
   expr.get_destination()->visit(*this);
 }
 
-void ExpressionVisitor::accept(CastExpression& expr) {}
+void ExpressionVisitor::accept(CastExpression& expr) {
+  expr.get_expression()->visit(*this);
+}
 
 void ExpressionVisitor::accept(StringExpression& expr) {}
 

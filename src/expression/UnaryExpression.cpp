@@ -1,10 +1,17 @@
 #include <ConstantExpression.h>
-#include <UnaryExpression.h>
+#include <Expression.h>
 
 //
 // Constructor
 //
 UnaryExpression::UnaryExpression(Expression* expr): expr(expr) {}
+
+//
+// Destructor
+//
+UnaryExpression::~UnaryExpression() {
+  delete (this->expr);
+}
 
 //
 // Evaluate

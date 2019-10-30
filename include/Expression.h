@@ -7,6 +7,7 @@
 
 // Forward declare classes
 class ExpressionVisitor;
+class DataType;
 
 class Expression {
 
@@ -29,11 +30,15 @@ class CommaExpression final: public Expression {
 
 public:
   CommaExpression();
+  CommaExpression(const std::vector<Expression*>& expr_list);
   ~CommaExpression();
 
   void add_expression(Expression* expr);
 
   const std::vector<Expression*>& get_expression_list() const;
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 
 private:
   std::vector<Expression*> expr_list;
@@ -50,6 +55,9 @@ public:
   Expression* get_source() const;
   Expression* get_destination() const;
 
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
+
 private:
   Expression* dest;
   Expression* src;
@@ -58,12 +66,39 @@ private:
 /**
  * Casting from one data type to another
  */
-class CastExpression final: public Expression {};
+class CastExpression final: public Expression {
+
+public:
+  CastExpression(Expression* expr, DataType* cast_to);
+  ~CastExpression();
+
+  Expression* get_expression();
+  DataType* get_cast_type();
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
+
+private:
+  Expression* expr;
+  DataType* cast_to;
+};
 
 /**
  * Represents a string literal, like "Hello World!"
  */
-class StringExpression final: public Expression {};
+class StringExpression final: public Expression {
+
+public:
+  StringExpression(const std::string& str);
+
+  const std::string& get_string() const;
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
+
+private:
+  std::string str;
+};
 
 /**
  * Expression that represents a variable, like "i", "j", or "k"
@@ -75,6 +110,9 @@ public:
 
   // Get the stored identifier
   const std::string& get_identifier() const;
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 
 private:
   std::string identifier;
@@ -90,6 +128,9 @@ public:
 
   Expression* get_expression() const;
   Expression* get_index() const;
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 
 private:
   Expression* expr;
@@ -108,6 +149,9 @@ public:
   Expression* get_expression() const;
   const std::vector<Expression*>& get_parameters_list() const;
 
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
+
 private:
   Expression* expr;
   std::vector<Expression*> parameters;
@@ -120,6 +164,7 @@ class UnaryExpression: public Expression {
 
 public:
   UnaryExpression(Expression* expr);
+  ~UnaryExpression();
 
   // ConstantValue evaluate();
   Expression* get_expression() const;
@@ -127,7 +172,7 @@ public:
 private:
   //  virtual ConstantValue unary_operator(ConstantValue value) = 0;
 
-private:
+protected:
   Expression* expr;
 };
 
@@ -138,6 +183,9 @@ class MinusExpression final: public UnaryExpression {
 
 public:
   MinusExpression(Expression* expr);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -147,6 +195,9 @@ class NotExpression final: public UnaryExpression {
 
 public:
   NotExpression(Expression* expr);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -156,6 +207,9 @@ class ComplementExpression final: public UnaryExpression {
 
 public:
   ComplementExpression(Expression* expr);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -165,6 +219,9 @@ class DereferenceExpression final: public UnaryExpression {
 
 public:
   DereferenceExpression(Expression* expr);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -174,6 +231,9 @@ class AddressOfExpression final: public UnaryExpression {
 
 public:
   AddressOfExpression(Expression* expr);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -183,6 +243,9 @@ class SizeofExpression final: public UnaryExpression {
 
 public:
   SizeofExpression(Expression* expr);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -192,6 +255,9 @@ class AlignofExpression final: public UnaryExpression {
 
 public:
   AlignofExpression(Expression* expr);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -212,7 +278,7 @@ private:
   // Compute a stored binary operator at runtime
   // virtual ConstantValue binary_operator(ConstantValue left, ConstantValue right) = 0;
 
-private:
+protected:
   Expression* left;
   Expression* right;
 };
@@ -224,6 +290,9 @@ class AdditionExpression final: public BinaryExpression {
 
 public:
   AdditionExpression(Expression* left, Expression* right);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -233,6 +302,9 @@ class SubtractionExpression final: public BinaryExpression {
 
 public:
   SubtractionExpression(Expression* left, Expression* right);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -242,6 +314,9 @@ class MultiplicationExpression final: public BinaryExpression {
 
 public:
   MultiplicationExpression(Expression* left, Expression* right);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -251,6 +326,9 @@ class DivisionExpression final: public BinaryExpression {
 
 public:
   DivisionExpression(Expression* left, Expression* right);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -260,6 +338,9 @@ class ModulusExpression final: public BinaryExpression {
 
 public:
   ModulusExpression(Expression* left, Expression* right);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -269,6 +350,9 @@ class LeftShiftExpression final: public BinaryExpression {
 
 public:
   LeftShiftExpression(Expression* left, Expression* right);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -278,6 +362,9 @@ class RightShiftExpression final: public BinaryExpression {
 
 public:
   RightShiftExpression(Expression* left, Expression* right);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -287,6 +374,9 @@ class LessThanExpression final: public BinaryExpression {
 
 public:
   LessThanExpression(Expression* left, Expression* right);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -296,6 +386,9 @@ class GreaterThanExpression final: public BinaryExpression {
 
 public:
   GreaterThanExpression(Expression* left, Expression* right);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -305,6 +398,9 @@ class LessThanOrEqualExpression final: public BinaryExpression {
 
 public:
   LessThanOrEqualExpression(Expression* left, Expression* right);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -314,6 +410,9 @@ class GreaterThanOrEqualExpression final: public BinaryExpression {
 
 public:
   GreaterThanOrEqualExpression(Expression* left, Expression* right);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -323,6 +422,9 @@ class EqualsExpression final: public BinaryExpression {
 
 public:
   EqualsExpression(Expression* left, Expression* right);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -332,6 +434,9 @@ class NotEqualsExpression final: public BinaryExpression {
 
 public:
   NotEqualsExpression(Expression* left, Expression* right);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -341,6 +446,9 @@ class BitwiseAndExpression final: public BinaryExpression {
 
 public:
   BitwiseAndExpression(Expression* left, Expression* right);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -350,6 +458,9 @@ class BitwiseOrExpression final: public BinaryExpression {
 
 public:
   BitwiseOrExpression(Expression* left, Expression* right);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -359,6 +470,9 @@ class BitwiseXorExpression final: public BinaryExpression {
 
 public:
   BitwiseXorExpression(Expression* left, Expression* right);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -368,6 +482,9 @@ class LogicalAndExpression final: public BinaryExpression {
 
 public:
   LogicalAndExpression(Expression* left, Expression* right);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -377,6 +494,9 @@ class LogicalOrExpression final: public BinaryExpression {
 
 public:
   LogicalOrExpression(Expression* left, Expression* right);
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 };
 
 /**
@@ -390,6 +510,9 @@ public:
   Expression* get_condition() const;
   Expression* get_true_expression() const;
   Expression* get_false_expression() const;
+
+  void visit(ExpressionVisitor& visitor);
+  Expression* clone() const;
 
 private:
   Expression* condition;
