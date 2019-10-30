@@ -10,7 +10,7 @@ LogicalOrExpression::LogicalOrExpression(Expression* left, Expression* right):
 //
 // Clone
 //
-Expression* LogicalOrExpression::clone() const {
+LogicalOrExpression* LogicalOrExpression::clone() const {
   return new LogicalOrExpression(this->left->clone(), this->right->clone());
 }
 

@@ -9,7 +9,7 @@ MinusExpression::MinusExpression(Expression* expr): UnaryExpression(expr) {}
 //
 // Clone
 //
-Expression* MinusExpression::clone() const {
+MinusExpression* MinusExpression::clone() const {
   return new MinusExpression(this->expr->clone());
 }
 

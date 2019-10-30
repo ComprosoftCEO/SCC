@@ -16,7 +16,7 @@ const std::string& IdentifierExpression::get_identifier() const {
 //
 // Clone
 //
-Expression* IdentifierExpression::clone() const {
+IdentifierExpression* IdentifierExpression::clone() const {
   return new IdentifierExpression(this->identifier);
 }
 

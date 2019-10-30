@@ -9,7 +9,7 @@ NotExpression::NotExpression(Expression* expr): UnaryExpression(expr) {}
 //
 // Clone
 //
-Expression* NotExpression::clone() const {
+NotExpression* NotExpression::clone() const {
   return new NotExpression(this->expr->clone());
 }
 

@@ -9,7 +9,7 @@ SizeofExpression::SizeofExpression(Expression* expr): UnaryExpression(expr) {}
 //
 // Clone
 //
-Expression* SizeofExpression::clone() const {
+SizeofExpression* SizeofExpression::clone() const {
   return new SizeofExpression(this->expr->clone());
 }
 

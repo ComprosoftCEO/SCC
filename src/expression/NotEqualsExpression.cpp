@@ -10,7 +10,7 @@ NotEqualsExpression::NotEqualsExpression(Expression* left, Expression* right):
 //
 // Clone
 //
-Expression* NotEqualsExpression::clone() const {
+NotEqualsExpression* NotEqualsExpression::clone() const {
   return new NotEqualsExpression(this->left->clone(), this->right->clone());
 }
 

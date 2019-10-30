@@ -11,7 +11,7 @@ ConditionalExpression::ConditionalExpression(Expression* condition, Expression* 
 //
 // Clone
 //
-Expression* ConditionalExpression::clone() const {
+ConditionalExpression* ConditionalExpression::clone() const {
   return new ConditionalExpression(this->condition->clone(), this->cond_true->clone(),
                                    this->cond_false->clone());
 }

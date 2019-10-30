@@ -10,7 +10,7 @@ SubtractionExpression::SubtractionExpression(Expression* left, Expression* right
 //
 // Clone
 //
-Expression* SubtractionExpression::clone() const {
+SubtractionExpression* SubtractionExpression::clone() const {
   return new SubtractionExpression(this->left->clone(), this->right->clone());
 }
 

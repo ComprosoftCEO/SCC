@@ -10,7 +10,7 @@ LeftShiftExpression::LeftShiftExpression(Expression* left, Expression* right):
 //
 // Clone
 //
-Expression* LeftShiftExpression::clone() const {
+LeftShiftExpression* LeftShiftExpression::clone() const {
   return new LeftShiftExpression(this->left->clone(), this->right->clone());
 }
 

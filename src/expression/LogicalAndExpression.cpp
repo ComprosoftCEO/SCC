@@ -10,7 +10,7 @@ LogicalAndExpression::LogicalAndExpression(Expression* left, Expression* right):
 //
 // Clone
 //
-Expression* LogicalAndExpression::clone() const {
+LogicalAndExpression* LogicalAndExpression::clone() const {
   return new LogicalAndExpression(this->left->clone(), this->right->clone());
 }
 

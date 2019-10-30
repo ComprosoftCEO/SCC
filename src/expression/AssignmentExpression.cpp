@@ -10,7 +10,7 @@ AssignmentExpression::AssignmentExpression(Expression* dest, Expression* src):
 //
 // Clone
 //
-Expression* AssignmentExpression::clone() const {
+AssignmentExpression* AssignmentExpression::clone() const {
   return new AssignmentExpression(this->dest->clone(), this->src->clone());
 }
 

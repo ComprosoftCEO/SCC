@@ -9,7 +9,7 @@ ComplementExpression::ComplementExpression(Expression* expr): UnaryExpression(ex
 //
 // Clone
 //
-Expression* ComplementExpression::clone() const {
+ComplementExpression* ComplementExpression::clone() const {
   return new ComplementExpression(this->expr->clone());
 }
 

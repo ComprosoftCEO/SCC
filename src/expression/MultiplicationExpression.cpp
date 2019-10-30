@@ -10,7 +10,7 @@ MultiplicationExpression::MultiplicationExpression(Expression* left, Expression*
 //
 // Clone
 //
-Expression* MultiplicationExpression::clone() const {
+MultiplicationExpression* MultiplicationExpression::clone() const {
   return new MultiplicationExpression(this->left->clone(), this->right->clone());
 }
 

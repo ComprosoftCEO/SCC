@@ -25,7 +25,7 @@ void CommaExpression::add_expression(Expression* expr) {
 //
 // Clone
 //
-Expression* CommaExpression::clone() const {
+CommaExpression* CommaExpression::clone() const {
   std::vector<Expression*> new_list;
   for (auto e: this->expr_list) { new_list.push_back(e->clone()); }
   return new CommaExpression(new_list);

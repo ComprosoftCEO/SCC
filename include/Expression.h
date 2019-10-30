@@ -38,7 +38,7 @@ public:
   const std::vector<Expression*>& get_expression_list() const;
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  CommaExpression* clone() const;
 
 private:
   std::vector<Expression*> expr_list;
@@ -56,7 +56,7 @@ public:
   Expression* get_destination() const;
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  AssignmentExpression* clone() const;
 
 private:
   Expression* dest;
@@ -72,7 +72,7 @@ public:
   CastExpression(Expression* expr, DataType* cast_to);
   ~CastExpression();
 
-  Expression* get_expression();
+  CastExpression* get_expression();
   DataType* get_cast_type();
 
   void visit(ExpressionVisitor& visitor);
@@ -94,7 +94,7 @@ public:
   const std::string& get_string() const;
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  StringExpression* clone() const;
 
 private:
   std::string str;
@@ -112,7 +112,7 @@ public:
   const std::string& get_identifier() const;
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  IdentifierExpression* clone() const;
 
 private:
   std::string identifier;
@@ -130,7 +130,7 @@ public:
   Expression* get_index() const;
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  BracketExpression* clone() const;
 
 private:
   Expression* expr;
@@ -150,7 +150,7 @@ public:
   const std::vector<Expression*>& get_parameters_list() const;
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  FunctionCallExpression* clone() const;
 
 private:
   Expression* expr;
@@ -185,7 +185,7 @@ public:
   MinusExpression(Expression* expr);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  MinusExpression* clone() const;
 };
 
 /**
@@ -197,7 +197,7 @@ public:
   NotExpression(Expression* expr);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  NotExpression* clone() const;
 };
 
 /**
@@ -209,7 +209,7 @@ public:
   ComplementExpression(Expression* expr);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  ComplementExpression* clone() const;
 };
 
 /**
@@ -221,7 +221,7 @@ public:
   DereferenceExpression(Expression* expr);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  DereferenceExpression* clone() const;
 };
 
 /**
@@ -233,7 +233,7 @@ public:
   AddressOfExpression(Expression* expr);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  AddressOfExpression* clone() const;
 };
 
 /**
@@ -245,7 +245,7 @@ public:
   SizeofExpression(Expression* expr);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  SizeofExpression* clone() const;
 };
 
 /**
@@ -257,7 +257,7 @@ public:
   AlignofExpression(Expression* expr);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  AlignofExpression* clone() const;
 };
 
 /**
@@ -292,7 +292,7 @@ public:
   AdditionExpression(Expression* left, Expression* right);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  AdditionExpression* clone() const;
 };
 
 /**
@@ -304,7 +304,7 @@ public:
   SubtractionExpression(Expression* left, Expression* right);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  SubtractionExpression* clone() const;
 };
 
 /**
@@ -316,7 +316,7 @@ public:
   MultiplicationExpression(Expression* left, Expression* right);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  MultiplicationExpression* clone() const;
 };
 
 /**
@@ -328,7 +328,7 @@ public:
   DivisionExpression(Expression* left, Expression* right);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  DivisionExpression* clone() const;
 };
 
 /**
@@ -340,7 +340,7 @@ public:
   ModulusExpression(Expression* left, Expression* right);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  ModulusExpression* clone() const;
 };
 
 /**
@@ -352,7 +352,7 @@ public:
   LeftShiftExpression(Expression* left, Expression* right);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  LeftShiftExpression* clone() const;
 };
 
 /**
@@ -364,7 +364,7 @@ public:
   RightShiftExpression(Expression* left, Expression* right);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  RightShiftExpression* clone() const;
 };
 
 /**
@@ -376,7 +376,7 @@ public:
   LessThanExpression(Expression* left, Expression* right);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  LessThanExpression* clone() const;
 };
 
 /**
@@ -388,7 +388,7 @@ public:
   GreaterThanExpression(Expression* left, Expression* right);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  GreaterThanExpression* clone() const;
 };
 
 /**
@@ -400,7 +400,7 @@ public:
   LessThanOrEqualExpression(Expression* left, Expression* right);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  LessThanOrEqualExpression* clone() const;
 };
 
 /**
@@ -412,7 +412,7 @@ public:
   GreaterThanOrEqualExpression(Expression* left, Expression* right);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  GreaterThanOrEqualExpression* clone() const;
 };
 
 /**
@@ -424,7 +424,7 @@ public:
   EqualsExpression(Expression* left, Expression* right);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  EqualsExpression* clone() const;
 };
 
 /**
@@ -436,7 +436,7 @@ public:
   NotEqualsExpression(Expression* left, Expression* right);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  NotEqualsExpression* clone() const;
 };
 
 /**
@@ -448,7 +448,7 @@ public:
   BitwiseAndExpression(Expression* left, Expression* right);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  BitwiseAndExpression* clone() const;
 };
 
 /**
@@ -460,7 +460,7 @@ public:
   BitwiseOrExpression(Expression* left, Expression* right);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  BitwiseOrExpression* clone() const;
 };
 
 /**
@@ -472,7 +472,7 @@ public:
   BitwiseXorExpression(Expression* left, Expression* right);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  BitwiseXorExpression* clone() const;
 };
 
 /**
@@ -484,7 +484,7 @@ public:
   LogicalAndExpression(Expression* left, Expression* right);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  LogicalAndExpression* clone() const;
 };
 
 /**
@@ -496,7 +496,7 @@ public:
   LogicalOrExpression(Expression* left, Expression* right);
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  LogicalOrExpression* clone() const;
 };
 
 /**
@@ -512,7 +512,7 @@ public:
   Expression* get_false_expression() const;
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  ConditionalExpression* clone() const;
 
 private:
   Expression* condition;

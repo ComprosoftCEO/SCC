@@ -10,7 +10,7 @@ DivisionExpression::DivisionExpression(Expression* left, Expression* right):
 //
 // Clone
 //
-Expression* DivisionExpression::clone() const {
+DivisionExpression* DivisionExpression::clone() const {
   return new DivisionExpression(this->left->clone(), this->right->clone());
 }
 

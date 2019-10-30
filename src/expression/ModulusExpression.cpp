@@ -10,7 +10,7 @@ ModulusExpression::ModulusExpression(Expression* left, Expression* right):
 //
 // Clone
 //
-Expression* ModulusExpression::clone() const {
+ModulusExpression* ModulusExpression::clone() const {
   return new ModulusExpression(this->left->clone(), this->right->clone());
 }
 

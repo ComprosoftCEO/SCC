@@ -9,7 +9,7 @@ DereferenceExpression::DereferenceExpression(Expression* expr): UnaryExpression(
 //
 // Clone
 //
-Expression* DereferenceExpression::clone() const {
+DereferenceExpression* DereferenceExpression::clone() const {
   return new DereferenceExpression(this->expr->clone());
 }
 

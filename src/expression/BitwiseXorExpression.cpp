@@ -10,7 +10,7 @@ BitwiseXorExpression::BitwiseXorExpression(Expression* left, Expression* right):
 //
 // Clone
 //
-Expression* BitwiseXorExpression::clone() const {
+BitwiseXorExpression* BitwiseXorExpression::clone() const {
   return new BitwiseXorExpression(this->left->clone(), this->right->clone());
 }
 

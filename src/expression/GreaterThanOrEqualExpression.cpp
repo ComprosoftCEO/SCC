@@ -10,7 +10,7 @@ GreaterThanOrEqualExpression::GreaterThanOrEqualExpression(Expression* left, Exp
 //
 // Clone
 //
-Expression* GreaterThanOrEqualExpression::clone() const {
+GreaterThanOrEqualExpression* GreaterThanOrEqualExpression::clone() const {
   return new GreaterThanOrEqualExpression(this->left->clone(), this->right->clone());
 }
 

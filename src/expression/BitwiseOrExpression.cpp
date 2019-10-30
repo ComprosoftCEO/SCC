@@ -10,7 +10,7 @@ BitwiseOrExpression::BitwiseOrExpression(Expression* left, Expression* right):
 //
 // Clone
 //
-Expression* BitwiseOrExpression::clone() const {
+BitwiseOrExpression* BitwiseOrExpression::clone() const {
   return new BitwiseOrExpression(this->left->clone(), this->right->clone());
 }
 

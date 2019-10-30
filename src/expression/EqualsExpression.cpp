@@ -10,7 +10,7 @@ EqualsExpression::EqualsExpression(Expression* left, Expression* right):
 //
 // Clone
 //
-Expression* EqualsExpression::clone() const {
+EqualsExpression* EqualsExpression::clone() const {
   return new EqualsExpression(this->left->clone(), this->right->clone());
 }
 

@@ -10,7 +10,7 @@ AdditionExpression::AdditionExpression(Expression* left, Expression* right):
 //
 // Clone
 //
-Expression* AdditionExpression::clone() const {
+AdditionExpression* AdditionExpression::clone() const {
   return new AdditionExpression(this->left->clone(), this->right->clone());
 }
 

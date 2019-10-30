@@ -13,7 +13,7 @@ FunctionCallExpression::FunctionCallExpression(Expression* expr,
 //
 // Clone
 //
-Expression* FunctionCallExpression::clone() const {
+FunctionCallExpression* FunctionCallExpression::clone() const {
   std::vector<Expression*> new_list;
   for (auto e: this->parameters) { new_list.push_back(e->clone()); }
   return new FunctionCallExpression(this->expr->clone(), new_list);

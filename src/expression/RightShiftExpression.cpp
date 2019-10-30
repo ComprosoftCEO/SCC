@@ -10,7 +10,7 @@ RightShiftExpression::RightShiftExpression(Expression* left, Expression* right):
 //
 // Clone
 //
-Expression* RightShiftExpression::clone() const {
+RightShiftExpression* RightShiftExpression::clone() const {
   return new RightShiftExpression(this->left->clone(), this->right->clone());
 }
 

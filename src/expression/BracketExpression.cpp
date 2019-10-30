@@ -10,7 +10,7 @@ BracketExpression::BracketExpression(Expression* expr, Expression* index):
 //
 // Clone
 //
-Expression* BracketExpression::clone() const {
+BracketExpression* BracketExpression::clone() const {
   return new BracketExpression(this->expr->clone(), this->index->clone());
 }
 

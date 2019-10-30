@@ -9,7 +9,7 @@ AlignofExpression::AlignofExpression(Expression* expr): UnaryExpression(expr) {}
 //
 // Clone
 //
-Expression* AlignofExpression::clone() const {
+AlignofExpression* AlignofExpression::clone() const {
   return new AlignofExpression(this->expr->clone());
 }
 

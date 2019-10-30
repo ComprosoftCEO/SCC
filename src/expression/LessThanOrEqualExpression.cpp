@@ -10,7 +10,7 @@ LessThanOrEqualExpression::LessThanOrEqualExpression(Expression* left, Expressio
 //
 // Clone
 //
-Expression* LessThanOrEqualExpression::clone() const {
+LessThanOrEqualExpression* LessThanOrEqualExpression::clone() const {
   return new LessThanOrEqualExpression(this->left->clone(), this->right->clone());
 }
 

@@ -9,7 +9,7 @@ AddressOfExpression::AddressOfExpression(Expression* expr): UnaryExpression(expr
 //
 // Clone
 //
-Expression* AddressOfExpression::clone() const {
+AddressOfExpression* AddressOfExpression::clone() const {
   return new AddressOfExpression(this->expr->clone());
 }
 
