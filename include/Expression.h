@@ -51,6 +51,7 @@ class AssignmentExpression final: public Expression {
 
 public:
   AssignmentExpression(Expression* dest, Expression* src);
+  ~AssignmentExpression();
 
   Expression* get_source() const;
   Expression* get_destination() const;
@@ -72,11 +73,11 @@ public:
   CastExpression(Expression* expr, DataType* cast_to);
   ~CastExpression();
 
-  CastExpression* get_expression();
+  Expression* get_expression();
   DataType* get_cast_type();
 
   void visit(ExpressionVisitor& visitor);
-  Expression* clone() const;
+  CastExpression* clone() const;
 
 private:
   Expression* expr;
@@ -125,6 +126,7 @@ class BracketExpression final: public Expression {
 
 public:
   BracketExpression(Expression* expr, Expression* index);
+  ~BracketExpression();
 
   Expression* get_expression() const;
   Expression* get_index() const;
@@ -145,6 +147,7 @@ class FunctionCallExpression final: public Expression {
 public:
   FunctionCallExpression(Expression* expr); // No arguments
   FunctionCallExpression(Expression* expr, const std::vector<Expression*>& parameters);
+  ~FunctionCallExpression();
 
   Expression* get_expression() const;
   const std::vector<Expression*>& get_parameters_list() const;
@@ -506,6 +509,7 @@ class ConditionalExpression final: public Expression {
 
 public:
   ConditionalExpression(Expression* condition, Expression* cond_true, Expression* cond_false);
+  ~ConditionalExpression();
 
   Expression* get_condition() const;
   Expression* get_true_expression() const;

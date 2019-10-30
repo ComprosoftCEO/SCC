@@ -8,6 +8,25 @@ AssignmentExpression::AssignmentExpression(Expression* dest, Expression* src):
   dest(dest), src(src) {}
 
 //
+// Destructor
+//
+AssignmentExpression::~AssignmentExpression() {
+  delete (this->dest);
+  delete (this->src);
+}
+
+//
+// Getters
+//
+Expression* AssignmentExpression::get_source() const {
+  return this->src;
+}
+
+Expression* AssignmentExpression::get_destination() const {
+  return this->dest;
+}
+
+//
 // Clone
 //
 AssignmentExpression* AssignmentExpression::clone() const {

@@ -12,7 +12,7 @@ CommaExpression::CommaExpression(const std::vector<Expression*>& expr_list): exp
 // Destructor
 //
 CommaExpression::~CommaExpression() {
-  for (auto it: this->expr_list) { delete (it); }
+  for (auto e: this->expr_list) { delete (e); }
 }
 
 //
@@ -20,6 +20,13 @@ CommaExpression::~CommaExpression() {
 //
 void CommaExpression::add_expression(Expression* expr) {
   this->expr_list.push_back(expr);
+}
+
+//
+// Get list of expressions
+//
+const std::vector<Expression*>& CommaExpression::get_expression_list() const {
+  return this->expr_list;
 }
 
 //

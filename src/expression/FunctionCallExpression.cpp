@@ -11,6 +11,25 @@ FunctionCallExpression::FunctionCallExpression(Expression* expr,
   expr(expr), parameters(parameters) {}
 
 //
+// Destructor
+//
+FunctionCallExpression::~FunctionCallExpression() {
+  for (auto e: this->parameters) { delete (e); }
+  delete (this->expr);
+}
+
+//
+// Getters
+//
+Expression* FunctionCallExpression::get_expression() const {
+  return this->expr;
+}
+
+const std::vector<Expression*>& FunctionCallExpression::get_parameters_list() const {
+  return this->parameters;
+}
+
+//
 // Clone
 //
 FunctionCallExpression* FunctionCallExpression::clone() const {

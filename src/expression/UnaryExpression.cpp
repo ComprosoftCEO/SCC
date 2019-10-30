@@ -14,6 +14,13 @@ UnaryExpression::~UnaryExpression() {
 }
 
 //
+// Getters
+//
+Expression* UnaryExpression::get_expression() const {
+  return this->expr;
+}
+
+//
 // Evaluate
 //
 /*ConstantValue UnaryExpression::evaluate() {

@@ -14,6 +14,17 @@ BinaryExpression::~BinaryExpression() {
 }
 
 //
+// Getters
+//
+Expression* BinaryExpression::get_left_expression() const {
+  return this->left;
+}
+
+Expression* BinaryExpression::get_right_expression() const {
+  return this->right;
+}
+
+//
 // Evaluate
 //
 // ConstantValue BinaryExpression::evaluate() {

@@ -9,6 +9,30 @@ ConditionalExpression::ConditionalExpression(Expression* condition, Expression* 
   condition(condition), cond_true(cond_true), cond_false(cond_false) {}
 
 //
+// Destructor
+//
+ConditionalExpression::~ConditionalExpression() {
+  delete (this->condition);
+  delete (this->cond_true);
+  delete (this->cond_false);
+}
+
+//
+// Getters
+//
+Expression* ConditionalExpression::get_condition() const {
+  return this->condition;
+}
+
+Expression* ConditionalExpression::get_true_expression() const {
+  return this->cond_true;
+}
+
+Expression* ConditionalExpression::get_false_expression() const {
+  return this->cond_false;
+}
+
+//
 // Clone
 //
 ConditionalExpression* ConditionalExpression::clone() const {

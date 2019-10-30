@@ -12,6 +12,8 @@ OBJECTS=\
 	expression/Expression.o \
 	expression/CommaExpression.o \
 	expression/AssignmentExpression.o \
+	expression/CastExpression.o \
+	expression/StringExpression.o \
 	expression/IdentifierExpression.o \
 	expression/BracketExpression.o \
 	expression/FunctionCallExpression.o \
