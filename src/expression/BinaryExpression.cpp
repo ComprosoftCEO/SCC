@@ -8,8 +8,8 @@ BinaryExpression::BinaryExpression(Expression* left, Expression* right): left(le
 //
 // Evaluate
 //
-ConstantValue BinaryExpression::evaluate() {
-  ConstantValue one = this->left->evaluate();
-  ConstantValue two = this->right->evaluate();
-  return this->binary_operator(one, two);
-}
+// ConstantValue BinaryExpression::evaluate() {
+//   ConstantValue one = this->left->evaluate();
+//   ConstantValue two = this->right->evaluate();
+//   return this->binary_operator(one, two);
+// }

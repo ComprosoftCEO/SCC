@@ -18,6 +18,9 @@ WHTSP 		[ \t\v\n\f]
 
 
 %{
+	#include <DataType.h>
+	#include <DataTypeFactory.h>
+	#include <Declarator.h>
 	#include <Expression.h>
 	#include <string>
 	#include "c.tab.h"
@@ -43,6 +46,7 @@ WHTSP 		[ \t\v\n\f]
 
 %option yylineno noyywrap 8bit nodefault                        
 %option reentrant bison-bridge bison-locations 
+%option prefix="cc"
 %%
 
 "/*"					{ BEGIN(COMMENT); }

@@ -1,37 +1,45 @@
 %define api.pure full
+%name-prefix "cc"
 %locations
 
 %parse-param { yyscan_t scanner } 
-%lex-param {yyscan_t scanner}
+%lex-param { yyscan_t scanner }
 // %parse-param {InsanityProgram* program}
 
-%code top {
+%code requires {
 	#include <cstdio>
 	#include <cstdlib>
 	#include <string>
-	#include <Expression.h>
-	#include <DataType.h>
-}
 
-%code requires {
+	#include <DataType.h>
+	#include <DataTypeFactory.h>
+	#include <Declarator.h>
+	#include <Expression.h>
+
 	// Declare stuff from Flex that Bison needs to know about:
 	typedef void* yyscan_t;
 }
 
 %code {
-	int yylex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, yyscan_t scanner);
-	static void yyerror(YYLTYPE* yyllocp, yyscan_t unused /*, InsanityProgram* program*/, const char* msg);
+	// Let Bison know about Flex methods
+	int cclex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, yyscan_t scanner);
+	static void ccerror(YYLTYPE* yyllocp, yyscan_t unused /*, InsanityProgram* program*/, const char* msg);
 }
 
 
 %union {
   std::string* str;                     // Identifier, string, type, etc.
   Expression* expr;                     // Expression interface
+	DataType* dt;                         // Data type object
+	Declarator* decl;                     // Declarator type (builds data type)
+	DataTypeFactory* fact;                // Abstract factory type
   std::vector<Expression*>* expr_list;  // List of expressions
-	ParameterList* param_list;						// List of parameters
+	ParameterList* param_list;            // List of parameters
 }
 
+//Destructors
 %destructor {delete($$);} <expr> <str>
+%destructor {delete($$);} <dt> <decl> <fact>
 %destructor {
 	for (auto el : *($$)) {
 		delete(el);
@@ -92,6 +100,17 @@
 %type <expr> assignment_expression expression constant_expression
 %type <expr_list> argument_expression_list
 
+// Data types
+%type <dt> specifier_qualifier_list type_name
+
+// Declarators
+%type <decl> declarator direct_declarator
+%type <fact> pointer
+%type <fact> abstract_declarator direct_abstract_declarator
+
+// Parameters
+%type <param> parameter_declaration
+%type <param_list> parameter_list
 
 //%type <list> insanity if
 //%type <stmt> statement
@@ -594,7 +613,7 @@ function_definition
 %%
 
 
-static void yyerror(YYLTYPE* yyllocp, yyscan_t unused /*, InsanityProgram* program */, const char *msg) {
+static void ccerror(YYLTYPE* yyllocp, yyscan_t unused /*, InsanityProgram* program */, const char *msg) {
 	fprintf(stderr, "%s! [Line %d:%d]\n",
 		msg,yyllocp->first_line, yyllocp->first_column);
 }
