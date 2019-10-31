@@ -55,8 +55,8 @@ OBJECTS=\
 	\
 	visitor/ExpressionVisitor.o \
 	\
-	Declarator.o \
-	\
+	factory/AbstractDeclarator.o \
+	factory/Declarator.o \
 	factory/DataTypeFactory.o \
 	factory/PointerFactory.o \
 	factory/ArrayFactory.o \

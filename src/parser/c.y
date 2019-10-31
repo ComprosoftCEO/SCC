@@ -45,7 +45,7 @@
     delete(el);
   }
   delete($$);
-} <expr_list> <param_list>
+} <expr_list>
 
 
 //Terminal types

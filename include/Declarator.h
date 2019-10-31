@@ -36,6 +36,8 @@ class Declarator final: public AbstractDeclarator {
 public:
   Declarator(const std::string& name);
 
+  const std::string& get_name() const;
+
 private:
   std::string name;
 };

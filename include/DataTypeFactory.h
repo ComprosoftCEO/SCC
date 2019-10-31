@@ -8,7 +8,7 @@ class DataType;
 class Expression;
 class Parameter;
 
-typedef std::vector<Parameter*> ParameterList;
+typedef std::vector<Parameter> ParameterList;
 
 /**
  * @class DataTypeFactory
@@ -70,7 +70,6 @@ class FunctionFactory final: public DataTypeFactory {
 
 public:
   FunctionFactory(DataTypeFactory* sub_factory, const ParameterList& parameters);
-  ~FunctionFactory();
 
 private:
   DataType* build_aggregate(DataType* internal_type);
