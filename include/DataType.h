@@ -6,7 +6,7 @@
 #include <vector>
 
 // List of all concrete data types
-enum class ConcreteDataType { PRIMITIVE, POINTER };
+enum class ConcreteDataType { PRIMITIVE, POINTER, ARRAY, FUNCTION };
 
 // List of primitive types
 enum class PrimitiveType {
@@ -25,6 +25,9 @@ enum class TypeQualifier { CONST, RESTRICT, VOLATILE, ATOMIC };
 // List of function specifiers
 enum class FunctionSpecifier { INLINE, NORETURN };
 
+// List of sizes
+#define POINTER_SIZE 8
+
 /**
  * @class DataType
  * Generic interface for working with any C type
@@ -32,15 +35,20 @@ enum class FunctionSpecifier { INLINE, NORETURN };
 class DataType {
 
 protected:
-  DataType(ConcreteDataType type);
+  DataType(ConcreteDataType concrete_type);
+
+public:
+  virtual ~DataType() = default;
 
   // Getter methods
   virtual size_t size() const = 0;
-  ConcreteDataType get_data_type() const;
+  ConcreteDataType get_concrete_type() const;
+
+  virtual DataType* clone() const = 0;
 
 private:
   // The underlying concrete type
-  ConcreteDataType type;
+  ConcreteDataType concrete_type;
 };
 
 /**
@@ -49,14 +57,14 @@ private:
  */
 class PrimitiveDataType: public DataType {
 
-public:
-  PrimitiveDataType(PrimitiveType type);
+protected:
+  PrimitiveDataType(PrimitiveType primitive_type);
 
+public:
   PrimitiveType get_primitive_type() const;
-  size_t size() const;
 
 private:
-  PrimitiveType type;
+  PrimitiveType primitive_type;
 };
 
 /**
@@ -66,14 +74,16 @@ private:
 class PointerDataType final: public DataType {
 
 public:
-  PointerDataType(DataType* type);
+  PointerDataType(DataType* point_type);
+  ~PointerDataType();
 
-  DataType* get_pointer_type() const;
+  DataType* get_point_type() const;
   size_t size() const;
-  size_t underlying_size() const;
+
+  PointerDataType* clone() const;
 
 private:
-  DataType* type;
+  DataType* point_type;
 };
 
 /**
@@ -84,10 +94,13 @@ class ArrayDataType final: public DataType {
 
 public:
   ArrayDataType(DataType* type);
-  ArrayDataType(DataType* type, class Expression* size);
+  ArrayDataType(DataType* type, class Expression* array_size);
 
   DataType* get_array_type() const;
+  Expression* get_array_size() const;
   size_t size() const;
+
+  DataType* clone() const;
 
 private:
   DataType* type;
@@ -103,8 +116,13 @@ class Parameter final {
 public:
   Parameter(DataType* type);
   Parameter(DataType* type, const std::string& name);
-
   ~Parameter();
+
+  // Give parameters value semantics
+  Parameter(const Parameter& other);
+  Parameter(Parameter&& other);
+  Parameter& operator=(const Parameter& other);
+  Parameter& operator=(Parameter&& other);
 
   DataType* get_type() const;
 
@@ -116,7 +134,7 @@ private:
   std::string name;
 };
 
-typedef std::vector<Parameter*> ParameterList;
+typedef std::vector<Parameter> ParameterList;
 
 /**
  * @class FunctionDataType
@@ -126,10 +144,13 @@ class FunctionDataType final: public DataType {
 
 public:
   FunctionDataType(const ParameterList& parameters, DataType* return_type);
+  ~FunctionDataType();
 
   DataType* get_return_type() const;
   const ParameterList& get_parameter_list() const;
   size_t size() const;
+
+  DataType* clone() const;
 
 private:
   ParameterList parameters;

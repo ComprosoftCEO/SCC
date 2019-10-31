@@ -30,8 +30,7 @@ DataType* CastExpression::get_cast_type() {
 // Clone
 //
 CastExpression* CastExpression::clone() const {
-  // TODO: Implement this method
-  return nullptr;
+  return new CastExpression(this->expr->clone(), this->cast_to->clone());
 }
 
 //

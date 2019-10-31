@@ -1,6 +1,6 @@
 # Makefile for Insanity C Compiler
 CC=g++
-CFLAGS=-std=c++11 -Iinclude
+CFLAGS=-std=c++14 -Iinclude
 
 PROGRAM=scc.out
 
@@ -8,6 +8,13 @@ OBJECTS=\
 	parser/c.tab.o \
 	parser/c.yy.o \
 	parser/specifiers.tab.o \
+	\
+	datatype/DataType.o \
+	datatype/PrimitiveDataType.o \
+	datatype/PointerDataType.o \
+	datatype/ArrayDataType.o \
+	datatype/FunctionDataType.o \
+	datatype/Parameter.o \
 	\
 	expression/Expression.o \
 	expression/CommaExpression.o \
