@@ -28,6 +28,15 @@
 
 
 %union {
+  C_INT ival;          // Literal integer
+  C_UINT uival;        // Literal unsigned integer
+  C_LONG lval;         // Literal long
+  C_ULONG ulval;       // Literal unsigned long
+  C_LONGLONG llval;    // Literal long long
+  C_ULONGLONG ullval;  // Literal unsigned long long
+  C_FLOAT fval;        // Literal floating point
+  C_DOUBLE dval;       // Literal double
+
   std::string* str;                     // Identifier, string, type, etc.
   Expression* expr;                     // Expression interface
   DataType* dt;                         // Data type object
@@ -50,7 +59,13 @@
 
 //Terminal types
 %token <str> IDENTIFIER STRING_LITERAL FUNC_NAME TYPEDEF_NAME ENUMERATION_CONSTANT
-%token I_CONSTANT F_CONSTANT
+
+%token <ival> INT_CONSTANT
+%token <uival> UINT_CONSTANT
+%token <lval> LONG_CONSTANT LONGLONG_CONSTANT
+%token <ulval> ULONG_CONSTANT ULONGLONG_CONSTANT
+%token <fval> F_CONSTANT
+%token <dval> D_CONSTANT
 
 %token SIZEOF
 %token PTR_OP "->"
@@ -127,8 +142,14 @@ primary_expression
   ;
 
 constant
-  : I_CONSTANT    /* includes character_constant */
+  : INT_CONSTANT    /* includes character_constant */
+  | UINT_CONSTANT
+  | LONG_CONSTANT
+  | ULONG_CONSTANT
+  | LONGLONG_CONSTANT
+  | ULONGLONG_CONSTANT
   | F_CONSTANT
+  | D_CONSTANT
   // | ENUMERATION_CONSTANT  /* after it has been defined as such */
   ;
 
