@@ -168,7 +168,7 @@ string
 
 postfix_expression
   : primary_expression                                    { $$ = $1; }
-  | postfix_expression '[' expression ']'                  { $$ = new BracketExpression($1, $3); }
+  | postfix_expression '[' expression ']'                 { $$ = new BracketExpression($1, $3); }
   | postfix_expression '(' ')'                            { $$ = new FunctionCallExpression($1); }
   | postfix_expression '(' argument_expression_list ')'   { $$ = new FunctionCallExpression($1, *$3); }
   // | postfix_expression '.' IDENTIFIER
@@ -201,7 +201,7 @@ unary_expression
 
 cast_expression
   : unary_expression                    { $$ = $1; }
-  | '(' type_name ')' cast_expression   { $$ = $4; /* TODO: Cast expression */}
+  | '(' type_name ')' cast_expression   { $$ = new CastExpression($4, $2); }
   ;
 
 multiplicative_expression
@@ -376,10 +376,10 @@ type_specifier
 //   ;
 
 specifier_qualifier_list
-  : type_specifier specifier_qualifier_list
-  | type_specifier
-  | type_qualifier specifier_qualifier_list
-  | type_qualifier
+  : type_specifier    { $$ = $1; }
+  // | type_specifier specifier_qualifier_list
+  // | type_qualifier specifier_qualifier_list
+  // | type_qualifier
   ;
 
 // struct_declarator_list
@@ -471,8 +471,8 @@ parameter_declaration
   ;
 
 type_name
-  : specifier_qualifier_list abstract_declarator
-  | specifier_qualifier_list
+  : specifier_qualifier_list abstract_declarator  { $$ = $2->build_data_type($1); delete($2); }
+  | specifier_qualifier_list                      { $$ = $1; }
   ;
 
 abstract_declarator
