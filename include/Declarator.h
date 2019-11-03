@@ -17,9 +17,10 @@ class AbstractDeclarator {
 
 public:
   AbstractDeclarator();
+  AbstractDeclarator(DataTypeFactory* sub_factory);
   virtual ~AbstractDeclarator();
 
-  void add_factory(const DataTypeFactoryFactory& build_factory);
+  void add_factory(DataTypeFactory* sub_factory);
 
   DataType* build_data_type(DataType* internal_type) const;
 

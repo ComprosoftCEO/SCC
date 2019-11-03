@@ -17,6 +17,8 @@ typedef std::vector<Parameter> ParameterList;
  */
 class DataTypeFactory {
 
+  friend class AbstractDeclarator; // Hacky
+
 public:
   // Sub-factory can be a NULL pointer
   DataTypeFactory(DataTypeFactory* sub_factory);
@@ -38,7 +40,10 @@ private:
 class PointerFactory final: public DataTypeFactory {
 
 public:
+  PointerFactory();
   PointerFactory(DataTypeFactory* sub_factory);
+
+  void add_factory(DataTypeFactory* sub_factory);
 
 private:
   DataType* build_aggregate(DataType* internal_type);
@@ -51,8 +56,8 @@ private:
 class ArrayFactory final: public DataTypeFactory {
 
 public:
-  ArrayFactory(DataTypeFactory* sub_factory);
-  ArrayFactory(DataTypeFactory* sub_factory, Expression* size);
+  ArrayFactory();
+  ArrayFactory(Expression* size);
 
   ~ArrayFactory();
 
@@ -69,12 +74,14 @@ private:
 class FunctionFactory final: public DataTypeFactory {
 
 public:
-  FunctionFactory(DataTypeFactory* sub_factory, const ParameterList& parameters);
+  FunctionFactory();
+  FunctionFactory(const ParameterList& parameters, bool elipsis = false);
 
 private:
   DataType* build_aggregate(DataType* internal_type);
 
   ParameterList parameters;
+  bool elipsis;
 };
 
 #endif /* Data Type Factory Header Included */

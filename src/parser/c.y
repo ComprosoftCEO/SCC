@@ -40,9 +40,11 @@
   std::string* str;                     // Identifier, string, type, etc.
   Expression* expr;                     // Expression interface
   DataType* dt;                         // Data type object
+  AbstractDeclarator* abs_decl;         // Declarator, but without the type
   Declarator* decl;                     // Declarator type (builds data type)
   DataTypeFactory* fact;                // Abstract factory type
   std::vector<Expression*>* expr_list;  // List of expressions
+  Parameter* param;                     // Single parameter in a function declaration
   ParameterList* param_list;            // List of parameters
 }
 
@@ -116,12 +118,14 @@
 %type <expr_list> argument_expression_list
 
 // Data types
-%type <dt> specifier_qualifier_list type_name type_specifier
+%type <dt> specifier_qualifier_list type_name type_specifier declaration_specifiers
 
 // Declarators
+%type <expr> initializer
 %type <decl> declarator direct_declarator
+%type <abs_decl> abstract_declarator direct_abstract_declarator
 %type <fact> pointer
-%type <fact> abstract_declarator direct_abstract_declarator
+
 
 // Parameters
 %type <param> parameter_declaration
@@ -288,14 +292,14 @@ constant_expression
   ;
 
 declaration
-  : declaration_specifiers ';'
-  | declaration_specifiers init_declarator_list ';'
+  : declaration_specifiers ';'                        { delete($1); }
+  | declaration_specifiers init_declarator_list ';'   
   // | TYPEDEF declaration_specifiers ';'
   // | TYPEDEF declaration_specifiers declarator_list ';'
   ;
 
 declaration_specifiers
-  : type_specifier
+  : type_specifier      { $$ = $1; }
   // : storage_class_specifier declaration_specifiers
   // | storage_class_specifier
   // | type_specifier declaration_specifiers
@@ -429,26 +433,25 @@ function_specifier
 //   ;
 
 declarator
-  : pointer direct_declarator
-  | direct_declarator
+  : pointer direct_declarator   { $$ = $2; $$->add_factory($1); }
+  | direct_declarator           { $$ = $1; }
   ;
 
 direct_declarator
-  : IDENTIFIER
-  | '(' declarator ')'
-  | direct_declarator '[' ']'
-  | direct_declarator '[' type_qualifier_list assignment_expression ']'
-  | direct_declarator '[' type_qualifier_list ']'
-  | direct_declarator '[' assignment_expression ']'
-  | direct_declarator '(' parameter_type_list ')'
-  | direct_declarator '(' ')'
+  : IDENTIFIER                                            { $$ = new Declarator(*$1); delete($1); }
+  | '(' declarator ')'                                    { $$ = $2; }
+  | direct_declarator '[' ']'                             { $$ = $1; $$->add_factory(new ArrayFactory()); }
+  | direct_declarator '[' assignment_expression ']'       { $$ = $1; $$->add_factory(new ArrayFactory($3)); }
+  | direct_declarator '(' ')'                             { $$ = $1; $$->add_factory(new FunctionFactory()); }
+  | direct_declarator '(' parameter_list ')'              { $$ = $1; $$->add_factory(new FunctionFactory(*$3)); delete($3); }
+  | direct_declarator '(' parameter_list ','ELLIPSIS ')'  { $$ = $1; $$->add_factory(new FunctionFactory(*$3, true)); delete($3); }
   ;
 
 pointer
-  : '*' type_qualifier_list pointer
-  | '*' type_qualifier_list
-  | '*' pointer
-  | '*'
+  // : '*' type_qualifier_list pointer
+  // | '*' type_qualifier_list
+  : '*' pointer                     { $$ = new PointerFactory($2); }
+  | '*'                             { $$ = new PointerFactory(); }
   ;
 
 type_qualifier_list
@@ -456,20 +459,15 @@ type_qualifier_list
   | type_qualifier_list type_qualifier
   ;
 
-parameter_type_list
-  : parameter_list ',' ELLIPSIS
-  | parameter_list
-  ;
-
 parameter_list
-  : parameter_declaration
-  | parameter_list ',' parameter_declaration
+  : parameter_declaration                       { $$ = new ParameterList{*$1}; delete($1);}
+  | parameter_list ',' parameter_declaration    { $$ = $1; $$->push_back(*$3); delete($3); }
   ;
 
 parameter_declaration
-  : declaration_specifiers declarator
-  | declaration_specifiers abstract_declarator
-  | declaration_specifiers
+  : declaration_specifiers declarator           { $$ = new Parameter($2->build_data_type($1), $2->get_name()); delete($2); }
+  | declaration_specifiers abstract_declarator  { $$ = new Parameter($2->build_data_type($1)); delete($2); }
+  | declaration_specifiers                      { $$ = new Parameter($1); }
   ;
 
 type_name
@@ -478,31 +476,29 @@ type_name
   ;
 
 abstract_declarator
-  : pointer direct_abstract_declarator
-  | pointer
-  | direct_abstract_declarator
+  : pointer direct_abstract_declarator    { $$ = $2; $$->add_factory($1); }
+  | pointer                               { $$ = new AbstractDeclarator($1); }
+  | direct_abstract_declarator            { $$ = $1; }
   ;
 
 direct_abstract_declarator
-  : '(' abstract_declarator ')'
-  | '[' ']'
-  | '[' type_qualifier_list assignment_expression ']'
-  | '[' type_qualifier_list ']'
-  | '[' assignment_expression ']'
-  | direct_abstract_declarator '[' ']'
-  | direct_abstract_declarator '[' type_qualifier_list assignment_expression ']'
-  | direct_abstract_declarator '[' type_qualifier_list ']'
-  | direct_abstract_declarator '[' assignment_expression ']'
-  | '(' ')'
-  | '(' parameter_type_list ')'
-  | direct_abstract_declarator '(' ')'
-  | direct_abstract_declarator '(' parameter_type_list ')'
+  : '(' abstract_declarator ')'                                     { $$ = $2; }
+  | '[' ']'                                                         { $$ = new AbstractDeclarator(new ArrayFactory()); }
+  | '[' assignment_expression ']'                                   { $$ = new AbstractDeclarator(new ArrayFactory($2)); }
+  | direct_abstract_declarator '[' ']'                              { $$ = $1; $$->add_factory(new ArrayFactory()); }
+  | direct_abstract_declarator '[' assignment_expression ']'        { $$ = $1; $$->add_factory(new ArrayFactory($3)); }
+  | '(' ')'                                                         { $$ = new AbstractDeclarator(new FunctionFactory()); }
+  | '(' parameter_list ')'                                          { $$ = new AbstractDeclarator(new FunctionFactory(*$2)); delete($2); }
+  | '(' parameter_list ',' ELLIPSIS ')'                             { $$ = new AbstractDeclarator(new FunctionFactory(*$2, true)); delete($2); }
+  | direct_abstract_declarator '(' ')'                              { $$ = $1; $$->add_factory(new FunctionFactory()); }
+  | direct_abstract_declarator '(' parameter_list ')'               { $$ = $1; $$->add_factory(new FunctionFactory(*$3)); delete($3); }
+  | direct_abstract_declarator '(' parameter_list ',' ELLIPSIS ')'  { $$ = $1; $$->add_factory(new FunctionFactory(*$3, true)); delete($3); }
   ;
 
 initializer
   // : '{' initializer_list '}'
   // | '{' initializer_list ',' '}'
-  : assignment_expression
+  : assignment_expression   { $$ = $1; }
   ;
 
 // initializer_list
@@ -525,38 +521,6 @@ initializer
 //   : '[' constant_expression ']'
 //   | '.' IDENTIFIER
 //   ;
-
-function_declarator
-  : pointer direct_function_declarator
-  | direct_function_declarator
-  ;
-
-direct_function_declarator
-  : IDENTIFIER '(' ')'
-  | IDENTIFIER '(' VOID ')'
-  | IDENTIFIER '(' named_parameter_type_list ')'
-  | '(' function_declarator ')'
-  | direct_function_declarator'[' ']'
-  | direct_function_declarator '[' type_qualifier_list assignment_expression ']'
-  | direct_function_declarator '[' type_qualifier_list ']'
-  | direct_function_declarator '[' assignment_expression ']'
-  | direct_function_declarator '(' parameter_type_list ')'
-  | direct_function_declarator '(' ')'
-  ;
-
-named_parameter_type_list
-  : named_parameter_list ',' ELLIPSIS
-  | named_parameter_list
-  ;
-
-named_parameter_list
-  : named_parameter_declaration
-  | named_parameter_list ',' named_parameter_declaration
-  ;
-
-named_parameter_declaration
-  : declaration_specifiers declarator
-  ;
 
 statement
   : labeled_statement
@@ -627,7 +591,7 @@ external_declaration
   ;
 
 function_definition
-  : declaration_specifiers function_declarator compound_statement
+  : declaration_specifiers declarator compound_statement
   ;
 
 /* We aren't supporting the K&R syntax */
