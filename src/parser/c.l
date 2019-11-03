@@ -10,7 +10,6 @@ HEX       [a-fA-F0-9]
 EXP       ([Ee][+-]?{DIG}+)
 HXP       ([Pp][+-]?{DIG}+)
 FLT_SFX   (f|F|l|L)
-INT_SFX   ((u|U)|(u|U)?(l|L|ll|LL)|(l|L|ll|LL)(u|U))
 CNST_PFX  (u|U|L)
 STR_PFX   (u8|u|U|L)
 EXP_SFX   (\\(['"\?\\abfnrtv]|[0-7]{1,3}|x[a-fA-F0-9]+))

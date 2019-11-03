@@ -11,6 +11,7 @@ enum class ConcreteDataType { PRIMITIVE, POINTER, ARRAY, FUNCTION };
 
 // List of primitive types
 enum class PrimitiveType {
+  VOID,
   CHAR,
   SHORT,
   INT,
@@ -42,6 +43,10 @@ enum class FunctionSpecifier { INLINE, NORETURN };
 
 // List of sizes
 #define POINTER_SIZE 8
+#define VOID_SIZE    0
+#define CHAR_SIZE    sizeof(C_CHAR)
+#define INT_SIZE     sizeof(C_INT)
+#define LONG_SIZE    sizeof(C_LONG)
 
 /**
  * @class DataType
@@ -80,6 +85,58 @@ public:
 
 private:
   PrimitiveType primitive_type;
+};
+
+/**
+ * @class VoidDataType
+ * Represents a "void" in C
+ */
+class VoidDataType final: public PrimitiveDataType {
+
+public:
+  VoidDataType();
+
+  size_t size() const;
+  VoidDataType* clone() const;
+};
+
+/**
+ * @class CharDataType
+ * Represents a 1-byte character data type
+ */
+class CharDataType final: public PrimitiveDataType {
+
+public:
+  CharDataType();
+
+  size_t size() const;
+  CharDataType* clone() const;
+};
+
+/**
+ * @class IntDataType
+ * Represents an integer (32 bit)
+ */
+class IntDataType final: public PrimitiveDataType {
+
+public:
+  IntDataType();
+
+  size_t size() const;
+  IntDataType* clone() const;
+};
+
+/**
+ * @class LongDataType
+ * Represents a long (32 or 64 bit integer)
+ */
+class LongDataType final: public PrimitiveDataType {
+
+public:
+  LongDataType();
+
+  size_t size() const;
+  LongDataType* clone() const;
 };
 
 /**

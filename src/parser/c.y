@@ -116,7 +116,7 @@
 %type <expr_list> argument_expression_list
 
 // Data types
-%type <dt> specifier_qualifier_list type_name
+%type <dt> specifier_qualifier_list type_name type_specifier
 
 // Declarators
 %type <decl> declarator direct_declarator
@@ -290,19 +290,20 @@ constant_expression
 declaration
   : declaration_specifiers ';'
   | declaration_specifiers init_declarator_list ';'
-  | TYPEDEF declaration_specifiers ';'
-  | TYPEDEF declaration_specifiers declarator_list ';'
+  // | TYPEDEF declaration_specifiers ';'
+  // | TYPEDEF declaration_specifiers declarator_list ';'
   ;
 
 declaration_specifiers
-  : storage_class_specifier declaration_specifiers
-  | storage_class_specifier
-  | type_specifier declaration_specifiers
-  | type_specifier
-  | type_qualifier declaration_specifiers
-  | type_qualifier
-  | function_specifier declaration_specifiers
-  | function_specifier
+  : type_specifier
+  // : storage_class_specifier declaration_specifiers
+  // | storage_class_specifier
+  // | type_specifier declaration_specifiers
+  // | type_specifier
+  // | type_qualifier declaration_specifiers
+  // | type_qualifier
+  // | function_specifier declaration_specifiers
+  // | function_specifier
   // | alignment_specifier declaration_specifiers
   // | alignment_specifier
   ;
@@ -317,10 +318,10 @@ init_declarator
   | declarator
   ;
 
-declarator_list
-  : declarator
-  | declarator_list ',' declarator
-  ;
+// declarator_list
+//   : declarator
+//   | declarator_list ',' declarator
+//   ;
 
 storage_class_specifier
   : EXTERN
@@ -331,16 +332,16 @@ storage_class_specifier
   ;
 
 type_specifier
-  : VOID
-  | CHAR
-  | SHORT
-  | INT
-  | LONG
-  | FLOAT
-  | DOUBLE
-  | SIGNED
-  | UNSIGNED
-  | BOOL
+  : VOID        { $$ = new VoidDataType(); }
+  | CHAR        { $$ = new CharDataType(); }
+  // | SHORT
+  | INT         { $$ = new IntDataType(); }
+  | LONG        { $$ = new LongDataType(); }
+  // | FLOAT
+  // | DOUBLE
+  // | SIGNED
+  // | UNSIGNED
+  // | BOOL
   // | COMPLEX
   // | IMAGINARY      /* non-mandated extension */
   // | atomic_type_specifier

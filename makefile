@@ -11,6 +11,10 @@ OBJECTS=\
 	\
 	datatype/DataType.o \
 	datatype/PrimitiveDataType.o \
+	datatype/VoidDataType.o \
+	datatype/CharDataType.o \
+	datatype/IntDataType.o \
+	datatype/LongDataType.o \
 	datatype/PointerDataType.o \
 	datatype/ArrayDataType.o \
 	datatype/FunctionDataType.o \
