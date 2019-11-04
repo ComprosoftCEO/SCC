@@ -30,7 +30,7 @@ public:
 class LabelStatement final: public Statement {
 
 public:
-  LavelStatement(const std::string& name);
+  LabelStatement(const std::string& name);
 
   const std::string& get_name() const;
 
@@ -185,7 +185,7 @@ public:
 
   void visit(StatementVisitor& visitor);
   ContinueStatement* clone() const;
-}
+};
 
 /**
  * @class BreakStatement

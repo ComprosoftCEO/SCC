@@ -58,6 +58,7 @@ OBJECTS=\
 	expression/ConditionalExpression.o \
 	\
 	visitor/ExpressionVisitor.o \
+	visitor/StatementVisitor.o \
 	\
 	factory/AbstractDeclarator.o \
 	factory/Declarator.o \

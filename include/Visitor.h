@@ -36,6 +36,19 @@ class LogicalAndExpression;
 class LogicalOrExpression;
 class ConditionalExpression;
 
+// Forward declare all of the statement classes
+class LabelStatement;
+class CompoundStatement;
+class ExpressionStatement;
+class IfStatement;
+class GotoStatement;
+class WhileStatement;
+class DoWhileStatement;
+class ForStatement;
+class ContinueStatement;
+class BreakStatement;
+class ReturnStatement;
+
 /**
  * @class ExpressionVisitor
  * Visitor interface for all expression objects. Has a default
@@ -79,6 +92,29 @@ public:
   virtual void accept(LogicalAndExpression& expr);
   virtual void accept(LogicalOrExpression& expr);
   virtual void accept(ConditionalExpression& expr);
+};
+
+/**
+ * @class StatementVisitor
+ * Visitor interface for all statement objects. Has a default
+ *   accept implementation to make concrete implementations easier.
+ */
+class StatementVisitor {
+
+public:
+  virtual ~StatementVisitor() = default;
+
+  virtual void accept(LabelStatement& stmt);
+  virtual void accept(CompoundStatement& stmt);
+  virtual void accept(ExpressionStatement& stmt);
+  virtual void accept(IfStatement& stmt);
+  virtual void accept(GotoStatement& stmt);
+  virtual void accept(WhileStatement& stmt);
+  virtual void accept(DoWhileStatement& stmt);
+  virtual void accept(ForStatement& stmt);
+  virtual void accept(ContinueStatement& stmt);
+  virtual void accept(BreakStatement& stmt);
+  virtual void accept(ReturnStatement& stmt);
 };
 
 #endif /* Visitor Header Included */
