@@ -57,6 +57,18 @@ OBJECTS=\
 	expression/LogicalOrExpression.o \
 	expression/ConditionalExpression.o \
 	\
+	statement/Statement.o \
+	statement/LabelStatement.o \
+	statement/CompoundStatement.o \
+	statement/ExpressionStatement.o \
+	statement/IfStatement.o \
+	statement/GotoStatement.o \
+	statement/WhileStatement.o \
+	statement/DoWhileStatement.o \
+	statement/ContinueStatement.o \
+	statement/BreakStatement.o \
+	statement/ReturnStatement.o \
+	\
 	visitor/ExpressionVisitor.o \
 	visitor/StatementVisitor.o \
 	\

@@ -48,7 +48,7 @@ private:
 class CompoundStatement final: public Statement {
 
 public:
-  CompoundStatement();
+  CompoundStatement() = default;
   CompoundStatement(const StatementList& stmt_list);
   ~CompoundStatement();
 
