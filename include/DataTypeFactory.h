@@ -43,8 +43,6 @@ public:
   PointerFactory();
   PointerFactory(DataTypeFactory* sub_factory);
 
-  void add_factory(DataTypeFactory* sub_factory);
-
 private:
   DataType* build_aggregate(DataType* internal_type);
 };

@@ -4,8 +4,10 @@
 //
 // Constructor
 //
-FunctionFactory::FunctionFactory(DataTypeFactory* sub_factory, const ParameterList& parameters):
-  DataTypeFactory(sub_factory), parameters(parameters) {}
+FunctionFactory::FunctionFactory(): DataTypeFactory(nullptr), elipsis(true) {}
+
+FunctionFactory::FunctionFactory(const ParameterList& parameters, bool elipsis):
+  DataTypeFactory(nullptr), parameters(parameters), elipsis(elipsis) {}
 
 //
 // Build the aggregate type

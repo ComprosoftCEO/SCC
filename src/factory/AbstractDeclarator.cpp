@@ -2,22 +2,25 @@
 #include <Declarator.h>
 
 //
-// Default Constructor
+// Constructor
 //
-AbstractDeclarator::AbstractDeclarator(): factory(nullptr) {}
+AbstractDeclarator::AbstractDeclarator(): AbstractDeclarator(nullptr) {}
+
+AbstractDeclarator::AbstractDeclarator(DataTypeFactory* sub_factory): sub_factory(sub_factory) {}
 
 //
 // Destructor
 //
 AbstractDeclarator::~AbstractDeclarator() {
-  delete (this->factory);
+  delete (this->sub_factory);
 }
 
 //
 // Add a factory to the set of factories
 //
-void AbstractDeclarator::add_factory(const DataTypeFactoryFactory& build_factory) {
-  this->factory = build_factory(this->factory);
+void AbstractDeclarator::add_factory(DataTypeFactory* new_factory) {
+  new_factory->sub_factory = this->sub_factory;
+  this->sub_factory        = new_factory;
 }
 
 //
@@ -25,9 +28,9 @@ void AbstractDeclarator::add_factory(const DataTypeFactoryFactory& build_factory
 //
 DataType* AbstractDeclarator::build_data_type(DataType* internal_type) const {
 
-  if (this->factory != nullptr) {
+  if (this->sub_factory != nullptr) {
     // Tail-end recursion
-    return this->factory->build_data_type(internal_type);
+    return this->sub_factory->build_data_type(internal_type);
   }
 
   return internal_type;

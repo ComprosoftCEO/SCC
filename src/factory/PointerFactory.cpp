@@ -4,6 +4,8 @@
 //
 // Constructor
 //
+PointerFactory::PointerFactory(): PointerFactory(nullptr) {}
+
 PointerFactory::PointerFactory(DataTypeFactory* sub_factory): DataTypeFactory(sub_factory) {}
 
 //

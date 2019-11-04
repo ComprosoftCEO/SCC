@@ -294,8 +294,6 @@ constant_expression
 declaration
   : declaration_specifiers ';'                        { delete($1); }
   | declaration_specifiers init_declarator_list ';'   
-  // | TYPEDEF declaration_specifiers ';'
-  // | TYPEDEF declaration_specifiers declarator_list ';'
   ;
 
 declaration_specifiers
@@ -328,7 +326,8 @@ init_declarator
 //   ;
 
 storage_class_specifier
-  : EXTERN
+  : TYPEDEF
+  | EXTERN
   | STATIC
   | THREAD_LOCAL
   | AUTO

@@ -20,12 +20,12 @@ public:
   AbstractDeclarator(DataTypeFactory* sub_factory);
   virtual ~AbstractDeclarator();
 
-  void add_factory(DataTypeFactory* sub_factory);
+  void add_factory(DataTypeFactory* new_factory);
 
   DataType* build_data_type(DataType* internal_type) const;
 
 private:
-  DataTypeFactory* factory; // Can be NULL
+  DataTypeFactory* sub_factory; // Can be NULL
 };
 
 /**
