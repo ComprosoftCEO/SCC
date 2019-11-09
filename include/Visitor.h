@@ -37,6 +37,7 @@ class LogicalOrExpression;
 class ConditionalExpression;
 
 // Forward declare all of the statement classes
+class EmptyStatement;
 class LabelStatement;
 class CompoundStatement;
 class ExpressionStatement;
@@ -104,6 +105,7 @@ class StatementVisitor {
 public:
   virtual ~StatementVisitor() = default;
 
+  virtual void accept(EmptyStatement& stmt);
   virtual void accept(LabelStatement& stmt);
   virtual void accept(CompoundStatement& stmt);
   virtual void accept(ExpressionStatement& stmt);

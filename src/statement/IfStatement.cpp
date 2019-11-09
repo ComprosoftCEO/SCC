@@ -50,8 +50,8 @@ void IfStatement::visit(StatementVisitor& visitor) {
 // Clone
 //
 IfStatement* IfStatement::clone() const {
-  Expression* new_expr = this->expr != nullptr ? this->expr->clone() : nullptr;
-  Statement* new_then  = this->then_stmt != nullptr ? this->then_stmt->clone() : nullptr;
-  Statement* new_else  = this->else_stmt != nullptr ? this->else_stmt->clone() : nullptr;
+  Expression* new_expr = Expression::clone(this->expr);
+  Statement* new_then  = Statement::clone(this->then_stmt);
+  Statement* new_else  = Statement::clone(this->else_stmt);
   return new IfStatement(new_expr, new_then, new_else);
 }

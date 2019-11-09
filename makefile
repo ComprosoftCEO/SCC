@@ -58,6 +58,7 @@ OBJECTS=\
 	expression/ConditionalExpression.o \
 	\
 	statement/Statement.o \
+	statement/EmptyStatement.o \
 	statement/LabelStatement.o \
 	statement/CompoundStatement.o \
 	statement/ExpressionStatement.o \

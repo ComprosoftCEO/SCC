@@ -21,6 +21,9 @@ public:
   virtual void visit(ExpressionVisitor& visitor) = 0;
 
   virtual Expression* clone() const = 0;
+
+  // Clone, or return a nullptr
+  static Expression* clone(Expression* expr);
 };
 
 /**

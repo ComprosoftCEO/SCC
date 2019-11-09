@@ -1,4 +1,9 @@
 #include <Statement.h>
 #include <Visitor.h>
 
-// No methods here...
+//
+// Static clone method
+//
+Statement* Statement::clone(Statement* stmt) {
+  return stmt != nullptr ? stmt->clone() : nullptr;
+}

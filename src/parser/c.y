@@ -15,6 +15,7 @@
   #include <DataTypeFactory.h>
   #include <Declarator.h>
   #include <Expression.h>
+  #include <Statement.h>
 
   // Declare stuff from Flex that Bison needs to know about:
   typedef void* yyscan_t;
@@ -46,6 +47,8 @@
   std::vector<Expression*>* expr_list;  // List of expressions
   Parameter* param;                     // Single parameter in a function declaration
   ParameterList* param_list;            // List of parameters
+  Statement* stmt;                      // Statement type
+  StatementList* stmt_list;             // List of statements
 }
 
 //Destructors
@@ -126,10 +129,15 @@
 %type <abs_decl> abstract_declarator direct_abstract_declarator
 %type <fact> pointer
 
-
 // Parameters
 %type <param> parameter_declaration
 %type <param_list> parameter_list
+
+// Statements
+%type <stmt> statement
+%type <expr> expression_statement
+%type <stmt> labeled_statement compound_statement selection_statement iteration_statement jump_statement
+%type <stmt_list> block_item_list
 
 //%type <list> insanity if
 //%type <stmt> statement
@@ -522,23 +530,23 @@ initializer
 //   ;
 
 statement
-  : labeled_statement
-  | compound_statement
-  | expression_statement
-  | selection_statement
-  | iteration_statement
-  | jump_statement
+  : labeled_statement     { $$ = $1; }
+  | compound_statement    { $$ = $1; }
+  | expression_statement  { $$ = ($1 == nullptr) ? ((Statement*) new EmptyStatement()) : ((Statement*) new ExpressionStatement($1)); }
+  | selection_statement   { $$ = $1; }
+  | iteration_statement   { $$ = $1; }
+  | jump_statement        { $$ = $1; }
   ;
 
 labeled_statement
-  : IDENTIFIER ':' statement
-  | CASE constant_expression ':' statement
-  | DEFAULT ':' statement
+  : IDENTIFIER ':' statement                    { $$ = new LabelStatement(*$1, $3); delete($1); }
+  // | CASE constant_expression ':' statement
+  // | DEFAULT ':' statement
   ;
 
 compound_statement
-  : '{' '}'
-  | '{'  block_item_list '}'
+  : '{' '}'                   { $$ = new CompoundStatement(); }
+  | '{'  block_item_list '}'  { $$ = new CompoundStatement(*$2); delete($2); }
   ;
 
 block_item_list
@@ -552,31 +560,31 @@ block_item
   ;
 
 expression_statement
-  : ';'
-  | expression ';'
+  : ';'               { $$ = nullptr; }
+  | expression ';'    { $$ = $1; }
   ;
 
 selection_statement
-  : IF '(' expression ')' statement ELSE statement
-  | IF '(' expression ')' statement
-  | SWITCH '(' expression ')' statement
+  : IF '(' expression ')' statement ELSE statement  { $$ = new IfStatement($3, $5, $7); }
+  | IF '(' expression ')' statement                 { $$ = new IfStatement($3, $5); }
+  // | SWITCH '(' expression ')' statement
   ;
 
 iteration_statement
-  : WHILE '(' expression ')' statement
-  | DO statement WHILE '(' expression ')' ';'
-  | FOR '(' expression_statement expression_statement ')' statement
-  | FOR '(' expression_statement expression_statement expression ')' statement
-  | FOR '(' declaration expression_statement ')' statement
-  | FOR '(' declaration expression_statement expression ')' statement
+  : WHILE '(' expression ')' statement                                            { $$ = new WhileStatement($3, $5); }
+  | DO statement WHILE '(' expression ')' ';'                                     { $$ = new DoWhileStatement($2, $5); }
+  // | FOR '(' expression_statement expression_statement ')' statement               { $$ = new ForStatement($3, $4, $6); }
+  // | FOR '(' expression_statement expression_statement expression ')' statement    { $$ = new ForStatement($3, $4, $5, $7); }
+  // | FOR '(' declaration expression_statement ')' statement
+  // | FOR '(' declaration expression_statement expression ')' statement
   ;
 
 jump_statement
-  : GOTO IDENTIFIER ';'
-  | CONTINUE ';'
-  | BREAK ';'
-  | RETURN ';'
-  | RETURN expression ';'
+  : GOTO IDENTIFIER ';'     { $$ = new GotoStatement(*$2); delete($2); }
+  | CONTINUE ';'            { $$ = new ContinueStatement(); }
+  | BREAK ';'               { $$ = new BreakStatement(); }
+  | RETURN ';'              { $$ = new ReturnStatement(); }
+  | RETURN expression ';'   { $$ = new ReturnStatement($2); }
   ;
 
 translation_unit

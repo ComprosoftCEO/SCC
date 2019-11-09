@@ -21,24 +21,41 @@ public:
 
   virtual void visit(StatementVisitor& visitor) = 0;
   virtual Statement* clone() const              = 0;
+
+  // Clone method that clones or returns null
+  static Statement* clone(Statement* stmt);
+};
+
+/**
+ * @class EmptyStatement
+ * Represents a statement that generates no code
+ */
+class EmptyStatement final: public Statement {
+
+public:
+  void visit(StatementVisitor& visitor);
+  EmptyStatement* clone() const;
 };
 
 /**
  * @class LabelStatement
- * Represents a label
+ * Represents a label. It's a proxy for its underlying statement type.
  */
 class LabelStatement final: public Statement {
 
 public:
-  LabelStatement(const std::string& name);
+  LabelStatement(const std::string& name, Statement* stmt);
+  ~LabelStatement();
 
   const std::string& get_name() const;
+  Statement* get_statement() const;
 
   void visit(StatementVisitor& visitor);
   LabelStatement* clone() const;
 
 private:
   std::string name;
+  Statement* stmt;
 };
 
 /**
@@ -103,6 +120,27 @@ private:
   Expression* expr;
   Statement* then_stmt;
   Statement* else_stmt;
+};
+
+/**
+ * @class SwitchStatement
+ * Represents a switch/case block in C
+ */
+class SwitchStatement final: public Statement {
+
+public:
+  SwitchStatement(Expression* expr, Statement* stmt);
+  ~SwitchStatement();
+
+  Expression* get_expression() const;
+  Statement* get_statement() const;
+
+  void visit(StatementVisitor& visitor);
+  SwitchStatement* clone() const;
+
+private:
+  Expression* expr;
+  Statement* stmt;
 };
 
 /**
@@ -172,6 +210,23 @@ private:
 class ForStatement final: public Statement {
 
 public:
+  ForStatement(Expression* init, Expression* cond, Statement* stmt);
+  ForStatement(Expression* init, Expression* cond, Expression* loop, Statement* stmt);
+  ~ForStatement();
+
+  Expression* get_init_expression() const;
+  Expression* get_cond_expression() const;
+  Expression* get_loop_expression() const;
+  Statement* get_statement() const;
+
+  void visit(StatementVisitor& visitor);
+  ForStatement* clone() const;
+
+private:
+  Expression* init; // May be null
+  Expression* cond; // May be null for infinite loop
+  Expression* loop; // Expression to evaluate after each loop iteration
+  Statement* stmt;  // Statement to execute inside the loop
 };
 
 /**

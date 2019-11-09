@@ -4,13 +4,24 @@
 //
 // Constructor
 //
-LabelStatement::LabelStatement(const std::string& name): name(name) {}
+LabelStatement::LabelStatement(const std::string& name, Statement* stmt): name(name), stmt(stmt) {}
+
+//
+// Destructor
+//
+LabelStatement::~LabelStatement() {
+  delete (this->stmt);
+}
 
 //
 // Getters
 //
 const std::string& LabelStatement::get_name() const {
   return this->name;
+}
+
+Statement* LabelStatement::get_statement() const {
+  return this->stmt;
 }
 
 //
@@ -24,5 +35,5 @@ void LabelStatement::visit(StatementVisitor& visitor) {
 // Clone
 //
 LabelStatement* LabelStatement::clone() const {
-  return new LabelStatement(this->name);
+  return new LabelStatement(this->name, Statement::clone(this->stmt));
 }

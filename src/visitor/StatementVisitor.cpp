@@ -1,6 +1,10 @@
 #include <Statement.h>
 #include <Visitor.h>
 
+void StatementVisitor::accept(EmptyStatement& stmt) {
+  return;
+}
+
 void StatementVisitor::accept(LabelStatement& stmt) {
   return;
 }
