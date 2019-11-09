@@ -13,7 +13,7 @@
 
   #include <DataType.h>
   #include <DataTypeFactory.h>
-  #include <Declarator.h>
+  #include <Declaration.h>
   #include <Expression.h>
   #include <Statement.h>
 

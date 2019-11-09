@@ -65,6 +65,7 @@ public:
   ConcreteDataType get_concrete_type() const;
 
   virtual DataType* clone() const = 0;
+  static DataType* clone(DataType* type);
 
 private:
   // The underlying concrete type

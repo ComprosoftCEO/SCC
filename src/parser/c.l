@@ -34,7 +34,6 @@ ULL_SFX   ([uU](ll|LL)|(ll|LL)[uU])
 %{
   #include <DataType.h>
   #include <DataTypeFactory.h>
-  #include <Declarator.h>
   #include <Expression.h>
   #include <string>
   #include "c.tab.h"

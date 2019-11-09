@@ -73,8 +73,11 @@ OBJECTS=\
 	visitor/ExpressionVisitor.o \
 	visitor/StatementVisitor.o \
 	\
-	factory/AbstractDeclarator.o \
-	factory/Declarator.o \
+	declaration/AbstractDeclaration.o\
+	declaration/Declaration.o \
+	declaration/AbstractDeclarator.o \
+	declaration/Declarator.o \
+	\
 	factory/DataTypeFactory.o \
 	factory/PointerFactory.o \
 	factory/ArrayFactory.o \

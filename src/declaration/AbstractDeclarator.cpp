@@ -1,5 +1,5 @@
 #include <DataTypeFactory.h>
-#include <Declarator.h>
+#include <Declaration.h>
 
 //
 // Constructor

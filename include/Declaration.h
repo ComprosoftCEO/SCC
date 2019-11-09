@@ -1,13 +1,44 @@
-#ifndef DECLARATOR_HEADER
-#define DECLARATOR_HEADER
+#ifndef DECLARATION_HEADER
+#define DECLARATION_HEADER
 
-#include <functional>
 #include <string>
 
 // Forward declare classes
+class DataType;
 class DataTypeFactory;
 
-typedef std::function<DataTypeFactory*(DataTypeFactory*)> DataTypeFactoryFactory;
+/**
+ * @class AbstractDeclaration
+ * Represents a data type with no name
+ */
+class AbstractDeclaration {
+
+public:
+  AbstractDeclaration(DataType* type);
+  virtual ~AbstractDeclaration();
+
+  DataType* get_type() const;
+  virtual AbstractDeclaration* clone() const;
+
+protected:
+  DataType* type;
+};
+
+/**
+ * @class Declaration
+ * Represents a declaration with a variable name
+ */
+class Declaration final: public AbstractDeclaration {
+
+public:
+  Declaration(DataType* type, const std::string& name);
+
+  const std::string& get_name() const;
+  Declaration* clone() const;
+
+private:
+  std::string name;
+};
 
 /**
  * @class AbstractDeclarator
@@ -43,4 +74,4 @@ private:
   std::string name;
 };
 
-#endif /* Declarator Header Included */
+#endif /* Declaration Header Included */
