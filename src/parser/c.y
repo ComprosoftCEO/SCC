@@ -569,8 +569,8 @@ compound_statement
   ;
 
 block_item_list
-  : block_item
-  | block_item_list block_item
+  : block_item                  { $$ = new StatementList(); $$->insert($$->end(), $1->begin(), $1->end()); delete($1); }
+  | block_item_list block_item  { $$ = $1; $$->insert($$->end(), $2->begin(), $2->end()); delete($2); }
   ;
 
 block_item
