@@ -15,12 +15,14 @@ class Expression;
  */
 class DataTypeFactory {
 
-  friend class Declarator; // Hacky
-
 public:
   // Sub-factory can be a NULL pointer
+  DataTypeFactory();
   DataTypeFactory(DataTypeFactory* sub_factory);
   virtual ~DataTypeFactory();
+
+  // Deletes the previous sub factory
+  void set_sub_factory(DataTypeFactory* sub_factory);
 
   DataType* build_data_type(DataType* internal_type);
 

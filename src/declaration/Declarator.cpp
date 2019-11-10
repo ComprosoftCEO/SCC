@@ -29,8 +29,8 @@ bool Declarator::has_initializer() const {
 // Modify internal state
 //
 void Declarator::add_factory(DataTypeFactory* new_factory) {
-  new_factory->sub_factory = this->sub_factory;
-  this->sub_factory        = new_factory;
+  new_factory->set_sub_factory(this->sub_factory);
+  this->sub_factory = new_factory;
 }
 
 void Declarator::set_initializer(Expression* init) {

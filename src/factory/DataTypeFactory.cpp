@@ -3,6 +3,8 @@
 //
 // Constructor
 //
+DataTypeFactory::DataTypeFactory(): DataTypeFactory(nullptr) {}
+
 DataTypeFactory::DataTypeFactory(DataTypeFactory* sub_factory): sub_factory(sub_factory) {}
 
 //
@@ -10,6 +12,14 @@ DataTypeFactory::DataTypeFactory(DataTypeFactory* sub_factory): sub_factory(sub_
 //
 DataTypeFactory::~DataTypeFactory() {
   delete (this->sub_factory);
+}
+
+//
+// Update the sub factory
+//
+void DataTypeFactory::set_sub_factory(DataTypeFactory* sub_factory) {
+  delete (this->sub_factory);
+  this->sub_factory = sub_factory;
 }
 
 //

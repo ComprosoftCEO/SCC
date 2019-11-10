@@ -7,7 +7,7 @@
 //
 ArrayFactory::ArrayFactory(): ArrayFactory(nullptr) {}
 
-ArrayFactory::ArrayFactory(Expression* size): DataTypeFactory(nullptr), size(nullptr) {}
+ArrayFactory::ArrayFactory(Expression* size): DataTypeFactory(), size(nullptr) {}
 
 //
 // Destructor
