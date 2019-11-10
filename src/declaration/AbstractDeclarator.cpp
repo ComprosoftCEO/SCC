@@ -34,3 +34,10 @@ DataType* AbstractDeclarator::build_data_type(DataType* internal_type) const {
 
   return internal_type;
 }
+
+//
+// Build the declaration
+//
+AbstractDeclaration* AbstractDeclarator::build_declaration(DataType* internal_type) const {
+  return new AbstractDeclaration(this->build_data_type(internal_type));
+}

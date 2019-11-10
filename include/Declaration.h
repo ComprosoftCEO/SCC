@@ -6,13 +6,20 @@
 
 // Forward declare classes
 class AbstractDeclaration;
+class Declaration;
+class InitDeclaration;
+class AbstractDeclarator;
+class Declarator;
+class InitDeclarator;
 class DataType;
 class DataTypeFactory;
 class Expression;
 class InitDeclarator;
 
-typedef std::vector<InitDeclarator*> InitDeclList;
 typedef std::vector<AbstractDeclaration*> AbsDeclList;
+typedef std::vector<Declaration*> DeclList;
+typedef std::vector<AbstractDeclarator*> AbsDeclrList;
+typedef std::vector<Declarator*> DeclrList;
 
 /**
  * @class AbstractDeclaration
@@ -25,6 +32,10 @@ public:
   virtual ~AbstractDeclaration();
 
   DataType* get_type() const;
+
+  virtual bool has_name() const; // If true, can cast to declaration
+  Declaration* to_declaration();
+
   virtual AbstractDeclaration* clone() const;
 
 protected:
@@ -35,19 +46,39 @@ protected:
  * @class Declaration
  * Represents a declaration with a variable name
  */
-class Declaration final: public AbstractDeclaration {
+class Declaration: public AbstractDeclaration {
 
 public:
   Declaration(DataType* type, const std::string& name);
-  Declaration(DataType* type, const std::string& name, Expression* init);
 
+  bool has_name() const;
   const std::string& get_name() const;
-  Expression* get_initializer() const;
+
+  virtual bool has_initializer() const;
+  InitDeclaration* to_init_declaration();
 
   Declaration* clone() const;
 
-private:
+protected:
   std::string name;
+};
+
+/**
+ * @class InitDeclaration
+ * Represents a declaration that stores an initializer value
+ */
+class InitDeclaration final: public Declaration {
+
+public:
+  InitDeclaration(DataType* type, const std::string& name, Expression* init);
+  ~InitDeclaration();
+
+  bool has_initializer() const;
+  Expression* get_initializer() const;
+
+  InitDeclaration* clone() const;
+
+private:
   Expression* init;
 };
 
@@ -65,8 +96,9 @@ public:
   void add_factory(DataTypeFactory* new_factory);
 
   DataType* build_data_type(DataType* internal_type) const;
+  virtual AbstractDeclaration* build_declaration(DataType* internal_type) const;
 
-private:
+protected:
   DataTypeFactory* sub_factory; // Can be NULL
 };
 
@@ -74,14 +106,17 @@ private:
  * @class Declarator
  * Represents a declarator with a name
  */
-class Declarator final: public AbstractDeclarator {
+class Declarator: public AbstractDeclarator {
 
 public:
   Declarator(const std::string& name);
+  Declarator(DataTypeFactory* sub_factory, const std::string& name);
 
   const std::string& get_name() const;
 
-private:
+  Declaration* build_declaration(DataType* internal_type) const;
+
+protected:
   std::string name;
 };
 
@@ -89,20 +124,17 @@ private:
  * @class InitDeclarator
  * Class that stores both a declarator and an initializer value
  */
-class InitDeclarator final {
+class InitDeclarator final: public Declarator {
 
 public:
-  InitDeclarator(Declarator* decl);
-  InitDeclarator(Declarator* decl, Expression* expr);
+  InitDeclarator(DataTypeFactory* sub_factory, const std::string& name, Expression* expr);
   ~InitDeclarator();
 
-  Declarator* get_declarator() const;
   Expression* get_expression() const;
 
-  AbstractDeclaration* build_declaration(DataType* internal_type) const;
+  InitDeclaration* build_declaration(DataType* internal_type) const;
 
 private:
-  Declarator* decl;
   Expression* expr;
 };
 

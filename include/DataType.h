@@ -184,30 +184,30 @@ private:
  * @class Parameter
  * Stores a single parameter in a function
  */
-class Parameter final {
+// class Parameter final {
 
-public:
-  Parameter(DataType* type);
-  Parameter(DataType* type, const std::string& name);
-  ~Parameter();
+// public:
+//   Parameter(DataType* type);
+//   Parameter(DataType* type, const std::string& name);
+//   ~Parameter();
 
-  // Give parameters value semantics
-  Parameter(const Parameter& other);
-  Parameter(Parameter&& other);
-  Parameter& operator=(const Parameter& other);
-  Parameter& operator=(Parameter&& other);
+//   // Give parameters value semantics
+//   Parameter(const Parameter& other);
+//   Parameter(Parameter&& other);
+//   Parameter& operator=(const Parameter& other);
+//   Parameter& operator=(Parameter&& other);
 
-  DataType* get_type() const;
+//   DataType* get_type() const;
 
-  bool has_name() const;
-  const std::string& get_name() const;
+//   bool has_name() const;
+//   const std::string& get_name() const;
 
-private:
-  DataType* type;
-  std::string name;
-};
+// private:
+//   DataType* type;
+//   std::string name;
+// };
 
-typedef std::vector<Parameter> ParameterList;
+typedef std::vector<class AbstractDeclaration*> ParameterList;
 
 /**
  * @class FunctionDataType

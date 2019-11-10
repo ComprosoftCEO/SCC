@@ -21,6 +21,17 @@ DataType* AbstractDeclaration::get_type() const {
 }
 
 //
+// Downcast to declaration
+//
+bool AbstractDeclaration::has_name() const {
+  return false;
+}
+
+Declaration* AbstractDeclaration::to_declaration() {
+  return dynamic_cast<Declaration*>(this);
+}
+
+//
 // Clone
 //
 AbstractDeclaration* AbstractDeclaration::clone() const {

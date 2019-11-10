@@ -4,25 +4,20 @@
 //
 // Constructor
 //
-InitDeclarator::InitDeclarator(Declarator* decl): InitDeclarator(decl, nullptr) {}
-
-InitDeclarator::InitDeclarator(Declarator* decl, Expression* expr): decl(decl), expr(expr) {}
+InitDeclarator::InitDeclarator(DataTypeFactory* sub_factory, const std::string& name,
+                               Expression* expr):
+  Declarator(sub_factory, name), expr(expr) {}
 
 //
 // Destructor
 //
 InitDeclarator::~InitDeclarator() {
-  delete (this->decl);
   delete (this->expr);
 }
 
 //
 // Getters
 //
-Declarator* InitDeclarator::get_declarator() const {
-  return this->decl;
-}
-
 Expression* InitDeclarator::get_expression() const {
   return this->expr;
 }
@@ -30,7 +25,7 @@ Expression* InitDeclarator::get_expression() const {
 //
 // Build the declaration
 //
-AbstractDeclaration* InitDeclarator::build_declaration(DataType* internal_type) const {
-  return new Declaration(this->decl->build_data_type(internal_type), this->decl->get_name(),
-                         this->expr);
+InitDeclaration* InitDeclarator::build_declaration(DataType* internal_type) const {
+  return new InitDeclaration(this->build_data_type(internal_type), this->name,
+                             Expression::clone(this->expr));
 }

@@ -6,9 +6,8 @@
 // Forward declare several classes
 class DataType;
 class Expression;
-class Parameter;
 
-typedef std::vector<Parameter> ParameterList;
+typedef std::vector<class AbstractDeclaration*> ParameterList;
 
 /**
  * @class DataTypeFactory
@@ -74,6 +73,7 @@ class FunctionFactory final: public DataTypeFactory {
 public:
   FunctionFactory();
   FunctionFactory(const ParameterList& parameters, bool elipsis = false);
+  ~FunctionFactory();
 
 private:
   DataType* build_aggregate(DataType* internal_type);

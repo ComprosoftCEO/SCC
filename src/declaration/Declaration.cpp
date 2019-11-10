@@ -5,20 +5,28 @@
 // Constructor
 //
 Declaration::Declaration(DataType* type, const std::string& name):
-  Declaration(type, name, nullptr) {}
-
-Declaration::Declaration(DataType* type, const std::string& name, Expression* initializer):
-  AbstractDeclaration(type), name(name), init(init) {}
+  AbstractDeclaration(type), name(name) {}
 
 //
 // Getters
 //
+bool Declaration::has_name() const {
+  return true;
+}
+
 const std::string& Declaration::get_name() const {
   return this->name;
 }
 
-Expression* Declaration::get_initializer() const {
-  return this->init;
+//
+// Downcast to initialzer declaration
+//
+bool Declaration::has_initializer() const {
+  return false;
+}
+
+InitDeclaration* Declaration::to_init_declaration() {
+  return dynamic_cast<InitDeclaration*>(this);
 }
 
 //

@@ -7,6 +7,7 @@
 class Statement;
 class StatementVisitor;
 class Expression;
+class Declaration;
 
 typedef std::vector<Statement*> StatementList;
 
@@ -35,6 +36,25 @@ class EmptyStatement final: public Statement {
 public:
   void visit(StatementVisitor& visitor);
   EmptyStatement* clone() const;
+};
+
+/**
+ * @class DeclarationStatement
+ * Statement that stores a declaration
+ */
+class DeclarationStatement final: public Statement {
+
+public:
+  DeclarationStatement(Declaration* decl);
+  ~DeclarationStatement();
+
+  Declaration* get_declaration() const;
+
+  void visit(StatementVisitor& visitor);
+  DeclarationStatement* clone() const;
+
+private:
+  Declaration* decl;
 };
 
 /**

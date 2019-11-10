@@ -75,6 +75,7 @@ OBJECTS=\
 	\
 	declaration/AbstractDeclaration.o\
 	declaration/Declaration.o \
+	declaration/InitDeclaration.o \
 	declaration/AbstractDeclarator.o \
 	declaration/Declarator.o \
 	declaration/InitDeclarator.o \

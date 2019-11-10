@@ -41,17 +41,18 @@
   std::string* str;                     // Identifier, string, type, etc.
   Expression* expr;                     // Expression interface
   DataType* dt;                         // Data type object
+
+  AbsDeclList* abs_decl_list;           // List of declarations without a name
+  DeclList* decl_list;                  // List of declarations with a name
   AbstractDeclaration* abs_decl;        // Abstract declaration (one without a name)
   Declaration* decl;                    // Declaration (one with a name)
   AbstractDeclarator* abs_declr;        // Declarator, but without the type
   Declarator* declr;                    // Declarator type (builds data type)
-  InitDeclarator* init_decl;            // Initializer declarator
-  InitDeclList* init_decl_list;         // List of initializer declarators
-  AbsDeclList* abs_decl_list;           // List of abstract declarations
+  AbsDeclrList* abs_declr_list;         // List of abstract declarators
+  DeclrList* declr_list;                // List of declarators
   DataTypeFactory* fact;                // Abstract factory type
+
   std::vector<Expression*>* expr_list;  // List of expressions
-  Parameter* param;                     // Single parameter in a function declaration
-  ParameterList* param_list;            // List of parameters
   Statement* stmt;                      // Statement type
   StatementList* stmt_list;             // List of statements
 }
@@ -125,27 +126,25 @@
 %type <expr> assignment_expression expression constant_expression
 %type <expr_list> argument_expression_list
 
-// Data types
-%type <dt> specifier_qualifier_list type_name type_specifier declaration_specifiers
-
 // Declarations and declarators
-%type <expr> initializer
-%type <abs_decl_list> declaration
-%type <init_decl_list> init_declarator_list
-%type <init_decl> init_declarator 
-%type <declr> declarator direct_declarator
+%type <decl_list> declaration
+%type <dt> declaration_specifiers specifier_qualifier_list type_specifier
+%type <declr_list> init_declarator_list declarator_list
+%type <declr> init_declarator declarator direct_declarator
+%type <dt> type_name
 %type <abs_declr> abstract_declarator direct_abstract_declarator
+%type <expr> initializer
 %type <fact> pointer
 
 // Parameters
-%type <param> parameter_declaration
-%type <param_list> parameter_list
+%type <abs_decl_list> parameter_list
+%type <abs_decl> parameter_declaration
 
 // Statements
 %type <stmt> statement
 %type <expr> expression_statement
 %type <stmt> labeled_statement compound_statement selection_statement iteration_statement jump_statement
-%type <stmt_list> block_item_list
+%type <stmt_list> block_item block_item_list
 
 //%type <list> insanity if
 //%type <stmt> statement
@@ -308,9 +307,8 @@ constant_expression
   ;
 
 declaration
-  : declaration_specifiers ';'                        { $$ = new AbsDeclList{new AbstractDeclaration($1)}; }
-  | declaration_specifiers init_declarator_list ';'   {
-    $$ = new AbsDeclList();
+  : declaration_specifiers init_declarator_list ';'   {
+    $$ = new DeclList();
     for (auto decl : *$2) {
       $$->push_back(decl->build_declaration($1->clone()));
       delete(decl);
@@ -318,6 +316,10 @@ declaration
     delete($2);
     delete($1);
   }
+  ;
+
+typedef_declaration
+  : TYPEDEF declaration_specifiers declarator_list
   ;
 
 declaration_specifiers
@@ -341,13 +343,13 @@ init_declarator_list
 
 init_declarator
   : declarator '=' initializer  { $$ = new InitDeclarator($1, $3); }
-  | declarator                  { $$ = new InitDeclarator($1); }
+  | declarator                  { $$ = $1; }
   ;
 
-// declarator_list
-//   : declarator
-//   | declarator_list ',' declarator
-//   ;
+declarator_list
+  : declarator
+  | declarator_list ',' declarator
+  ;
 
 storage_class_specifier
   : TYPEDEF
@@ -483,14 +485,14 @@ type_qualifier_list
   ;
 
 parameter_list
-  : parameter_declaration                       { $$ = new ParameterList{*$1}; delete($1);}
-  | parameter_list ',' parameter_declaration    { $$ = $1; $$->push_back(*$3); delete($3); }
+  : parameter_declaration                       { $$ = new ParameterList{$1}; }
+  | parameter_list ',' parameter_declaration    { $$ = $1; $$->push_back($3); }
   ;
 
 parameter_declaration
-  : declaration_specifiers declarator           { $$ = new Parameter($2->build_data_type($1), $2->get_name()); delete($2); }
-  | declaration_specifiers abstract_declarator  { $$ = new Parameter($2->build_data_type($1)); delete($2); }
-  | declaration_specifiers                      { $$ = new Parameter($1); }
+  : declaration_specifiers declarator           { $$ = $2->build_declaration($1); delete($2); }
+  | declaration_specifiers abstract_declarator  { $$ = $2->build_declaration($1); delete($2); }
+  | declaration_specifiers                      { $$ = new AbstractDeclaration($1); }
   ;
 
 type_name
@@ -571,8 +573,14 @@ block_item_list
   ;
 
 block_item
-  : declaration
-  | statement
+  : statement     { $$ = new StatementList{$1}; }
+  | declaration   {
+    $$ = new StatementList();
+    for (auto decl : *$1) {
+      $$->push_bash(new DeclarationStatement(decl));
+    }
+    delete($1);
+  }
   ;
 
 expression_statement
@@ -589,8 +597,8 @@ selection_statement
 iteration_statement
   : WHILE '(' expression ')' statement                                            { $$ = new WhileStatement($3, $5); }
   | DO statement WHILE '(' expression ')' ';'                                     { $$ = new DoWhileStatement($2, $5); }
-  // | FOR '(' expression_statement expression_statement ')' statement               { $$ = new ForStatement($3, $4, $6); }
-  // | FOR '(' expression_statement expression_statement expression ')' statement    { $$ = new ForStatement($3, $4, $5, $7); }
+  | FOR '(' expression_statement expression_statement ')' statement               { $$ = new ForStatement($3, $4, $6); }
+  | FOR '(' expression_statement expression_statement expression ')' statement    { $$ = new ForStatement($3, $4, $5, $7); }
   // | FOR '(' declaration expression_statement ')' statement
   // | FOR '(' declaration expression_statement expression ')' statement
   ;
