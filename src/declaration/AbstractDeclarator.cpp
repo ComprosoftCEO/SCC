@@ -27,11 +27,17 @@ void AbstractDeclarator::add_factory(DataTypeFactory* new_factory) {
 // Build the data type
 //
 DataType* AbstractDeclarator::build_data_type(DataType* internal_type) const {
-
   if (this->sub_factory != nullptr) {
     // Tail-end recursion
-    return this->sub_factory->build_data_type(internal_type);
+    this->sub_factory->build_data_type(internal_type);
   }
 
   return internal_type;
+}
+
+//
+// Build the declaration
+//
+AbstractDeclaration* AbstractDeclarator::build_declaration(DataType* internal_type) const {
+  return new AbstractDeclaration(this->build_data_type(internal_type));
 }

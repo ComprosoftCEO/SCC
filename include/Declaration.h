@@ -53,6 +53,9 @@ public:
 
   void add_factory(DataTypeFactory* new_factory);
 
+  virtual AbstractDeclaration* build_declaration(DataType* internal_type) const;
+
+protected:
   DataType* build_data_type(DataType* internal_type) const;
 
 private:
@@ -69,6 +72,8 @@ public:
   Declarator(const std::string& name);
 
   const std::string& get_name() const;
+
+  Declaration* build_declaration(DataType* internal_type) const;
 
 private:
   std::string name;

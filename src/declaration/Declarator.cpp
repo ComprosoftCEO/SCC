@@ -12,3 +12,10 @@ Declarator::Declarator(const std::string& name): name(name) {}
 const std::string& Declarator::get_name() const {
   return this->name;
 }
+
+//
+// Build the declaration
+//
+Declaration* Declarator::build_declaration(DataType* internal_type) const {
+  return new Declaration(this->build_data_type(internal_type), this->name);
+}
