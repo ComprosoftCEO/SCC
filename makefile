@@ -58,6 +58,7 @@ OBJECTS=\
 	\
 	statement/Statement.o \
 	statement/EmptyStatement.o \
+	statement/DeclarationStatement.o \
 	statement/LabelStatement.o \
 	statement/CompoundStatement.o \
 	statement/ExpressionStatement.o \

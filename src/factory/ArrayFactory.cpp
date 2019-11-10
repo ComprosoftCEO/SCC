@@ -5,9 +5,14 @@
 //
 // Constructor
 //
-ArrayFactory::ArrayFactory(): ArrayFactory(nullptr) {}
+ArrayFactory::ArrayFactory(): ArrayFactory(nullptr, nullptr) {}
 
-ArrayFactory::ArrayFactory(Expression* size): DataTypeFactory(), size(nullptr) {}
+ArrayFactory::ArrayFactory(DataTypeFactory* sub_factory): ArrayFactory(sub_factory, nullptr) {}
+
+ArrayFactory::ArrayFactory(Expression* size): ArrayFactory(nullptr, size) {}
+
+ArrayFactory::ArrayFactory(DataTypeFactory* sub_factory, Expression* size):
+  DataTypeFactory(sub_factory), size(size) {}
 
 //
 // Destructor

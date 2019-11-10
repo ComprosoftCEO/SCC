@@ -15,6 +15,13 @@ DataTypeFactory::~DataTypeFactory() {
 }
 
 //
+// Getters
+//
+DataTypeFactory* DataTypeFactory::get_sub_factory() const {
+  return this->sub_factory;
+}
+
+//
 // Update the sub factory
 //
 void DataTypeFactory::set_sub_factory(DataTypeFactory* sub_factory) {

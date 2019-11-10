@@ -22,6 +22,10 @@ Declaration::~Declaration() {
 //
 // Getters
 //
+DataType* Declaration::get_type() const {
+  return this->type;
+}
+
 const std::string& Declaration::get_name() const {
   return this->name;
 }
@@ -32,4 +36,11 @@ bool Declaration::has_initializer() const {
 
 Expression* Declaration::get_initializer() const {
   return this->init;
+}
+
+//
+// Clone
+//
+Declaration* Declaration::clone() const {
+  return new Declaration(DataType::clone(this->type), this->name, Expression::clone(this->init));
 }

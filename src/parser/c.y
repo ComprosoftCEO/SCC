@@ -15,6 +15,7 @@
   #include <DataTypeFactory.h>
   #include <Declaration.h>
   #include <Expression.h>
+  #include <Parameter.h>
   #include <Statement.h>
 
   // Declare stuff from Flex that Bison needs to know about:
@@ -42,15 +43,15 @@
   Expression* expr;                     // Expression interface
   DataType* dt;                         // Data type object
 
-  AbsDeclList* abs_decl_list;           // List of declarations without a name
-  DeclList* decl_list;                  // List of declarations with a name
-  AbstractDeclaration* abs_decl;        // Abstract declaration (one without a name)
+  DeclarationList* decl_list;           // List of declarations with a name
   Declaration* decl;                    // Declaration (one with a name)
-  AbstractDeclarator* abs_declr;        // Declarator, but without the type
+  DeclaratorList* declr_list;           // List of declarators
   Declarator* declr;                    // Declarator type (builds data type)
-  AbsDeclrList* abs_declr_list;         // List of abstract declarators
-  DeclrList* declr_list;                // List of declarators
   DataTypeFactory* fact;                // Abstract factory type
+  PointerFactory* pfact;                // Pointer factory (special case)
+
+  Parameter* param;                     // Single parameter in a function
+  ParameterList* param_list;            // List of parameters in a function
 
   std::vector<Expression*>* expr_list;  // List of expressions
   Statement* stmt;                      // Statement type
@@ -59,7 +60,7 @@
 
 //Destructors
 %destructor {delete($$);} <expr> <str>
-%destructor {delete($$);} <dt> <decl> <abs_decl> <abs_declr> <declr> <fact>
+%destructor {delete($$);} <dt> <decl> <declr> <fact> <pfact>
 %destructor {
   for (auto el : *($$)) {
     delete(el);
@@ -132,13 +133,13 @@
 %type <declr_list> init_declarator_list declarator_list
 %type <declr> init_declarator declarator direct_declarator
 %type <dt> type_name
-%type <abs_declr> abstract_declarator direct_abstract_declarator
+%type <fact> abstract_declarator direct_abstract_declarator
 %type <expr> initializer
-%type <fact> pointer
+%type <pfact> pointer
 
 // Parameters
-%type <abs_decl_list> parameter_list
-%type <abs_decl> parameter_declaration
+%type <param_list> parameter_list
+%type <param> parameter_declaration
 
 // Statements
 %type <stmt> statement
@@ -308,7 +309,7 @@ constant_expression
 
 declaration
   : declaration_specifiers init_declarator_list ';'   {
-    $$ = new DeclList();
+    $$ = new DeclarationList();
     for (auto decl : *$2) {
       $$->push_back(decl->build_declaration($1->clone()));
       delete(decl);
@@ -337,12 +338,12 @@ declaration_specifiers
   ;
 
 init_declarator_list
-  : init_declarator                           { $$ = new InitDeclList{$1}; }
+  : init_declarator                           { $$ = new DeclaratorList{$1}; }
   | init_declarator_list ',' init_declarator  { $$ = $1; $1->push_back($3); }
   ;
 
 init_declarator
-  : declarator '=' initializer  { $$ = new InitDeclarator($1, $3); }
+  : declarator '=' initializer  { $$ = $1; $1->set_initializer($3); }
   | declarator                  { $$ = $1; }
   ;
 
@@ -475,8 +476,8 @@ direct_declarator
 pointer
   // : '*' type_qualifier_list pointer
   // | '*' type_qualifier_list
-  : '*' pointer                     { $$ = new PointerFactory($2); }
-  | '*'                             { $$ = new PointerFactory(); }
+  : pointer '*'                      { $$ = $1; $1->add_factory(new PointerFactory()); }
+  | '*'                              { $$ = new PointerFactory(); }
   ;
 
 type_qualifier_list
@@ -485,14 +486,14 @@ type_qualifier_list
   ;
 
 parameter_list
-  : parameter_declaration                       { $$ = new ParameterList{$1}; }
-  | parameter_list ',' parameter_declaration    { $$ = $1; $$->push_back($3); }
+  : parameter_declaration                       { $$ = new ParameterList{*$1}; delete($1); }
+  | parameter_list ',' parameter_declaration    { $$ = $1; $$->push_back(*$3); delete($3); }
   ;
 
 parameter_declaration
-  : declaration_specifiers declarator           { $$ = $2->build_declaration($1); delete($2); }
-  | declaration_specifiers abstract_declarator  { $$ = $2->build_declaration($1); delete($2); }
-  | declaration_specifiers                      { $$ = new AbstractDeclaration($1); }
+  : declaration_specifiers declarator           { $$ = new Parameter($2->build_declaration($1)); delete($2); }
+  | declaration_specifiers abstract_declarator  { $$ = new Parameter($2->build_data_type($1)); delete($2); }
+  | declaration_specifiers                      { $$ = new Parameter($1); }
   ;
 
 type_name
@@ -501,23 +502,23 @@ type_name
   ;
 
 abstract_declarator
-  : pointer direct_abstract_declarator    { $$ = $2; $$->add_factory($1); }
-  | pointer                               { $$ = new AbstractDeclarator($1); }
+  : pointer                               { $$ = $1; }
   | direct_abstract_declarator            { $$ = $1; }
+  | pointer direct_abstract_declarator    { $$ = $1; $1->add_factory($2); }
   ;
 
 direct_abstract_declarator
   : '(' abstract_declarator ')'                                     { $$ = $2; }
-  | '[' ']'                                                         { $$ = new AbstractDeclarator(new ArrayFactory()); }
-  | '[' assignment_expression ']'                                   { $$ = new AbstractDeclarator(new ArrayFactory($2)); }
-  | direct_abstract_declarator '[' ']'                              { $$ = $1; $$->add_factory(new ArrayFactory()); }
-  | direct_abstract_declarator '[' assignment_expression ']'        { $$ = $1; $$->add_factory(new ArrayFactory($3)); }
-  | '(' ')'                                                         { $$ = new AbstractDeclarator(new FunctionFactory()); }
-  | '(' parameter_list ')'                                          { $$ = new AbstractDeclarator(new FunctionFactory(*$2)); delete($2); }
-  | '(' parameter_list ',' ELLIPSIS ')'                             { $$ = new AbstractDeclarator(new FunctionFactory(*$2, true)); delete($2); }
-  | direct_abstract_declarator '(' ')'                              { $$ = $1; $$->add_factory(new FunctionFactory()); }
-  | direct_abstract_declarator '(' parameter_list ')'               { $$ = $1; $$->add_factory(new FunctionFactory(*$3)); delete($3); }
-  | direct_abstract_declarator '(' parameter_list ',' ELLIPSIS ')'  { $$ = $1; $$->add_factory(new FunctionFactory(*$3, true)); delete($3); }
+  | '[' ']'                                                         { $$ = new ArrayFactory(); }
+  | '[' assignment_expression ']'                                   { $$ = new ArrayFactory($2); }
+  | direct_abstract_declarator '[' ']'                              { $$ = new ArrayFactory($1); }
+  | direct_abstract_declarator '[' assignment_expression ']'        { $$ = new ArrayFactory($1, $3); }
+  | '(' ')'                                                         { $$ = new FunctionFactory(); }
+  | '(' parameter_list ')'                                          { $$ = new FunctionFactory(*$2); delete($2); }
+  | '(' parameter_list ',' ELLIPSIS ')'                             { $$ = new FunctionFactory(*$2, true); delete($2); }
+  | direct_abstract_declarator '(' ')'                              { $$ = new FunctionFactory($1); }
+  | direct_abstract_declarator '(' parameter_list ')'               { $$ = new FunctionFactory($1, *$3); delete($3); }
+  | direct_abstract_declarator '(' parameter_list ',' ELLIPSIS ')'  { $$ = new FunctionFactory($1, *$3, true); delete($3); }
   ;
 
 initializer
@@ -577,7 +578,7 @@ block_item
   | declaration   {
     $$ = new StatementList();
     for (auto decl : *$1) {
-      $$->push_bash(new DeclarationStatement(decl));
+      $$->push_back(new DeclarationStatement(decl));
     }
     delete($1);
   }
@@ -597,8 +598,8 @@ selection_statement
 iteration_statement
   : WHILE '(' expression ')' statement                                            { $$ = new WhileStatement($3, $5); }
   | DO statement WHILE '(' expression ')' ';'                                     { $$ = new DoWhileStatement($2, $5); }
-  | FOR '(' expression_statement expression_statement ')' statement               { $$ = new ForStatement($3, $4, $6); }
-  | FOR '(' expression_statement expression_statement expression ')' statement    { $$ = new ForStatement($3, $4, $5, $7); }
+  // | FOR '(' expression_statement expression_statement ')' statement               { $$ = new ForStatement($3, $4, $6); }
+  // | FOR '(' expression_statement expression_statement expression ')' statement    { $$ = new ForStatement($3, $4, $5, $7); }
   // | FOR '(' declaration expression_statement ')' statement
   // | FOR '(' declaration expression_statement expression ')' statement
   ;

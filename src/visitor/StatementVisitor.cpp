@@ -9,6 +9,10 @@ void StatementVisitor::accept(LabelStatement& stmt) {
   return;
 }
 
+void StatementVisitor::accept(DeclarationStatement& stmt) {
+  return;
+}
+
 void StatementVisitor::accept(CompoundStatement& stmt) {
   for (auto s: stmt.get_statement_list()) {
     if (s != nullptr) { s->visit(*this); }

@@ -33,6 +33,11 @@ void Declarator::add_factory(DataTypeFactory* new_factory) {
   this->sub_factory = new_factory;
 }
 
+void Declarator::add_factory(PointerFactory* pointer_factory) {
+  pointer_factory->add_factory(this->sub_factory);
+  this->sub_factory = pointer_factory;
+}
+
 void Declarator::set_initializer(Expression* init) {
   delete (this->init);
   this->init = init;

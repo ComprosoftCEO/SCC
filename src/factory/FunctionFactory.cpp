@@ -6,8 +6,15 @@
 //
 FunctionFactory::FunctionFactory(): DataTypeFactory(), elipsis(true) {}
 
+FunctionFactory::FunctionFactory(DataTypeFactory* sub_factory):
+  DataTypeFactory(sub_factory), elipsis(true) {}
+
 FunctionFactory::FunctionFactory(const ParameterList& parameters, bool elipsis):
-  DataTypeFactory(), parameters(parameters), elipsis(elipsis) {}
+  FunctionFactory(nullptr, parameters, elipsis) {}
+
+FunctionFactory::FunctionFactory(DataTypeFactory* sub_factory, const ParameterList& parameters,
+                                 bool elipsis):
+  DataTypeFactory(sub_factory), parameters(parameters), elipsis(elipsis) {}
 
 //
 // Build the aggregate type

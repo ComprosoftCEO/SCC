@@ -7,7 +7,13 @@
 // Forward declare classes
 class DataType;
 class DataTypeFactory;
+class Declaration;
+class Declarator;
+class PointerFactory;
 class Expression;
+
+typedef std::vector<Declarator*> DeclaratorList;
+typedef std::vector<Declaration*> DeclarationList;
 
 /**
  * @class Declaration
@@ -20,9 +26,12 @@ public:
   Declaration(DataType* type, const std::string& name, Expression* init);
   ~Declaration();
 
+  DataType* get_type() const;
   const std::string& get_name() const;
   bool has_initializer() const;
   Expression* get_initializer() const;
+
+  Declaration* clone() const;
 
 protected:
   DataType* type;
@@ -45,6 +54,8 @@ public:
   bool has_initializer() const;
 
   void add_factory(DataTypeFactory* new_factory);
+  void add_factory(PointerFactory* pointer_factory);
+
   void set_initializer(Expression* init); // Replaces initializer in object
 
   Declaration* build_declaration(DataType* internal_type) const;

@@ -6,6 +6,7 @@
 
 // Forward declare classes
 class DataType;
+class Declaration;
 
 /**
  * @class Parameter
@@ -16,6 +17,7 @@ class Parameter final {
 public:
   Parameter(DataType* type);
   Parameter(DataType* type, const std::string& name);
+  Parameter(Declaration* decl); // Deletes the declaration
   ~Parameter();
 
   // Give parameters value semantics

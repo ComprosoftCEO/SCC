@@ -21,7 +21,8 @@ public:
   DataTypeFactory(DataTypeFactory* sub_factory);
   virtual ~DataTypeFactory();
 
-  // Deletes the previous sub factory
+  // Set factory deletes the previous sub factory
+  DataTypeFactory* get_sub_factory() const;
   void set_sub_factory(DataTypeFactory* sub_factory);
 
   DataType* build_data_type(DataType* internal_type);
@@ -30,6 +31,7 @@ private:
   // Constructs the pointer, function, or array
   virtual DataType* build_aggregate(DataType* internal_type) = 0;
 
+private:
   DataTypeFactory* sub_factory;
 };
 
@@ -43,6 +45,8 @@ public:
   PointerFactory();
   PointerFactory(DataTypeFactory* sub_factory);
 
+  void add_factory(DataTypeFactory* sub_factory);
+
 private:
   DataType* build_aggregate(DataType* internal_type);
 };
@@ -55,7 +59,9 @@ class ArrayFactory final: public DataTypeFactory {
 
 public:
   ArrayFactory();
+  ArrayFactory(DataTypeFactory* sub_factory);
   ArrayFactory(Expression* size);
+  ArrayFactory(DataTypeFactory* sub_factory, Expression* size);
 
   ~ArrayFactory();
 
@@ -73,7 +79,10 @@ class FunctionFactory final: public DataTypeFactory {
 
 public:
   FunctionFactory();
+  FunctionFactory(DataTypeFactory* sub_factory);
   FunctionFactory(const ParameterList& parameters, bool elipsis = false);
+  FunctionFactory(DataTypeFactory* sub_factory, const ParameterList& parameters,
+                  bool elipsis = false);
 
 private:
   DataType* build_aggregate(DataType* internal_type);

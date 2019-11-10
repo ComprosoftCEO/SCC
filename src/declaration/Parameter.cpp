@@ -1,4 +1,5 @@
 #include <DataType.h>
+#include <Declaration.h>
 #include <Parameter.h>
 #include <algorithm> /* For std::swap */
 
@@ -8,6 +9,11 @@
 Parameter::Parameter(DataType* type): type(type) {}
 
 Parameter::Parameter(DataType* type, const std::string& name): type(type), name(name) {}
+
+Parameter::Parameter(Declaration* decl):
+  Parameter(DataType::clone(decl->get_type()), decl->get_name()) {
+  delete (decl);
+}
 
 //
 // Destructor
