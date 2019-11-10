@@ -108,6 +108,9 @@ public:
   ExpressionStatement(Expression* expr);
   ~ExpressionStatement();
 
+  // Returns EmptyStatement() if expr is null
+  static Statement* build_statement(Expression* expr);
+
   Expression* get_expression() const;
 
   void visit(StatementVisitor& visitor);

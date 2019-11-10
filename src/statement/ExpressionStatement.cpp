@@ -15,6 +15,14 @@ ExpressionStatement::~ExpressionStatement() {
 }
 
 //
+// Build the statement
+//
+Statement* ExpressionStatement::build_statement(Expression* expr) {
+  if (expr == nullptr) { return new EmptyStatement(); }
+  return new ExpressionStatement(expr);
+}
+
+//
 // Getters
 //
 Expression* ExpressionStatement::get_expression() const {

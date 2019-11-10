@@ -551,7 +551,7 @@ initializer
 statement
   : labeled_statement     { $$ = $1; }
   | compound_statement    { $$ = $1; }
-  | expression_statement  { $$ = ($1 == nullptr) ? ((Statement*) new EmptyStatement()) : ((Statement*) new ExpressionStatement($1)); }
+  | expression_statement  { $$ = ExpressionStatement::build_statement($1); }
   | selection_statement   { $$ = $1; }
   | iteration_statement   { $$ = $1; }
   | jump_statement        { $$ = $1; }

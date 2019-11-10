@@ -38,6 +38,7 @@ class ConditionalExpression;
 
 // Forward declare all of the statement classes
 class EmptyStatement;
+class DeclarationStatement;
 class LabelStatement;
 class CompoundStatement;
 class ExpressionStatement;
