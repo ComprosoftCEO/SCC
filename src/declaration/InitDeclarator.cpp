@@ -26,3 +26,11 @@ Declarator* InitDeclarator::get_declarator() const {
 Expression* InitDeclarator::get_expression() const {
   return this->expr;
 }
+
+//
+// Build the declaration
+//
+AbstractDeclaration* InitDeclarator::build_declaration(DataType* internal_type) const {
+  return new Declaration(this->decl->build_data_type(internal_type), this->decl->get_name(),
+                         this->expr);
+}

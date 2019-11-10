@@ -47,6 +47,7 @@
   Declarator* declr;                    // Declarator type (builds data type)
   InitDeclarator* init_decl;            // Initializer declarator
   InitDeclList* init_decl_list;         // List of initializer declarators
+  AbsDeclList* abs_decl_list;           // List of abstract declarations
   DataTypeFactory* fact;                // Abstract factory type
   std::vector<Expression*>* expr_list;  // List of expressions
   Parameter* param;                     // Single parameter in a function declaration
@@ -129,7 +130,7 @@
 
 // Declarations and declarators
 %type <expr> initializer
-%type <decl> declaration
+%type <abs_decl_list> declaration
 %type <init_decl_list> init_declarator_list
 %type <init_decl> init_declarator 
 %type <declr> declarator direct_declarator
@@ -307,8 +308,16 @@ constant_expression
   ;
 
 declaration
-  : declaration_specifiers ';'                        { delete($1); }
-  | declaration_specifiers init_declarator_list ';'   
+  : declaration_specifiers ';'                        { $$ = new AbsDeclList{new AbstractDeclaration($1)}; }
+  | declaration_specifiers init_declarator_list ';'   {
+    $$ = new AbsDeclList();
+    for (auto decl : *$2) {
+      $$->push_back(decl->build_declaration($1->clone()));
+      delete(decl);
+    }
+    delete($2);
+    delete($1);
+  }
   ;
 
 declaration_specifiers

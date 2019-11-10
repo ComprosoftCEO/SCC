@@ -5,12 +5,14 @@
 #include <vector>
 
 // Forward declare classes
+class AbstractDeclaration;
 class DataType;
 class DataTypeFactory;
 class Expression;
 class InitDeclarator;
 
 typedef std::vector<InitDeclarator*> InitDeclList;
+typedef std::vector<AbstractDeclaration*> AbsDeclList;
 
 /**
  * @class AbstractDeclaration
@@ -37,13 +39,16 @@ class Declaration final: public AbstractDeclaration {
 
 public:
   Declaration(DataType* type, const std::string& name);
-  Declaration(DataType* type, const std::string& name, Expression* initializer);
+  Declaration(DataType* type, const std::string& name, Expression* init);
 
   const std::string& get_name() const;
+  Expression* get_initializer() const;
+
   Declaration* clone() const;
 
 private:
   std::string name;
+  Expression* init;
 };
 
 /**
@@ -59,7 +64,6 @@ public:
 
   void add_factory(DataTypeFactory* new_factory);
 
-  virtual AbstractDeclaration* build_declaration(DataType* internal_type) const;
   DataType* build_data_type(DataType* internal_type) const;
 
 private:
@@ -76,8 +80,6 @@ public:
   Declarator(const std::string& name);
 
   const std::string& get_name() const;
-
-  Declaration* build_declaration(DataType* internal_type) const;
 
 private:
   std::string name;
@@ -96,6 +98,8 @@ public:
 
   Declarator* get_declarator() const;
   Expression* get_expression() const;
+
+  AbstractDeclaration* build_declaration(DataType* internal_type) const;
 
 private:
   Declarator* decl;
