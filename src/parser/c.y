@@ -46,6 +46,7 @@
   AbstractDeclarator* abs_declr;        // Declarator, but without the type
   Declarator* declr;                    // Declarator type (builds data type)
   InitDeclarator* init_decl;            // Initializer declarator
+  InitDeclList* init_decl_list;         // List of initializer declarators
   DataTypeFactory* fact;                // Abstract factory type
   std::vector<Expression*>* expr_list;  // List of expressions
   Parameter* param;                     // Single parameter in a function declaration
@@ -129,6 +130,7 @@
 // Declarations and declarators
 %type <expr> initializer
 %type <decl> declaration
+%type <init_decl_list> init_declarator_list
 %type <init_decl> init_declarator 
 %type <declr> declarator direct_declarator
 %type <abs_declr> abstract_declarator direct_abstract_declarator
@@ -324,8 +326,8 @@ declaration_specifiers
   ;
 
 init_declarator_list
-  : init_declarator
-  | init_declarator_list ',' init_declarator
+  : init_declarator                           { $$ = new InitDeclList{$1}; }
+  | init_declarator_list ',' init_declarator  { $$ = $1; $1->push_back($3); }
   ;
 
 init_declarator

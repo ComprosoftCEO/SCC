@@ -2,11 +2,15 @@
 #define DECLARATION_HEADER
 
 #include <string>
+#include <vector>
 
 // Forward declare classes
 class DataType;
 class DataTypeFactory;
 class Expression;
+class InitDeclarator;
+
+typedef std::vector<InitDeclarator*> InitDeclList;
 
 /**
  * @class AbstractDeclaration
@@ -33,6 +37,7 @@ class Declaration final: public AbstractDeclaration {
 
 public:
   Declaration(DataType* type, const std::string& name);
+  Declaration(DataType* type, const std::string& name, Expression* initializer);
 
   const std::string& get_name() const;
   Declaration* clone() const;
