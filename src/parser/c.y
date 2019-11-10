@@ -41,8 +41,11 @@
   std::string* str;                     // Identifier, string, type, etc.
   Expression* expr;                     // Expression interface
   DataType* dt;                         // Data type object
-  AbstractDeclarator* abs_decl;         // Declarator, but without the type
-  Declarator* decl;                     // Declarator type (builds data type)
+  AbstractDeclaration* abs_decl;        // Abstract declaration (one without a name)
+  Declaration* decl;                    // Declaration (one with a name)
+  AbstractDeclarator* abs_declr;        // Declarator, but without the type
+  Declarator* declr;                    // Declarator type (builds data type)
+  InitDeclarator* init_decl;            // Initializer declarator
   DataTypeFactory* fact;                // Abstract factory type
   std::vector<Expression*>* expr_list;  // List of expressions
   Parameter* param;                     // Single parameter in a function declaration
@@ -53,7 +56,7 @@
 
 //Destructors
 %destructor {delete($$);} <expr> <str>
-%destructor {delete($$);} <dt> <decl> <fact>
+%destructor {delete($$);} <dt> <decl> <abs_decl> <abs_declr> <declr> <fact>
 %destructor {
   for (auto el : *($$)) {
     delete(el);
@@ -123,10 +126,12 @@
 // Data types
 %type <dt> specifier_qualifier_list type_name type_specifier declaration_specifiers
 
-// Declarators
+// Declarations and declarators
 %type <expr> initializer
-%type <decl> declarator direct_declarator
-%type <abs_decl> abstract_declarator direct_abstract_declarator
+%type <decl> declaration
+%type <init_decl> init_declarator 
+%type <declr> declarator direct_declarator
+%type <abs_declr> abstract_declarator direct_abstract_declarator
 %type <fact> pointer
 
 // Parameters
@@ -324,8 +329,8 @@ init_declarator_list
   ;
 
 init_declarator
-  : declarator '=' initializer
-  | declarator
+  : declarator '=' initializer  { $$ = new InitDeclarator($1, $3); }
+  | declarator                  { $$ = new InitDeclarator($1); }
   ;
 
 // declarator_list

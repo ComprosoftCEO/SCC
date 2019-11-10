@@ -77,6 +77,7 @@ OBJECTS=\
 	declaration/Declaration.o \
 	declaration/AbstractDeclarator.o \
 	declaration/Declarator.o \
+	declaration/InitDeclarator.o \
 	\
 	factory/DataTypeFactory.o \
 	factory/PointerFactory.o \

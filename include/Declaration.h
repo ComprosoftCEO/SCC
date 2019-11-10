@@ -6,6 +6,7 @@
 // Forward declare classes
 class DataType;
 class DataTypeFactory;
+class Expression;
 
 /**
  * @class AbstractDeclaration
@@ -54,8 +55,6 @@ public:
   void add_factory(DataTypeFactory* new_factory);
 
   virtual AbstractDeclaration* build_declaration(DataType* internal_type) const;
-
-protected:
   DataType* build_data_type(DataType* internal_type) const;
 
 private:
@@ -77,6 +76,25 @@ public:
 
 private:
   std::string name;
+};
+
+/**
+ * @class InitDeclarator
+ * Class that stores both a declarator and an initializer value
+ */
+class InitDeclarator final {
+
+public:
+  InitDeclarator(Declarator* decl);
+  InitDeclarator(Declarator* decl, Expression* expr);
+  ~InitDeclarator();
+
+  Declarator* get_declarator() const;
+  Expression* get_expression() const;
+
+private:
+  Declarator* decl;
+  Expression* expr;
 };
 
 #endif /* Declaration Header Included */
