@@ -1,6 +1,6 @@
 # Makefile for Insanity C Compiler
 CC=g++
-CFLAGS=-std=c++14 -Iinclude
+CFLAGS=-std=c++11 -Iinclude
 
 PROGRAM=scc.out
 

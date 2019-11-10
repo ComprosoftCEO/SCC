@@ -1,6 +1,7 @@
 #ifndef DATA_TYPE_HEADER
 #define DATA_TYPE_HEADER
 
+#include <Parameter.h>
 #include <cstddef> /* For size_t */
 #include <cstdint>
 #include <string>
@@ -179,35 +180,6 @@ private:
   DataType* type;
   class Expression* array_size;
 };
-
-/**
- * @class Parameter
- * Stores a single parameter in a function
- */
-// class Parameter final {
-
-// public:
-//   Parameter(DataType* type);
-//   Parameter(DataType* type, const std::string& name);
-//   ~Parameter();
-
-//   // Give parameters value semantics
-//   Parameter(const Parameter& other);
-//   Parameter(Parameter&& other);
-//   Parameter& operator=(const Parameter& other);
-//   Parameter& operator=(Parameter&& other);
-
-//   DataType* get_type() const;
-
-//   bool has_name() const;
-//   const std::string& get_name() const;
-
-// private:
-//   DataType* type;
-//   std::string name;
-// };
-
-typedef std::vector<class AbstractDeclaration*> ParameterList;
 
 /**
  * @class FunctionDataType

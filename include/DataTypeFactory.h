@@ -73,7 +73,6 @@ class FunctionFactory final: public DataTypeFactory {
 public:
   FunctionFactory();
   FunctionFactory(const ParameterList& parameters, bool elipsis = false);
-  ~FunctionFactory();
 
 private:
   DataType* build_aggregate(DataType* internal_type);
