@@ -8,7 +8,6 @@
 class DataType;
 class DataTypeFactory;
 class Expression;
-class InitDeclarator;
 
 /**
  * @class Declaration
@@ -28,16 +27,7 @@ public:
 protected:
   DataType* type;
   std::string name;
-  Expression* expr;
-};
-
-/**
- * @class AbstractDeclarator
- * Represents a declarator with no name
- */
-class AbstractDeclarator {
-
-public:
+  Expression* init;
 };
 
 /**

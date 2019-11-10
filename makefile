@@ -18,7 +18,6 @@ OBJECTS=\
 	datatype/PointerDataType.o \
 	datatype/ArrayDataType.o \
 	datatype/FunctionDataType.o \
-	datatype/Parameter.o \
 	\
 	expression/Expression.o \
 	expression/CommaExpression.o \
@@ -73,12 +72,9 @@ OBJECTS=\
 	visitor/ExpressionVisitor.o \
 	visitor/StatementVisitor.o \
 	\
-	declaration/AbstractDeclaration.o\
 	declaration/Declaration.o \
-	declaration/InitDeclaration.o \
-	declaration/AbstractDeclarator.o \
 	declaration/Declarator.o \
-	declaration/InitDeclarator.o \
+	declaration/Parameter.o \
 	\
 	factory/DataTypeFactory.o \
 	factory/PointerFactory.o \

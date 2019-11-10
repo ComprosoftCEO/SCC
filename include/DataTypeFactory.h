@@ -1,13 +1,12 @@
 #ifndef DATA_TYPE_FACTORY_HEADER
 #define DATA_TYPE_FACTORY_HEADER
 
+#include <Parameter.h>
 #include <vector>
 
 // Forward declare several classes
 class DataType;
 class Expression;
-
-typedef std::vector<class AbstractDeclaration*> ParameterList;
 
 /**
  * @class DataTypeFactory
@@ -16,7 +15,7 @@ typedef std::vector<class AbstractDeclaration*> ParameterList;
  */
 class DataTypeFactory {
 
-  friend class AbstractDeclarator; // Hacky
+  friend class Declarator; // Hacky
 
 public:
   // Sub-factory can be a NULL pointer
