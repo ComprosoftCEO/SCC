@@ -4,7 +4,7 @@
 
 %parse-param { yyscan_t scanner } 
 %lex-param { yyscan_t scanner }
-// %parse-param { FunctionDefinitionList& functions }
+%parse-param { FunctionDefinitionList& functions }
 
 %code requires {
   #include <cstdio>
@@ -26,7 +26,7 @@
 %code {
   // Let Bison know about Flex methods
   int cclex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, yyscan_t scanner);
-  static void ccerror(YYLTYPE* yyllocp, yyscan_t unused /*, InsanityProgram* program*/, const char* msg);
+  static void ccerror(YYLTYPE* yyllocp, yyscan_t unused, FunctionDefinitionList& functions, const char *msg);
 }
 
 
@@ -616,7 +616,7 @@ jump_statement
   ;
 
 translation_unit
-  : function_definition_list    // { functions = $1; }
+  : function_definition_list  { functions = *$1; delete($1); }
   ;
 
 /* Implement global variables later */
@@ -639,7 +639,7 @@ function_definition
 %%
 
 
-static void ccerror(YYLTYPE* yyllocp, yyscan_t unused /*, InsanityProgram* program */, const char *msg) {
+static void ccerror(YYLTYPE* yyllocp, yyscan_t unused, FunctionDefinitionList& functions, const char *msg) {
   fprintf(stderr, "%s! [Line %d:%d]\n",
     msg,yyllocp->first_line, yyllocp->first_column);
 }
