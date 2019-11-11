@@ -4,7 +4,7 @@
 
 %parse-param { yyscan_t scanner } 
 %lex-param { yyscan_t scanner }
-// %parse-param {InsanityProgram* program}
+// %parse-param { FunctionDefinitionList& functions }
 
 %code requires {
   #include <cstdio>
@@ -15,6 +15,7 @@
   #include <DataTypeFactory.h>
   #include <Declaration.h>
   #include <Expression.h>
+  #include <FunctionDefinition.h>
   #include <Parameter.h>
   #include <Statement.h>
 
@@ -56,6 +57,9 @@
   std::vector<Expression*>* expr_list;  // List of expressions
   Statement* stmt;                      // Statement type
   StatementList* stmt_list;             // List of statements
+
+  FunctionDefinition* func;             // Single function definition
+  FunctionDefinitionList* func_list;    // List of function definitions
 }
 
 //Destructors
@@ -115,7 +119,6 @@
 
 
 //Nonterminal types
-
 %type <str> string
 
 // Expressions
@@ -147,9 +150,9 @@
 %type <stmt> labeled_statement compound_statement selection_statement iteration_statement jump_statement
 %type <stmt_list> block_item block_item_list
 
-//%type <list> insanity if
-//%type <stmt> statement
-//%type <label> lblName label jump subroutine libraryLabel libraryCall
+// Function definition
+%type <func> function_definition
+%type <func_list> function_definition_list
 
 %start translation_unit
 %%
@@ -613,17 +616,22 @@ jump_statement
   ;
 
 translation_unit
-  : external_declaration
-  | translation_unit external_declaration
+  : function_definition_list    // { functions = $1; }
   ;
 
-external_declaration
-  : function_definition
-  | declaration
+/* Implement global variables later */
+// external_declaration
+//   : function_definition
+//   | declaration
+//   ;
+
+function_definition_list
+  : function_definition                           { $$ = new FunctionDefinitionList{$1}; }
+  | function_definition_list function_definition  { $$ = $1; $$->push_back($2); }
   ;
 
 function_definition
-  : declaration_specifiers declarator compound_statement
+  : declaration_specifiers declarator compound_statement  { $$ = new FunctionDefinition($2->build_declaration($1), $3); }
   ;
 
 /* We aren't supporting the K&R syntax */

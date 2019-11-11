@@ -77,6 +77,7 @@ OBJECTS=\
 	declaration/Declaration.o \
 	declaration/Declarator.o \
 	declaration/Parameter.o \
+	declaration/FunctionDefinition.o \
 	\
 	factory/DataTypeFactory.o \
 	factory/PointerFactory.o \
