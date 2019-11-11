@@ -66,6 +66,7 @@ OBJECTS=\
 	statement/GotoStatement.o \
 	statement/WhileStatement.o \
 	statement/DoWhileStatement.o \
+	statement/ForStatement.o \
 	statement/ContinueStatement.o \
 	statement/BreakStatement.o \
 	statement/ReturnStatement.o \

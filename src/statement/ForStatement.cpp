@@ -3,13 +3,26 @@
 #include <Visitor.h>
 
 //
+// Convert a declaration list into a block statement
+//
+static CompoundStatement* build_declaration_statement(const DeclarationList& list) {
+  StatementList stmt_list;
+  for (auto decl: list) { stmt_list.push_back(new DeclarationStatement(decl)); }
+  return new CompoundStatement(stmt_list);
+}
+
+//
 // Constructors
 //
-ForStatement::ForStatement(Expression* init, Expression* cond, Statement* stmt):
-  ForStatement(init, cond, nullptr, stmt) {}
+ForStatement::ForStatement(Statement* init, Expression* cond, Expression* loop, Statement* stmt):
+  init(init), cond(cond), loop(loop), stmt(stmt) {}
 
 ForStatement::ForStatement(Expression* init, Expression* cond, Expression* loop, Statement* stmt):
-  init(init), cond(cond), loop(loop), stmt(stmt) {}
+  ForStatement(ExpressionStatement::build_statement(init), cond, loop, stmt) {}
+
+ForStatement::ForStatement(const DeclarationList& init, Expression* cond, Expression* loop,
+                           Statement* stmt):
+  ForStatement(build_declaration_statement(init), cond, loop, stmt) {}
 
 //
 // Destructor
@@ -24,7 +37,7 @@ ForStatement::~ForStatement() {
 //
 // Getters
 //
-Expression* ForStatement::get_init_expression() const {
+Statement* ForStatement::get_init_statement() const {
   return this->init;
 }
 
@@ -43,7 +56,7 @@ Statement* ForStatement::get_statement() const {
 //
 // Visit
 //
-void GotoStatement::visit(StatementVisitor& visitor) {
+void ForStatement::visit(StatementVisitor& visitor) {
   visitor.accept(*this);
 }
 
@@ -51,7 +64,7 @@ void GotoStatement::visit(StatementVisitor& visitor) {
 // Clone
 //
 ForStatement* ForStatement::clone() const {
-  Expression* new_init = Expression::clone(this->init);
+  Statement* new_init  = Statement::clone(this->init);
   Expression* new_cond = Expression::clone(this->cond);
   Expression* new_loop = Expression::clone(this->loop);
   Statement* new_stmt  = Statement::clone(this->stmt);

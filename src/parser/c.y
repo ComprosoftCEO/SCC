@@ -598,10 +598,10 @@ selection_statement
 iteration_statement
   : WHILE '(' expression ')' statement                                            { $$ = new WhileStatement($3, $5); }
   | DO statement WHILE '(' expression ')' ';'                                     { $$ = new DoWhileStatement($2, $5); }
-  // | FOR '(' expression_statement expression_statement ')' statement               { $$ = new ForStatement($3, $4, $6); }
-  // | FOR '(' expression_statement expression_statement expression ')' statement    { $$ = new ForStatement($3, $4, $5, $7); }
-  // | FOR '(' declaration expression_statement ')' statement
-  // | FOR '(' declaration expression_statement expression ')' statement
+  | FOR '(' expression_statement expression_statement ')' statement               { $$ = new ForStatement($3, $4, nullptr, $6); }
+  | FOR '(' expression_statement expression_statement expression ')' statement    { $$ = new ForStatement($3, $4, $5, $7); }
+  | FOR '(' declaration expression_statement ')' statement                        { $$ = new ForStatement(*$3, $4, nullptr, $6); delete($3); }
+  | FOR '(' declaration expression_statement expression ')' statement             { $$ = new ForStatement(*$3, $4, $5, $7); delete($3); }
   ;
 
 jump_statement

@@ -10,6 +10,7 @@ class Expression;
 class Declaration;
 
 typedef std::vector<Statement*> StatementList;
+typedef std::vector<Declaration*> DeclarationList;
 
 /**
  * @class Statement
@@ -233,11 +234,12 @@ private:
 class ForStatement final: public Statement {
 
 public:
-  ForStatement(Expression* init, Expression* cond, Statement* stmt);
+  ForStatement(Statement* init, Expression* cond, Expression* loop, Statement* stmt);
   ForStatement(Expression* init, Expression* cond, Expression* loop, Statement* stmt);
+  ForStatement(const DeclarationList& init, Expression* cond, Expression* loop, Statement* stmt);
   ~ForStatement();
 
-  Expression* get_init_expression() const;
+  Statement* get_init_statement() const;
   Expression* get_cond_expression() const;
   Expression* get_loop_expression() const;
   Statement* get_statement() const;
@@ -246,7 +248,7 @@ public:
   ForStatement* clone() const;
 
 private:
-  Expression* init; // May be null
+  Statement* init;  // May be null
   Expression* cond; // May be null for infinite loop
   Expression* loop; // Expression to evaluate after each loop iteration
   Statement* stmt;  // Statement to execute inside the loop

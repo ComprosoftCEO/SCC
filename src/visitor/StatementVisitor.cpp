@@ -44,7 +44,11 @@ void StatementVisitor::accept(DoWhileStatement& stmt) {
 }
 
 void StatementVisitor::accept(ForStatement& stmt) {
-  return; // TODO: Implement this loop type
+  Statement* init = stmt.get_init_statement();
+  Statement* s    = stmt.get_statement();
+
+  if (init != nullptr) { init->visit(*this); }
+  if (s != nullptr) { s->visit(*this); }
 }
 
 void StatementVisitor::accept(ContinueStatement& stmt) {
