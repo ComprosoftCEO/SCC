@@ -42,6 +42,9 @@
 
   std::string* str;                     // Identifier, string, type, etc.
   Expression* expr;                     // Expression interface
+  std::vector<Expression*>* expr_list;  // List of expressions
+  Statement* stmt;                      // Statement type
+  StatementList* stmt_list;             // List of statements
   DataType* dt;                         // Data type object
 
   DeclarationList* decl_list;           // List of declarations with a name
@@ -53,29 +56,24 @@
 
   Parameter* param;                     // Single parameter in a function
   ParameterList* param_list;            // List of parameters in a function
-
-  std::vector<Expression*>* expr_list;  // List of expressions
-  Statement* stmt;                      // Statement type
-  StatementList* stmt_list;             // List of statements
-
   FunctionDefinition* func;             // Single function definition
   FunctionDefinitionList* func_list;    // List of function definitions
 }
 
 //Destructors
-%destructor {delete($$);} <expr> <str>
-%destructor {delete($$);} <dt> <decl> <declr> <fact> <pfact>
+%destructor {delete($$);} <str> <expr> <dt> <stmt>
+%destructor {delete($$);} <decl> <declr> <fact> <pfact>
+%destructor {delete($$);} <param> <param_list> <func>
 %destructor {
   for (auto el : *($$)) {
     delete(el);
   }
   delete($$);
-} <expr_list>
+} <expr_list> <decl_list> <declr_list> <stmt_list> <func_list>
 
 
 //Terminal types
 %token <str> IDENTIFIER STRING_LITERAL FUNC_NAME TYPEDEF_NAME ENUMERATION_CONSTANT
-
 %token <ival> INT_CONSTANT
 %token <uival> UINT_CONSTANT
 %token <lval> LONG_CONSTANT LONGLONG_CONSTANT
