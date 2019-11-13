@@ -103,7 +103,7 @@ $(PROGRAM): $(OBJECTS)
 # Build the parser (using a Bison file)
 %.tab.o: %.tab.cpp
 %.tab.cpp: %.y
-	bison --defines=$(@:%.cpp=%.h) -o $@ $<
+	bison --defines=$(@:%.cpp=%.h) -o $@ $< -v
 
 # Build the lexer (using a Flex file)
 %.yy.o: %.yy.cpp
@@ -137,5 +137,5 @@ run: $(PROGRAM)
 .PHONY: clean
 clean:
 	rm -f $(PROGRAM) $(OBJECTS)
-	rm -f src/parser/c.tab.cpp src/parser/c.yy.cpp
+	rm -f src/parser/c.tab.cpp src/parser/c.yy.cpp src/parser/c.output
 	rm -f src/parser/c.tab.h src/parser/c.yy.h

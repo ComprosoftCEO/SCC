@@ -117,6 +117,9 @@
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 %token ALIGNAS ALIGNOF ATOMIC GENERIC NORETURN STATIC_ASSERT THREAD_LOCAL
 
+// Fix problem with "else" shift/reduce conflict
+//  Same precedence, but "shift" wins.
+%right "then" ELSE 
 
 //Nonterminal types
 %type <str> string
@@ -595,8 +598,8 @@ expression_statement
   ;
 
 selection_statement
-  : IF '(' expression ')' statement ELSE statement  { $$ = new IfStatement($3, $5, $7); }
-  | IF '(' expression ')' statement                 { $$ = new IfStatement($3, $5); }
+  : IF '(' expression ')' statement %prec "then"    { $$ = new IfStatement($3, $5); }
+  | IF '(' expression ')' statement ELSE statement  { $$ = new IfStatement($3, $5, $7); }
   // | SWITCH '(' expression ')' statement
   ;
 

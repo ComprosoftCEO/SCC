@@ -37,3 +37,4 @@
 # Lexer and Parser output files
 *.tab.*
 *.yy.*
+*.output
