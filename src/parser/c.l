@@ -7,12 +7,6 @@ NZ_DIG    [1-9]
 LTR       [a-zA-Z_]
 ALNUM     [a-zA-Z_0-9]
 HEX       [a-fA-F0-9]
-EXP       ([Ee][+-]?{DIG}+)
-HXP       ([Pp][+-]?{DIG}+)
-FLT_SFX   (f|F|l|L)
-CHR_PFX   (u|U|L)
-STR_PFX   (u8|u|U|L)
-ESC       (\\(['"\?\\abfnrtv]|[0-7]{1,3}|x[a-fA-F0-9]+))
 WHTSP     [ \t\v\n\f]
 
 /* Integer Types */
@@ -23,6 +17,7 @@ OCT_INT   {OCT}+
 /* Integer Prefixes */
 HEX_PFX   (0[xX])
 OCT_PFX   0
+CHR_PFX   (u|U|L)
 
 /* Integer Suffixes */
 U_SFX     (u|U)
@@ -31,8 +26,12 @@ UL_SFX    ([uU][lL]|[lL][uU])
 LL_SFX    (ll|LL)
 ULL_SFX   ([uU](ll|LL)|(ll|LL)[uU])
 
-/* Floating point types (Uses intermediate types)*/
+/* Floating point type */
 FLT       ({FLT_FLT}|{HEX_FLT})
+
+/* Intermediate float types */
+EXP       ([Ee][+-]?{DIG}+)
+HXP       ([Pp][+-]?{DIG}+)
 
 FLT_FLT   ({FLT_FLT1}|{FLT_FLT2}|{FLT_FLT3})
 FLT_FLT1  ({DIG}+{EXP})
@@ -47,6 +46,10 @@ HEX_FLT3  ({HEX_PFX}{HEX}+"."{HXP})
 /* Float Suffixes */
 F_SFX     (f|F)
 LD_SFX    (l|L)
+
+/* Strings */
+STR_PFX   (u8|u|U|L)
+ESC       (\\(['"\?\\abfnrtv]|[0-7]{1,3}|x[a-fA-F0-9]+))
 
 %{
   #include <DataType.h>
@@ -68,8 +71,6 @@ LD_SFX    (l|L)
 
   extern int sym_type(const char *);    /* returns type from symbol table */
   #define sym_type(identifier) IDENTIFIER /* with no symbol table, fake it */
-
-  static std::string parse_string(const char*);
 
   static int check_type(void);      /* Solves C typedef problem */
 %}
@@ -159,10 +160,6 @@ LD_SFX    (l|L)
 {OCT_PFX}{OCT_INT}{LL_SFX}       { yylval->llval  = std::stoll(yytext, 0, 8);  return LONGLONG_CONSTANT; }
 {OCT_PFX}{OCT_INT}{ULL_SFX}      { yylval->ullval = std::stoull(yytext, 0, 8); return ULONGLONG_CONSTANT; }
 
- /* Standard character syntax
-{CHR_PFX}?"'"([^'\\\n]|{ESC})+"'"    { return I_CONSTANT; }
- */
-
  /* Character Integers */
 {CHR_PFX}?['][^'\\\n][']        { yylval->ival = yytext[1]; return INT_CONSTANT; }
 {CHR_PFX}?[']\\\'[']            { yylval->ival = '\''; return INT_CONSTANT; }
@@ -185,23 +182,10 @@ LD_SFX    (l|L)
 {FLT}                           { yylval->dval = std::stod(yytext, 0); return D_CONSTANT; }
 {FLT}{LD_SFX}                   { yylval->ldval = std::stold(yytext, 0); return D_CONSTANT; }
 
-  /*
-{DIG}+{EXP}{FLT_SFX}?                     { return F_CONSTANT; }
-{DIG}*"."{DIG}+{EXP}?{FLT_SFX}?           { return F_CONSTANT; }
-{DIG}+"."{EXP}?{FLT_SFX}?                 { return F_CONSTANT; }
-{HEX_PFX}{HEX}+{HXP}{FLT_SFX}?            { return F_CONSTANT; }
-{HEX_PFX}{HEX}*"."{HEX}+{HXP}{FLT_SFX}?   { return F_CONSTANT; }
-{HEX_PFX}{HEX}+"."{HXP}{FLT_SFX}?         { return F_CONSTANT; }
-{HEX_FLT}
-*/
-
- /* Standard string syntax:
-({STR_PFX}?\"([^"\\\n]|{ESC})*\"{WHTSP}*)+  { return STRING_LITERAL; }
- *
- * Note: We aren't supporting UTF-8, UTF-16, or UTF-32 strings
- */
-
  /* String Parsing */
+ /*
+ /* Note: String concatenation is handled by the grammar */
+ /* Note: We aren't supporting UTF-8, UTF-16, or UTF-32 strings */
 {STR_PFX}?\"[^"\\\n]*\"   {
   yylval->str = new std::string(yytext + 1, yyleng - 2);
   return STRING_LITERAL;
