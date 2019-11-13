@@ -10,9 +10,9 @@ HEX       [a-fA-F0-9]
 EXP       ([Ee][+-]?{DIG}+)
 HXP       ([Pp][+-]?{DIG}+)
 FLT_SFX   (f|F|l|L)
-CNST_PFX  (u|U|L)
+CHR_PFX   (u|U|L)
 STR_PFX   (u8|u|U|L)
-EXP_SFX   (\\(['"\?\\abfnrtv]|[0-7]{1,3}|x[a-fA-F0-9]+))
+ESC       (\\(['"\?\\abfnrtv]|[0-7]{1,3}|x[a-fA-F0-9]+))
 WHTSP     [ \t\v\n\f]
 
 /* Integer Types */
@@ -52,10 +52,13 @@ ULL_SFX   ([uU](ll|LL)|(ll|LL)[uU])
   extern int sym_type(const char *);    /* returns type from symbol table */
   #define sym_type(identifier) IDENTIFIER /* with no symbol table, fake it */
 
+  static std::string parse_string(const char*);
+
   static int check_type(void);      /* Solves C typedef problem */
 %}
 
 %x COMMENT
+%x S_STRING
 
 %option yylineno noyywrap 8bit nodefault                        
 %option reentrant bison-bridge bison-locations 
@@ -132,17 +135,33 @@ ULL_SFX   ([uU](ll|LL)|(ll|LL)[uU])
 {HEX_PFX}{HEX_INT}{ULL_SFX}      { yylval->ullval = std::stoull(yytext, 0, 16); return ULONGLONG_CONSTANT; }
 
  /* Octal Integers */
-{OCT_PFX}{OCT_INT}               { yylval->ival   = std::stoi(yytext, 0, 16);   return INT_CONSTANT; }
-{OCT_PFX}{OCT_INT}{U_SFX}        { yylval->uival  = std::stoul(yytext, 0, 16);  return UINT_CONSTANT; }
-{OCT_PFX}{OCT_INT}{L_SFX}        { yylval->lval   = std::stol(yytext, 0, 16);   return LONG_CONSTANT; }
-{OCT_PFX}{OCT_INT}{UL_SFX}       { yylval->ulval  = std::stoul(yytext, 0, 16);  return ULONG_CONSTANT; }
-{OCT_PFX}{OCT_INT}{LL_SFX}       { yylval->llval  = std::stoll(yytext, 0, 16);  return LONGLONG_CONSTANT; }
-{OCT_PFX}{OCT_INT}{ULL_SFX}      { yylval->ullval = std::stoull(yytext, 0, 16); return ULONGLONG_CONSTANT; }
+{OCT_PFX}{OCT_INT}               { yylval->ival   = std::stoi(yytext, 0, 8);   return INT_CONSTANT; }
+{OCT_PFX}{OCT_INT}{U_SFX}        { yylval->uival  = std::stoul(yytext, 0, 8);  return UINT_CONSTANT; }
+{OCT_PFX}{OCT_INT}{L_SFX}        { yylval->lval   = std::stol(yytext, 0, 8);   return LONG_CONSTANT; }
+{OCT_PFX}{OCT_INT}{UL_SFX}       { yylval->ulval  = std::stoul(yytext, 0, 8);  return ULONG_CONSTANT; }
+{OCT_PFX}{OCT_INT}{LL_SFX}       { yylval->llval  = std::stoll(yytext, 0, 8);  return LONGLONG_CONSTANT; }
+{OCT_PFX}{OCT_INT}{ULL_SFX}      { yylval->ullval = std::stoull(yytext, 0, 8); return ULONGLONG_CONSTANT; }
 
-
- /* Other integer?? No idea how to parse this!
-{CNST_PFX}?"'"([^'\\\n]|{EXP_SFX})+"'"    { return I_CONSTANT; }
+ /* Standard character syntax
+{CHR_PFX}?"'"([^'\\\n]|{ESC})+"'"    { return I_CONSTANT; }
  */
+
+ /* Character Integers */
+{CHR_PFX}?['][^'\\\n][']        { yylval->ival = yytext[1]; return INT_CONSTANT; }
+{CHR_PFX}?[']\\\'[']            { yylval->ival = '\''; return INT_CONSTANT; }
+{CHR_PFX}?[']\\\"[']            { yylval->ival = '\"'; return INT_CONSTANT; }
+{CHR_PFX}?[']\\\?[']            { yylval->ival = '?';  return INT_CONSTANT; }
+{CHR_PFX}?[']\\\\[']            { yylval->ival = '\\'; return INT_CONSTANT; }
+{CHR_PFX}?[']\\a[']             { yylval->ival = '\a'; return INT_CONSTANT; }
+{CHR_PFX}?[']\\b[']             { yylval->ival = '\f'; return INT_CONSTANT; }
+{CHR_PFX}?[']\\f[']             { yylval->ival = '\f'; return INT_CONSTANT; }
+{CHR_PFX}?[']\\n[']             { yylval->ival = '\n'; return INT_CONSTANT; }
+{CHR_PFX}?[']\\r[']             { yylval->ival = '\r'; return INT_CONSTANT; }
+{CHR_PFX}?[']\\t[']             { yylval->ival = '\t'; return INT_CONSTANT; }
+{CHR_PFX}?[']\\v[']             { yylval->ival = '\v'; return INT_CONSTANT; }
+
+{CHR_PFX}?[']\\{OCT}{3}[']      { yylval->ival = std::stoi(yytext + 2, 0, 8); return INT_CONSTANT; }
+{CHR_PFX}?[']\\x{HEX}{2}[']     { yylval->ival = std::stoi(yytext + 3, 0, 16); return INT_CONSTANT; }
 
  /*
 {DIG}+{EXP}{FLT_SFX}?                     { return F_CONSTANT; }
@@ -153,8 +172,47 @@ ULL_SFX   ([uU](ll|LL)|(ll|LL)[uU])
 {HEX_PFX}{HEX}+"."{HXP}{FLT_SFX}?         { return F_CONSTANT; }
  */
 
-({STR_PFX}?\"([^"\\\n]|{EXP_SFX})*\"{WHTSP}*)+  { return STRING_LITERAL; }
+ /* Standard string syntax:
+  * Note: We aren't supporting UTF-8, UTF-16, or UTF-32 strings
+({STR_PFX}?\"([^"\\\n]|{ESC})*\"{WHTSP}*)+  { return STRING_LITERAL; }
+ */
 
+ /* String Parsing */
+{STR_PFX}?\"[^"\\\n]*\"   {
+  yylval->str = new std::string(yytext + 1, yyleng - 2);
+  return STRING_LITERAL;
+}
+
+{STR_PFX}?\"[^"\\\n]*     {
+  yylval->str = new std::string(yytext + 1, yyleng - 1);
+  BEGIN(S_STRING);
+  /* No return, so the scanner will continue in the new state */
+}
+
+<S_STRING>[^"\\]+         { yylval->str->append(yytext, yyleng); }
+<S_STRING>\\\'            { *yylval->str += '\''; }
+<S_STRING>\\\"            { *yylval->str += '\''; }
+<S_STRING>\\\?            { *yylval->str += '?'; }
+<S_STRING>\\\\            { *yylval->str += '\\'; }
+<S_STRING>\\a             { *yylval->str += '\a'; }
+<S_STRING>\\b             { *yylval->str += '\b'; }
+<S_STRING>\\f             { *yylval->str += '\f'; }
+<S_STRING>\\n             { *yylval->str += '\n'; }
+<S_STRING>\\r             { *yylval->str += '\r'; }
+<S_STRING>\\t             { *yylval->str += '\t'; }
+<S_STRING>\\v             { *yylval->str += '\v'; }
+<S_STRING>\\.             { *yylval->str += yytext[1]; }
+
+<S_STRING>\\{OCT}{3}      { *yylval->str += (char) std::stoi(yytext+1, 0, 8); }
+<S_STRING>\\[xX]{HEX}{2}  { *yylval->str += (char) std::stoi(yytext+2, 0, 16); }
+ /* No unicode escape sequences yet */
+
+<S_STRING>\\\n            { /* A backslash at the end of the line. Do nothing */ }
+<S_STRING>\"              { BEGIN(INITIAL); return STRING_LITERAL; }
+<S_STRING>\\              { BEGIN(INITIAL); return STRING_LITERAL; /* Should signal a lexical error */ }
+<S_STRING><<EOF>>         { BEGIN(INITIAL); return STRING_LITERAL; /* Should signal a lexical error */ }
+
+ /* Other tokens */
 "..."         { return ELLIPSIS; }
 ">>="         { return RIGHT_ASSIGN; }
 "<<="         { return LEFT_ASSIGN; }
