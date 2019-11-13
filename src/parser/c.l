@@ -173,8 +173,9 @@ ULL_SFX   ([uU](ll|LL)|(ll|LL)[uU])
  */
 
  /* Standard string syntax:
-  * Note: We aren't supporting UTF-8, UTF-16, or UTF-32 strings
 ({STR_PFX}?\"([^"\\\n]|{ESC})*\"{WHTSP}*)+  { return STRING_LITERAL; }
+ *
+ * Note: We aren't supporting UTF-8, UTF-16, or UTF-32 strings
  */
 
  /* String Parsing */

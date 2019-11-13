@@ -23,6 +23,7 @@ OBJECTS=\
 	expression/CommaExpression.o \
 	expression/AssignmentExpression.o \
 	expression/CastExpression.o \
+	expression/ConstantExpression.o \
 	expression/StringExpression.o \
 	expression/IdentifierExpression.o \
 	expression/BracketExpression.o \

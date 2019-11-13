@@ -32,6 +32,10 @@ void ExpressionVisitor::accept(CastExpression& expr) {
   if (cast != nullptr) { cast->visit(*this); }
 }
 
+void ExpressionVisitor::accept(ConstantExpression& expr) {
+  return;
+}
+
 void ExpressionVisitor::accept(StringExpression& expr) {
   return;
 }

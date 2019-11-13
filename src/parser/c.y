@@ -39,6 +39,7 @@
   C_ULONGLONG ullval;  // Literal unsigned long long
   C_FLOAT fval;        // Literal floating point
   C_DOUBLE dval;       // Literal double
+  C_LONGDOUBLE ldval;  // Literal long double
 
   std::string* str;                     // Identifier, string, type, etc.
   Expression* expr;                     // Expression interface
@@ -80,6 +81,7 @@
 %token <ulval> ULONG_CONSTANT ULONGLONG_CONSTANT
 %token <fval> F_CONSTANT
 %token <dval> D_CONSTANT
+%token <ldval> LD_CONSTANT
 
 %token SIZEOF
 %token PTR_OP "->"
@@ -120,7 +122,7 @@
 %type <str> string
 
 // Expressions
-%type <expr> primary_expression postfix_expression unary_expression cast_expression
+%type <expr> primary_expression constant postfix_expression unary_expression cast_expression
 %type <expr> multiplicative_expression additive_expression shift_expression
 %type <expr> relational_expression equality_expression
 %type <expr> and_expression exclusive_or_expression inclusive_or_expression
@@ -157,20 +159,21 @@
 
 primary_expression
   : IDENTIFIER          { $$ = new IdentifierExpression(*$1); delete($1); }
-  | constant            { $$ = nullptr; /* TODO: Implement constants */ }
-  | string              { $$ = nullptr;  /* TODO: Implement this */}
+  | constant            { $$ = $1; }
+  | string              { $$ = new StringExpression(*$1); delete($1); }
   | '(' expression ')'  { $$ = $2; }
   ;
 
 constant
-  : INT_CONSTANT    /* includes character_constant */
-  | UINT_CONSTANT
-  | LONG_CONSTANT
-  | ULONG_CONSTANT
-  | LONGLONG_CONSTANT
-  | ULONGLONG_CONSTANT
-  | F_CONSTANT
-  | D_CONSTANT
+  : INT_CONSTANT        { $$ = new ConstantExpression((C_INT) $1); /* includes character constant */ }
+  | UINT_CONSTANT       { $$ = new ConstantExpression((C_UINT) $1); }
+  | LONG_CONSTANT       { $$ = new ConstantExpression((C_LONG) $1); }
+  | ULONG_CONSTANT      { $$ = new ConstantExpression((C_ULONG) $1); }
+  | LONGLONG_CONSTANT   { $$ = new ConstantExpression((C_LONGLONG) $1); }
+  | ULONGLONG_CONSTANT  { $$ = new ConstantExpression((C_ULONGLONG) $1); }
+  | F_CONSTANT          { $$ = new ConstantExpression((C_FLOAT) $1); }
+  | D_CONSTANT          { $$ = new ConstantExpression((C_DOUBLE) $1); }
+  | LD_CONSTANT         { $$ = new ConstantExpression((C_LONGDOUBLE) $1); }
   // | ENUMERATION_CONSTANT  /* after it has been defined as such */
   ;
 
@@ -179,7 +182,8 @@ constant
 //   ;
 
 string
-  : STRING_LITERAL
+  : STRING_LITERAL          { $$ = $1; }
+  | string STRING_LITERAL   { $$ = $1; $$->append(*$2); delete($2); }
   // | FUNC_NAME
   ;
 

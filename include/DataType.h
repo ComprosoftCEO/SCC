@@ -1,53 +1,13 @@
 #ifndef DATA_TYPE_HEADER
 #define DATA_TYPE_HEADER
 
+#include <CTypes.h>
 #include <Parameter.h>
-#include <cstddef> /* For size_t */
-#include <cstdint>
 #include <string>
 #include <vector>
 
 // List of all concrete data types
 enum class ConcreteDataType { PRIMITIVE, POINTER, ARRAY, FUNCTION };
-
-// List of primitive types
-enum class PrimitiveType {
-  VOID,
-  CHAR,
-  SHORT,
-  INT,
-  LONG,
-  LONGLONG,
-  FLOAT,
-  DOUBLE,
-};
-
-// Typdef of literal sizes
-typedef int8_t C_CHAR;
-typedef uint8_t C_UCHAR;
-typedef int16_t C_SHORT;
-typedef uint16_t C_USHORT;
-typedef int32_t C_INT;
-typedef uint32_t C_UINT;
-typedef int64_t C_LONG;
-typedef uint64_t C_ULONG;
-typedef C_LONG C_LONGLONG;
-typedef C_ULONG C_ULONGLONG;
-typedef float C_FLOAT;
-typedef double C_DOUBLE;
-
-// List of all type qualifiers
-enum class TypeQualifier { CONST, RESTRICT, VOLATILE, ATOMIC };
-
-// List of function specifiers
-enum class FunctionSpecifier { INLINE, NORETURN };
-
-// List of sizes
-#define POINTER_SIZE 8
-#define VOID_SIZE    0
-#define CHAR_SIZE    sizeof(C_CHAR)
-#define INT_SIZE     sizeof(C_INT)
-#define LONG_SIZE    sizeof(C_LONG)
 
 /**
  * @class DataType

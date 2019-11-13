@@ -1,6 +1,7 @@
 #ifndef EXPRESSION_HEADER
 #define EXPRESSION_HEADER
 
+#include <CTypes.h>
 #include <ConstantValue.h>
 #include <string>
 #include <vector>
@@ -85,6 +86,57 @@ public:
 private:
   Expression* expr;
   DataType* cast_to;
+};
+
+/**
+ *@class ConstantExpression
+ * Represents an expression that stores a literal
+ */
+class ConstantExpression final: public Expression {
+
+public:
+  explicit ConstantExpression(C_INT ival);
+  explicit ConstantExpression(C_UINT uival);
+  explicit ConstantExpression(C_LONG lval);
+  explicit ConstantExpression(C_ULONG ulval);
+  explicit ConstantExpression(C_LONGLONG llval);
+  explicit ConstantExpression(C_ULONGLONG ullval);
+  explicit ConstantExpression(C_FLOAT fval);
+  explicit ConstantExpression(C_DOUBLE dval);
+  explicit ConstantExpression(C_LONGDOUBLE ldval);
+
+  PrimitiveType get_type() const;
+  bool get_unsigned() const;
+
+  // Casting types
+  void to_int() const;
+  C_UINT to_uint() const;
+  C_LONG to_long() const;
+  C_ULONG to_ulong() const;
+  C_LONGLONG to_longlong() const;
+  C_ULONGLONG to_ulonglong() const;
+  C_FLOAT to_float() const;
+  C_DOUBLE to_double() const;
+  C_LONGDOUBLE to_longdouble() const;
+
+  void visit(ExpressionVisitor& visitor);
+  ConstantExpression* clone() const;
+
+private:
+  union {
+    C_INT ival;         // Integer
+    C_UINT uival;       // Unsigned integer
+    C_LONG lval;        // Long
+    C_ULONG ulval;      // Unsigned long
+    C_LONGLONG llval;   // Long long
+    C_ULONGLONG ullval; // Unsigned long long
+    C_FLOAT fval;       // Floating point
+    C_DOUBLE dval;      // Double
+    C_LONGDOUBLE ldval; // Long double
+  } value;
+
+  PrimitiveType type;
+  bool is_unsigned;
 };
 
 /**

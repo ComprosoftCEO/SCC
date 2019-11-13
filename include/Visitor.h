@@ -5,6 +5,7 @@
 class CommaExpression;
 class AssignmentExpression;
 class CastExpression;
+class ConstantExpression;
 class StringExpression;
 class IdentifierExpression;
 class BracketExpression;
@@ -64,6 +65,7 @@ public:
   virtual void accept(CommaExpression& expr);
   virtual void accept(AssignmentExpression& expr);
   virtual void accept(CastExpression& expr);
+  virtual void accept(ConstantExpression& expr);
   virtual void accept(StringExpression& expr);
   virtual void accept(IdentifierExpression& expr);
   virtual void accept(BracketExpression& expr);
