@@ -31,6 +31,23 @@ UL_SFX    ([uU][lL]|[lL][uU])
 LL_SFX    (ll|LL)
 ULL_SFX   ([uU](ll|LL)|(ll|LL)[uU])
 
+/* Floating point types (Uses intermediate types)*/
+FLT       ({FLT_FLT}|{HEX_FLT})
+
+FLT_FLT   ({FLT_FLT1}|{FLT_FLT2}|{FLT_FLT3})
+FLT_FLT1  ({DIG}+{EXP})
+FLT_FLT2  ({DIG}*"."{DIG}+{EXP})
+FLT_FLT3  ({DIG}+"."{EXP})
+
+HEX_FLT   ({HEX_FLT1}|{HEX_FLT2}|{HEX_FLT3})
+HEX_FLT1  ({HEX_PFX}{HEX}+{HXP})
+HEX_FLT2  ({HEX_PFX}{HEX}*"."{HEX}+{HXP}) 
+HEX_FLT3  ({HEX_PFX}{HEX}+"."{HXP})
+
+/* Float Suffixes */
+F_SFX     (f|F)
+LD_SFX    (l|L)
+
 %{
   #include <DataType.h>
   #include <DataTypeFactory.h>
@@ -163,14 +180,20 @@ ULL_SFX   ([uU](ll|LL)|(ll|LL)[uU])
 {CHR_PFX}?[']\\{OCT}{3}[']      { yylval->ival = std::stoi(yytext + 2, 0, 8); return INT_CONSTANT; }
 {CHR_PFX}?[']\\x{HEX}{2}[']     { yylval->ival = std::stoi(yytext + 3, 0, 16); return INT_CONSTANT; }
 
- /*
+ /* Float literals */
+{FLT}{F_SFX}                    { yylval->fval = std::stof(yytext, 0); return F_CONSTANT; }
+{FLT}                           { yylval->dval = std::stod(yytext, 0); return D_CONSTANT; }
+{FLT}{LD_SFX}                   { yylval->ldval = std::stold(yytext, 0); return D_CONSTANT; }
+
+  /*
 {DIG}+{EXP}{FLT_SFX}?                     { return F_CONSTANT; }
 {DIG}*"."{DIG}+{EXP}?{FLT_SFX}?           { return F_CONSTANT; }
 {DIG}+"."{EXP}?{FLT_SFX}?                 { return F_CONSTANT; }
 {HEX_PFX}{HEX}+{HXP}{FLT_SFX}?            { return F_CONSTANT; }
 {HEX_PFX}{HEX}*"."{HEX}+{HXP}{FLT_SFX}?   { return F_CONSTANT; }
 {HEX_PFX}{HEX}+"."{HXP}{FLT_SFX}?         { return F_CONSTANT; }
- */
+{HEX_FLT}
+*/
 
  /* Standard string syntax:
 ({STR_PFX}?\"([^"\\\n]|{ESC})*\"{WHTSP}*)+  { return STRING_LITERAL; }
