@@ -46,6 +46,8 @@ public:
   PrimitiveType get_primitive_type() const;
   bool is_unsigned() const;
 
+  static PrimitiveDataType* from_type(PrimitiveType type);
+
 private:
   PrimitiveType primitive_type;
 };
