@@ -44,6 +44,7 @@ protected:
 
 public:
   PrimitiveType get_primitive_type() const;
+  bool is_unsigned() const;
 
 private:
   PrimitiveType primitive_type;
@@ -76,6 +77,45 @@ public:
 };
 
 /**
+ * @class UnsignedCharDataType
+ * Represents a 1-byte unsigned character data type
+ */
+class UnsignedCharDataType final: public PrimitiveDataType {
+
+public:
+  UnsignedCharDataType();
+
+  size_t size() const;
+  UnsignedCharDataType* clone() const;
+};
+
+/**
+ * @class ShortDataType
+ * Represents a 2-byte short data type
+ */
+class ShortDataType final: public PrimitiveDataType {
+
+public:
+  ShortDataType();
+
+  size_t size() const;
+  ShortDataType* clone() const;
+};
+
+/**
+ * @class UnsignedShortDataType
+ * Represents a 2-byte unsigned short data type
+ */
+class UnsignedShortDataType final: public PrimitiveDataType {
+
+public:
+  UnsignedShortDataType();
+
+  size_t size() const;
+  UnsignedShortDataType* clone() const;
+};
+
+/**
  * @class IntDataType
  * Represents an integer (32 bit)
  */
@@ -89,8 +129,21 @@ public:
 };
 
 /**
+ * @class UnsignedIntDataType
+ * Represents an unsigned 32-bit integer
+ */
+class UnsignedIntDataType final: public PrimitiveDataType {
+
+public:
+  UnsignedIntDataType();
+
+  size_t size() const;
+  UnsignedIntDataType* clone() const;
+};
+
+/**
  * @class LongDataType
- * Represents a long (32 or 64 bit integer)
+ * Represents a long (64 bit integer)
  */
 class LongDataType final: public PrimitiveDataType {
 
@@ -99,6 +152,84 @@ public:
 
   size_t size() const;
   LongDataType* clone() const;
+};
+
+/**
+ * @class UnsignedLongDataType
+ * Represents an unsigned long data type (64 bit integer)
+ */
+class UnsignedLongDataType final: public PrimitiveDataType {
+
+public:
+  UnsignedLongDataType();
+
+  size_t size() const;
+  UnsignedLongDataType* clone() const;
+};
+
+/**
+ * @class LongLongDataType
+ * Represents a long long (128-bit) integer
+ */
+class LongLongDataType final: public PrimitiveDataType {
+
+public:
+  LongLongDataType();
+
+  size_t size() const;
+  LongLongDataType* clone() const;
+};
+
+/**
+ * @class UnsignedLongLongDataType
+ * Represents an unsigned long long (128-bit) integer
+ */
+class UnsignedLongLongDataType final: public PrimitiveDataType {
+
+public:
+  UnsignedLongLongDataType();
+
+  size_t size() const;
+  UnsignedLongLongDataType* clone() const;
+};
+
+/**
+ * @class FloatDataType
+ * Represents a 32-bit floating point number
+ */
+class FloatDataType final: public PrimitiveDataType {
+
+public:
+  FloatDataType();
+
+  size_t size() const;
+  FloatDataType* clone() const;
+};
+
+/**
+ * @class DoubleDataType
+ * Represents a 64-bit floating point number
+ */
+class DoubleDataType final: public PrimitiveDataType {
+
+public:
+  DoubleDataType();
+
+  size_t size() const;
+  DoubleDataType* clone() const;
+};
+
+/**
+ * @class LongDoubleDataType
+ * Represents an 80-bit floating point number
+ */
+class LongDoubleDataType final: public PrimitiveDataType {
+
+public:
+  LongDoubleDataType();
+
+  size_t size() const;
+  LongDoubleDataType* clone() const;
 };
 
 /**

@@ -4,32 +4,42 @@
 //
 // Constructor
 //
-ConstantExpression::ConstantExpression(C_INT ival):
-  value{.ival = ival}, type(PrimitiveType::INT), is_unsigned(false) {}
+ConstantExpression::ConstantExpression(C_INT ival): value{.ival = ival}, type(PrimitiveType::INT) {}
 
 ConstantExpression::ConstantExpression(C_UINT uival):
-  value{.uival = uival}, type(PrimitiveType::INT), is_unsigned(true) {}
+  value{.uival = uival}, type(PrimitiveType::UINT) {}
 
 ConstantExpression::ConstantExpression(C_LONG lval):
-  value{.lval = lval}, type(PrimitiveType::LONG), is_unsigned(false) {}
+  value{.lval = lval}, type(PrimitiveType::LONG) {}
 
 ConstantExpression::ConstantExpression(C_ULONG ulval):
-  value{.ulval = ulval}, type(PrimitiveType::LONG), is_unsigned(true) {}
+  value{.ulval = ulval}, type(PrimitiveType::ULONG) {}
 
 ConstantExpression::ConstantExpression(C_LONGLONG llval):
-  value{.llval = llval}, type(PrimitiveType::LONGLONG), is_unsigned(false) {}
+  value{.llval = llval}, type(PrimitiveType::LONGLONG) {}
 
 ConstantExpression::ConstantExpression(C_ULONGLONG ullval):
-  value{.ullval = ullval}, type(PrimitiveType::LONGLONG), is_unsigned(true) {}
+  value{.ullval = ullval}, type(PrimitiveType::ULONGLONG) {}
 
 ConstantExpression::ConstantExpression(C_FLOAT fval):
-  value{.fval = fval}, type(PrimitiveType::FLOAT), is_unsigned(false) {}
+  value{.fval = fval}, type(PrimitiveType::FLOAT) {}
 
 ConstantExpression::ConstantExpression(C_DOUBLE dval):
-  value{.dval = dval}, type(PrimitiveType::DOUBLE), is_unsigned(false) {}
+  value{.dval = dval}, type(PrimitiveType::DOUBLE) {}
 
 ConstantExpression::ConstantExpression(C_LONGDOUBLE ldval):
-  value{.ldval = ldval}, type(PrimitiveType::LONGDOUBLE), is_unsigned(false) {}
+  value{.ldval = ldval}, type(PrimitiveType::LONGDOUBLE) {}
+
+//
+// Getters
+//
+PrimitiveType ConstantExpression::get_type() const {
+  return this->type;
+}
+
+bool ConstantExpression::get_unsigned() const {
+  return is_unsigned_type(this->type);
+}
 
 //
 // Visit

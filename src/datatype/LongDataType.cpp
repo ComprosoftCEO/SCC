@@ -9,7 +9,7 @@ LongDataType::LongDataType(): PrimitiveDataType(PrimitiveType::LONG) {}
 // Getters
 //
 size_t LongDataType::size() const {
-  return LONG_SIZE;
+  return sizeof(C_LONG);
 }
 
 //

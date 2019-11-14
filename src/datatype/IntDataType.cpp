@@ -9,7 +9,7 @@ IntDataType::IntDataType(): PrimitiveDataType(PrimitiveType::INT) {}
 // Getters
 //
 size_t IntDataType::size() const {
-  return INT_SIZE;
+  return sizeof(C_INT);
 }
 
 //

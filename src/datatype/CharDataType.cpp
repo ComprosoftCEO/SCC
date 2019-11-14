@@ -9,7 +9,7 @@ CharDataType::CharDataType(): PrimitiveDataType(PrimitiveType::CHAR) {}
 // Getters
 //
 size_t CharDataType::size() const {
-  return CHAR_SIZE;
+  return sizeof(C_CHAR);
 }
 
 //

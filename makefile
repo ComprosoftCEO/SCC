@@ -9,12 +9,23 @@ OBJECTS=\
 	parser/c.yy.o \
 	parser/specifiers.tab.o \
 	\
+  datatype/CTypes.o \
 	datatype/DataType.o \
 	datatype/PrimitiveDataType.o \
 	datatype/VoidDataType.o \
 	datatype/CharDataType.o \
+	datatype/UnsignedCharDataType.o \
+	datatype/ShortDataType.o \
+	datatype/UnsignedShortDataType.o \
 	datatype/IntDataType.o \
+	datatype/UnsignedIntDataType.o \
 	datatype/LongDataType.o \
+	datatype/UnsignedLongDataType.o \
+	datatype/LongLongDataType.o \
+	datatype/UnsignedLongLongDataType.o \
+	datatype/FloatDataType.o \
+	datatype/DoubleDataType.o \
+	datatype/LongDoubleDataType.o \
 	datatype/PointerDataType.o \
 	datatype/ArrayDataType.o \
 	datatype/FunctionDataType.o \

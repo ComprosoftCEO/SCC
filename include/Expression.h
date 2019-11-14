@@ -109,7 +109,7 @@ public:
   bool get_unsigned() const;
 
   // Casting types
-  void to_int() const;
+  C_INT to_int() const;
   C_UINT to_uint() const;
   C_LONG to_long() const;
   C_ULONG to_ulong() const;
@@ -136,7 +136,6 @@ private:
   } value;
 
   PrimitiveType type;
-  bool is_unsigned;
 };
 
 /**

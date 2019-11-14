@@ -8,10 +8,15 @@
 enum class PrimitiveType {
   VOID,
   CHAR,
+  UCHAR,
   SHORT,
+  USHORT,
   INT,
+  UINT,
   LONG,
+  ULONG,
   LONGLONG,
+  ULONGLONG,
   FLOAT,
   DOUBLE,
   LONGDOUBLE,
@@ -38,11 +43,11 @@ enum class TypeQualifier { CONST, RESTRICT, VOLATILE, ATOMIC };
 // List of function specifiers
 enum class FunctionSpecifier { INLINE, NORETURN };
 
-// List of sizes
+// List of custom sizes
 #define POINTER_SIZE 8
 #define VOID_SIZE    0
-#define CHAR_SIZE    sizeof(C_CHAR)
-#define INT_SIZE     sizeof(C_INT)
-#define LONG_SIZE    sizeof(C_LONG)
+
+// Helper Functions
+bool is_unsigned_type(PrimitiveType type);
 
 #endif /* C Types Header Included */
