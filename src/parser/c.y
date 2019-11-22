@@ -4,7 +4,7 @@
 
 %parse-param { yyscan_t scanner } 
 %lex-param { yyscan_t scanner }
-%parse-param { FunctionDefinitionList& functions }
+%parse-param { TranslationUnit*& unit }
 
 %code requires {
   #include <cstdio>
@@ -15,9 +15,9 @@
   #include <DataTypeFactory.h>
   #include <Declaration.h>
   #include <Expression.h>
-  #include <FunctionDefinition.h>
   #include <Parameter.h>
   #include <Statement.h>
+  #include <TranslationUnit.h>
 
   // Declare stuff from Flex that Bison needs to know about:
   typedef void* yyscan_t;
@@ -26,7 +26,7 @@
 %code {
   // Let Bison know about Flex methods
   int cclex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, yyscan_t scanner);
-  static void ccerror(YYLTYPE* yyllocp, yyscan_t unused, FunctionDefinitionList& functions, const char *msg);
+  static void ccerror(YYLTYPE* yyllocp, yyscan_t unused, TranslationUnit*& unit, const char *msg);
 }
 
 
@@ -54,7 +54,6 @@
   SpecifierQualifierBuilder* builder;   // Special object to build specifiers and qualifiers
 
   DeclarationList* decl_list;           // List of declarations with a name
-  Declaration* decl;                    // Declaration (one with a name)
   DeclaratorList* declr_list;           // List of declarators
   Declarator* declr;                    // Declarator type (builds data type)
   DataTypeFactory* fact;                // Abstract factory type
@@ -66,7 +65,7 @@
   Parameter* param;                     // Single parameter in a function
   ParameterList* param_list;            // List of parameters in a function
   FunctionDefinition* func;             // Single function definition
-  FunctionDefinitionList* func_list;    // List of function definitions
+  TranslationUnit* unit;                // Translation Unit (everything in the file)
 }
 
 
@@ -74,14 +73,15 @@
 // Destructors
 //====================================
 %destructor {delete($$);} <str> <expr> <dt> <stmt>
-%destructor {delete($$);} <decl> <declr> <fact> <pfact>
-%destructor {delete($$);} <param> <param_list> <func>
+%destructor {delete($$);} <tqlist> <builder>
+%destructor {delete($$);} <declr> <fact> <pfact>
+%destructor {delete($$);} <param> <param_list> <func> <unit>
 %destructor {
   for (auto el : *($$)) {
     delete(el);
   }
   delete($$);
-} <expr_list> <decl_list> <declr_list> <stmt_list> <func_list>
+} <expr_list> <decl_list> <declr_list> <stmt_list>
 
 
 
@@ -167,7 +167,8 @@
 %type <expr> initializer
 %type <pfact> pointer
 
-// Parameters
+// Parameters and functions
+%type <func> function_definition
 %type <param_list> parameter_list
 %type <param> parameter_declaration
 
@@ -177,12 +178,9 @@
 %type <stmt> labeled_statement compound_statement selection_statement iteration_statement jump_statement
 %type <stmt_list> block_item block_item_list
 
-// Function definition
-%type <func> function_definition
-%type <func_list> function_definition_list
-
 // Which token to start with
-%start translation_unit
+%type <unit> translation_unit
+%start c_file
 %%
 
 primary_expression
@@ -341,6 +339,7 @@ constant_expression
   ;
 
 declaration
+  // : declaration_specifiers { $$ = new DeclarationList{new Declaration($1->get_data_type())}; delete($1); }
   : declaration_specifiers init_declarator_list ';'   {
     $$ = new DeclarationList();
     for (auto decl : *$2) {
@@ -376,8 +375,8 @@ init_declarator
   ;
 
 storage_class_specifier
-  : TYPEDEF         { $$ = StorageClassSpecifier::TYPEDEF; }
-  | EXTERN          { $$ = StorageClassSpecifier::EXTERN; }
+  // : TYPEDEF         { $$ = StorageClassSpecifier::TYPEDEF; }
+  : EXTERN          { $$ = StorageClassSpecifier::EXTERN; }
   | STATIC          { $$ = StorageClassSpecifier::STATIC; }
   | THREAD_LOCAL    { $$ = StorageClassSpecifier::THREAD_LOCAL; }
   | AUTO            { $$ = StorageClassSpecifier::AUTO; }
@@ -636,19 +635,15 @@ jump_statement
   ;
 
 /* Entry point */
-translation_unit
-  : function_definition_list  { functions = *$1; delete($1); }
+c_file
+  : translation_unit { unit = $1; }
   ;
 
-/* Implement global variables later */
-// external_declaration
-//   : function_definition
-//   | declaration
-//   ;
-
-function_definition_list
-  : function_definition                           { $$ = new FunctionDefinitionList{$1}; }
-  | function_definition_list function_definition  { $$ = $1; $$->push_back($2); }
+translation_unit
+  : function_definition                     { $$ = new TranslationUnit($1); }
+  | translation_unit function_definition    { $$ = $1; $$->add_function_definition($2); }
+  | declaration                             { $$ = new TranslationUnit(*$1); delete($1); }
+  | translation_unit declaration            { $$ = $1; $$->add_declarations(*$2); delete($2); }
   ;
 
 function_definition
@@ -660,7 +655,7 @@ function_definition
 %%
 
 
-static void ccerror(YYLTYPE* yyllocp, yyscan_t unused, FunctionDefinitionList& functions, const char *msg) {
+static void ccerror(YYLTYPE* yyllocp, yyscan_t unused, TranslationUnit*& unit, const char *msg) {
   fprintf(stderr, "%s! [Line %d:%d]\n",
     msg,yyllocp->first_line, yyllocp->first_column);
 }

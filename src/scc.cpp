@@ -1,7 +1,7 @@
 #include "parser/c.tab.h"
 #include "parser/c.yy.h"
 
-#include <FunctionDefinition.h>
+#include <TranslationUnit.h>
 #include <cstdio>
 
 //
@@ -27,12 +27,13 @@ int main(int argc, char** argv) {
   cclex_init(&scanner);
   ccset_in(file, scanner);
 
-  FunctionDefinitionList function_list;
-  int result = ccparse(scanner, function_list);
+  TranslationUnit* unit;
+  int result = ccparse(scanner, unit);
 
   cclex_destroy(scanner);
   fclose(file);
 
+  delete (unit);
   // if (result != 0) { return delete (program), 1; }
 
   // Output the program to the file
