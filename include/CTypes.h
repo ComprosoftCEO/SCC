@@ -43,6 +43,9 @@ enum class TypeQualifier { CONST, RESTRICT, VOLATILE, ATOMIC };
 // List of function specifiers
 enum class FunctionSpecifier { INLINE, NORETURN };
 
+// List of storage class specifiers
+enum class StorageClassSpecifier { TYPEDEF, EXTERN, STATIC, THREAD_LOCAL, AUTO, REGISTER };
+
 // List of custom sizes
 #define POINTER_SIZE 8
 #define VOID_SIZE    0

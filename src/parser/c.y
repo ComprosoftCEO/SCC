@@ -31,22 +31,27 @@
 
 
 %union {
-  C_INT ival;          // Literal integer
-  C_UINT uival;        // Literal unsigned integer
-  C_LONG lval;         // Literal long
-  C_ULONG ulval;       // Literal unsigned long
-  C_LONGLONG llval;    // Literal long long
-  C_ULONGLONG ullval;  // Literal unsigned long long
-  C_FLOAT fval;        // Literal floating point
-  C_DOUBLE dval;       // Literal double
-  C_LONGDOUBLE ldval;  // Literal long double
-
+  C_INT ival;                           // Literal integer
+  C_UINT uival;                         // Literal unsigned integer
+  C_LONG lval;                          // Literal long
+  C_ULONG ulval;                        // Literal unsigned long
+  C_LONGLONG llval;                     // Literal long long
+  C_ULONGLONG ullval;                   // Literal unsigned long long
+  C_FLOAT fval;                         // Literal floating point
+  C_DOUBLE dval;                        // Literal double
+  C_LONGDOUBLE ldval;                   // Literal long double
   std::string* str;                     // Identifier, string, type, etc.
+
   Expression* expr;                     // Expression interface
   std::vector<Expression*>* expr_list;  // List of expressions
-  Statement* stmt;                      // Statement type
-  StatementList* stmt_list;             // List of statements
+
   DataType* dt;                         // Data type object
+
+  TypeQualifier tq;                     // Type qualifier (const, volatile, etc.)
+  FunctionSpecifier fs;                 // Function specifier (inline, noreturn, etc.)
+  StorageClassSpecifier scs;            // Storage class specifier (extern, static, register, etc.)
+  std::vector<TypeQualifier>* tqlist;   // List of type qualifiers
+  SpecifierQualifierBuilder* builder;   // Special object to build specifiers and qualifiers
 
   DeclarationList* decl_list;           // List of declarations with a name
   Declaration* decl;                    // Declaration (one with a name)
@@ -55,13 +60,19 @@
   DataTypeFactory* fact;                // Abstract factory type
   PointerFactory* pfact;                // Pointer factory (special case)
 
+  Statement* stmt;                      // Statement type
+  StatementList* stmt_list;             // List of statements
+
   Parameter* param;                     // Single parameter in a function
   ParameterList* param_list;            // List of parameters in a function
   FunctionDefinition* func;             // Single function definition
   FunctionDefinitionList* func_list;    // List of function definitions
 }
 
-//Destructors
+
+//====================================
+// Destructors
+//====================================
 %destructor {delete($$);} <str> <expr> <dt> <stmt>
 %destructor {delete($$);} <decl> <declr> <fact> <pfact>
 %destructor {delete($$);} <param> <param_list> <func>
@@ -73,7 +84,10 @@
 } <expr_list> <decl_list> <declr_list> <stmt_list> <func_list>
 
 
-//Terminal types
+
+//====================================
+// Terminal types
+//====================================
 %token <str> IDENTIFIER STRING_LITERAL FUNC_NAME TYPEDEF_NAME ENUMERATION_CONSTANT
 %token <ival> INT_CONSTANT
 %token <uival> UINT_CONSTANT
@@ -121,7 +135,11 @@
 //  Same precedence, but "shift" wins.
 %right "then" ELSE 
 
+
+
+//====================================
 //Nonterminal types
+//====================================
 %type <str> string
 
 // Expressions
@@ -133,10 +151,16 @@
 %type <expr> assignment_expression expression constant_expression
 %type <expr_list> argument_expression_list
 
+// Type specifiers and qualifiers
+%type <tq> type_qualifier
+%type <tqlist> type_qualifier_list
+%type <scs> storage_class_specifier
+%type <fs> function_specifier
+%type <builder> type_specifier declaration_specifiers specifier_qualifier_list
+
 // Declarations and declarators
 %type <decl_list> declaration
-%type <dt> declaration_specifiers specifier_qualifier_list type_specifier
-%type <declr_list> init_declarator_list declarator_list
+%type <declr_list> init_declarator_list
 %type <declr> init_declarator declarator direct_declarator
 %type <dt> type_name
 %type <fact> abstract_declarator direct_abstract_declarator
@@ -157,6 +181,7 @@
 %type <func> function_definition
 %type <func_list> function_definition_list
 
+// Which token to start with
 %start translation_unit
 %%
 
@@ -319,7 +344,7 @@ declaration
   : declaration_specifiers init_declarator_list ';'   {
     $$ = new DeclarationList();
     for (auto decl : *$2) {
-      $$->push_back(decl->build_declaration($1->clone()));
+      $$->push_back(decl->build_declaration($1->get_data_type()));
       delete(decl);
     }
     delete($2);
@@ -327,20 +352,15 @@ declaration
   }
   ;
 
-typedef_declaration
-  : TYPEDEF declaration_specifiers declarator_list
-  ;
-
 declaration_specifiers
-  : type_specifier      { $$ = $1; }
-  // : storage_class_specifier declaration_specifiers
-  // | storage_class_specifier
-  // | type_specifier declaration_specifiers
-  // | type_specifier
-  // | type_qualifier declaration_specifiers
-  // | type_qualifier
-  // | function_specifier declaration_specifiers
-  // | function_specifier
+  : storage_class_specifier declaration_specifiers  { $$ = new SpecifierQualifierBuilder($1, *$2); delete($2); }
+  | storage_class_specifier                         { $$ = new SpecifierQualifierBuilder($1); }
+  | type_specifier declaration_specifiers           { $$ = $1; $$->merge_tokens(*$2); delete($2); }
+  | type_specifier                                  { $$ = $1; }
+  | type_qualifier declaration_specifiers           { $$ = new SpecifierQualifierBuilder($1, *$2); delete($2); }
+  | type_qualifier                                  { $$ = new SpecifierQualifierBuilder($1); }
+  | function_specifier declaration_specifiers       { $$ = new SpecifierQualifierBuilder($1, *$2); delete($2); }
+  | function_specifier                              { $$ = new SpecifierQualifierBuilder($1); }
   // | alignment_specifier declaration_specifiers
   // | alignment_specifier
   ;
@@ -355,31 +375,26 @@ init_declarator
   | declarator                  { $$ = $1; }
   ;
 
-declarator_list
-  : declarator
-  | declarator_list ',' declarator
-  ;
-
 storage_class_specifier
-  : TYPEDEF
-  | EXTERN
-  | STATIC
-  | THREAD_LOCAL
-  | AUTO
-  | REGISTER
+  : TYPEDEF         { $$ = StorageClassSpecifier::TYPEDEF; }
+  | EXTERN          { $$ = StorageClassSpecifier::EXTERN; }
+  | STATIC          { $$ = StorageClassSpecifier::STATIC; }
+  | THREAD_LOCAL    { $$ = StorageClassSpecifier::THREAD_LOCAL; }
+  | AUTO            { $$ = StorageClassSpecifier::AUTO; }
+  | REGISTER        { $$ = StorageClassSpecifier::REGISTER; }
   ;
 
 type_specifier
-  : VOID        { $$ = new VoidDataType(); }
-  | CHAR        { $$ = new CharDataType(); }
-  // | SHORT
-  | INT         { $$ = new IntDataType(); }
-  | LONG        { $$ = new LongDataType(); }
-  // | FLOAT
-  // | DOUBLE
-  // | SIGNED
-  // | UNSIGNED
-  // | BOOL
+  : VOID        { $$ = new SpecifierQualifierBuilder(); $$->add_void(); }
+  | CHAR        { $$ = new SpecifierQualifierBuilder(); $$->add_char(); }
+  | SHORT       { $$ = new SpecifierQualifierBuilder(); $$->add_short(); }
+  | INT         { $$ = new SpecifierQualifierBuilder(); $$->add_int(); }
+  | LONG        { $$ = new SpecifierQualifierBuilder(); $$->add_long(); }
+  | FLOAT       { $$ = new SpecifierQualifierBuilder(); $$->add_float(); }
+  | DOUBLE      { $$ = new SpecifierQualifierBuilder(); $$->add_double(); }
+  | SIGNED      { $$ = new SpecifierQualifierBuilder(); $$->add_signed(); }
+  | UNSIGNED    { $$ = new SpecifierQualifierBuilder(); $$->add_unsigned(); }
+  | BOOL        { $$ = new SpecifierQualifierBuilder(); $$->add_bool(); }
   // | COMPLEX
   // | IMAGINARY      /* non-mandated extension */
   // | atomic_type_specifier
@@ -410,10 +425,10 @@ type_specifier
 //   ;
 
 specifier_qualifier_list
-  : type_specifier    { $$ = $1; }
-  // | type_specifier specifier_qualifier_list
-  // | type_qualifier specifier_qualifier_list
-  // | type_qualifier
+  : type_specifier specifier_qualifier_list   { $$ = $1; $$->merge_tokens(*$2); delete($2); }
+  | type_specifier                            { $$ = $1; }
+  | type_qualifier specifier_qualifier_list   { $$ = new SpecifierQualifierBuilder($1, *$2); delete($2); }
+  | type_qualifier                            { $$ = new SpecifierQualifierBuilder($1); }
   ;
 
 // struct_declarator_list
@@ -450,15 +465,15 @@ specifier_qualifier_list
 //   ;
 
 type_qualifier
-  : CONST
-  | RESTRICT
-  | VOLATILE
-  | ATOMIC
+  : CONST           { $$ = TypeQualifier::CONST; }
+  | RESTRICT        { $$ = TypeQualifier::RESTRICT; }
+  | VOLATILE        { $$ = TypeQualifier::VOLATILE; }
+  | ATOMIC          { $$ = TypeQualifier::ATOMIC; }
   ;
 
 function_specifier
-  : INLINE
-  | NORETURN
+  : INLINE          { $$ = FunctionSpecifier::INLINE; }
+  | NORETURN        { $$ = FunctionSpecifier::NORETURN; }
   ;
 
 // alignment_specifier
@@ -482,15 +497,15 @@ direct_declarator
   ;
 
 pointer
-  // : '*' type_qualifier_list pointer
-  // | '*' type_qualifier_list
-  : pointer '*'                      { $$ = $1; $1->add_factory(new PointerFactory()); }
+  : '*' type_qualifier_list pointer  { $$ = $3; $$->add_factory(new PointerFactory(*$2)); delete($2); }
+  | '*' type_qualifier_list          { $$ = new PointerFactory(*$2); delete($2); }
+  | '*' pointer                      { $$ = $2; $$->add_factory(new PointerFactory()); }
   | '*'                              { $$ = new PointerFactory(); }
   ;
 
 type_qualifier_list
-  : type_qualifier
-  | type_qualifier_list type_qualifier
+  : type_qualifier                        { $$ = new std::vector<TypeQualifier>{$1}; }
+  | type_qualifier_list type_qualifier    { $$ = $1; $$->push_back($2); }
   ;
 
 parameter_list
@@ -499,14 +514,14 @@ parameter_list
   ;
 
 parameter_declaration
-  : declaration_specifiers declarator           { $$ = new Parameter($2->build_declaration($1)); delete($2); }
-  | declaration_specifiers abstract_declarator  { $$ = new Parameter($2->build_data_type($1)); delete($2); }
-  | declaration_specifiers                      { $$ = new Parameter($1); }
+  : declaration_specifiers declarator           { $$ = new Parameter($2->build_declaration($1->get_data_type())); delete($2); delete($1); }
+  | declaration_specifiers abstract_declarator  { $$ = new Parameter($2->build_data_type($1->get_data_type())); delete($2); delete($1); }
+  | declaration_specifiers                      { $$ = new Parameter($1->get_data_type()); delete($1); }
   ;
 
 type_name
-  : specifier_qualifier_list abstract_declarator  { $$ = $2->build_data_type($1); delete($2); }
-  | specifier_qualifier_list                      { $$ = $1; }
+  : specifier_qualifier_list abstract_declarator  { $$ = $2->build_data_type($1->get_data_type()); delete($2); delete($1); }
+  | specifier_qualifier_list                      { $$ = $1->get_data_type(); delete($1); }
   ;
 
 abstract_declarator
@@ -567,8 +582,8 @@ statement
 
 labeled_statement
   : IDENTIFIER ':' statement                    { $$ = new LabelStatement(*$1, $3); delete($1); }
-  // | CASE constant_expression ':' statement
-  // | DEFAULT ':' statement
+  | CASE constant_expression ':' statement      { $$ = new CaseStatement($2, $4); }
+  | DEFAULT ':' statement                       { $$ = new DefaultCaseStatement($3); }
   ;
 
 compound_statement
@@ -600,7 +615,7 @@ expression_statement
 selection_statement
   : IF '(' expression ')' statement %prec "then"    { $$ = new IfStatement($3, $5); }
   | IF '(' expression ')' statement ELSE statement  { $$ = new IfStatement($3, $5, $7); }
-  // | SWITCH '(' expression ')' statement
+  | SWITCH '(' expression ')' statement             { $$ = new SwitchStatement($3, $5); }
   ;
 
 iteration_statement
@@ -620,6 +635,7 @@ jump_statement
   | RETURN expression ';'   { $$ = new ReturnStatement($2); }
   ;
 
+/* Entry point */
 translation_unit
   : function_definition_list  { functions = *$1; delete($1); }
   ;
@@ -636,7 +652,7 @@ function_definition_list
   ;
 
 function_definition
-  : declaration_specifiers declarator compound_statement  { $$ = new FunctionDefinition($2->build_declaration($1), $3); }
+  : declaration_specifiers declarator compound_statement  { $$ = new FunctionDefinition($2->build_declaration($1->get_data_type()), $3); delete($1); }
   ;
 
 /* We aren't supporting the K&R syntax */

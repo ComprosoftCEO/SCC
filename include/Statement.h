@@ -80,6 +80,46 @@ private:
 };
 
 /**
+ * @class CaseStatement
+ * Represents a case for a switch statement
+ */
+class CaseStatement final: public Statement {
+
+public:
+  CaseStatement(Expression* value, Statement* stmt);
+  ~CaseStatement();
+
+  Expression* get_expression() const;
+  Statement* get_statement() const;
+
+  void visit(StatementVisitor& visitor);
+  CaseStatement* clone() const;
+
+private:
+  Expression* value;
+  Statement* stmt;
+};
+
+/**
+ * @class DefaultCaseStatement
+ * Represents the default "case" label
+ */
+class DefaultCaseStatement final: public Statement {
+
+public:
+  DefaultCaseStatement(Statement* stmt);
+  ~DefaultCaseStatement();
+
+  Statement* get_statement() const;
+
+  void visit(StatementVisitor& visitor);
+  DefaultCaseStatement* clone() const;
+
+private:
+  Statement* stmt;
+};
+
+/**
  * @class CompoundStatement
  * Group of statements with a separate namespace
  */

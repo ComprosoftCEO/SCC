@@ -90,6 +90,7 @@ OBJECTS=\
 	declaration/Declarator.o \
 	declaration/Parameter.o \
 	declaration/FunctionDefinition.o \
+	declaration/SpecifierQualifierBuilder.o \
 	\
 	factory/DataTypeFactory.o \
 	factory/PointerFactory.o \

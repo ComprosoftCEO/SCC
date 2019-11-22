@@ -1,6 +1,7 @@
 #ifndef DATA_TYPE_FACTORY_HEADER
 #define DATA_TYPE_FACTORY_HEADER
 
+#include <CTypes.h>
 #include <Parameter.h>
 #include <vector>
 
@@ -43,12 +44,15 @@ class PointerFactory final: public DataTypeFactory {
 
 public:
   PointerFactory();
-  PointerFactory(DataTypeFactory* sub_factory);
+  PointerFactory(const std::vector<TypeQualifier>& qualifier_list);
 
   void add_factory(DataTypeFactory* sub_factory);
 
 private:
   DataType* build_aggregate(DataType* internal_type);
+
+private:
+  std::vector<TypeQualifier> qualifier_list;
 };
 
 /**
