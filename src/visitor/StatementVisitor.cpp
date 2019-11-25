@@ -6,7 +6,18 @@ void StatementVisitor::accept(EmptyStatement& stmt) {
 }
 
 void StatementVisitor::accept(LabelStatement& stmt) {
-  return;
+  Statement* s = stmt.get_statement();
+  if (s != nullptr) { s->visit(*this); }
+}
+
+void StatementVisitor::accept(CaseStatement& stmt) {
+  Statement* s = stmt.get_statement();
+  if (s != nullptr) { s->visit(*this); }
+}
+
+void StatementVisitor::accept(DefaultCaseStatement& stmt) {
+  Statement* s = stmt.get_statement();
+  if (s != nullptr) { s->visit(*this); }
 }
 
 void StatementVisitor::accept(DeclarationStatement& stmt) {
@@ -27,6 +38,11 @@ void StatementVisitor::accept(IfStatement& stmt) {
   Statement *then_stmt = stmt.get_then_statement(), *else_stmt = stmt.get_else_statement();
   if (then_stmt != nullptr) { then_stmt->visit(*this); }
   if (else_stmt != nullptr) { else_stmt->visit(*this); }
+}
+
+void StatementVisitor::accept(SwitchStatement& stmt) {
+  Statement* s = stmt.get_statement();
+  if (s != nullptr) { s->visit(*this); }
 }
 
 void StatementVisitor::accept(GotoStatement& stmt) {

@@ -53,6 +53,11 @@ public:
 
   void add_function_definition(FunctionDefinition* func_def);
   void add_declarations(const DeclarationList& decl_list); // Takes ownership
+
+private:
+  // TODO: Store the order of declarations
+  std::vector<FunctionDefinition*> functions;
+  DeclarationList global_declarations;
 };
 
 #endif /* Translation Unit Header Included */

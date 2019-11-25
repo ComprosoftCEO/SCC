@@ -89,7 +89,7 @@ public:
   CaseStatement(Expression* value, Statement* stmt);
   ~CaseStatement();
 
-  Expression* get_expression() const;
+  Expression* get_value() const;
   Statement* get_statement() const;
 
   void visit(StatementVisitor& visitor);

@@ -72,9 +72,12 @@ OBJECTS=\
 	statement/EmptyStatement.o \
 	statement/DeclarationStatement.o \
 	statement/LabelStatement.o \
+	statement/CaseStatement.o \
+	statement/DefaultCaseStatement.o \
 	statement/CompoundStatement.o \
 	statement/ExpressionStatement.o \
 	statement/IfStatement.o \
+	statement/SwitchStatement.o \
 	statement/GotoStatement.o \
 	statement/WhileStatement.o \
 	statement/DoWhileStatement.o \
@@ -96,6 +99,8 @@ OBJECTS=\
 	factory/PointerFactory.o \
 	factory/ArrayFactory.o \
 	factory/FunctionFactory.o \
+	\
+	TranslationUnit.o \
 	scc.o \
 
 # Add the source directory
