@@ -1,6 +1,5 @@
 %define api.pure full
 %name-prefix "specifiers_"
-%locations
 
 %parse-param { TypeSpecifierList& specifiers } 
 %lex-param { TypeSpecifierList& specifiers }
@@ -13,12 +12,12 @@
 
 %code {
 	// Let Bison know about tokenization methods
-	extern int specifiers_lex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, TypeSpecifierList& specifiers);
-	static void specifiers_error(YYLTYPE* yyllocp, TypeSpecifierList& unused, DataType*& dt, const char* msg);
+	extern int specifiers_lex(YYSTYPE* yylvalp, TypeSpecifierList& specifiers);
+	static void specifiers_error(TypeSpecifierList& unused, DataType*& dt, const char* msg);
 }
 
 
-%token BOOL CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE VOID
+%token VOID CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE BOOL
 // %token COMPLEX IMAGINARY 
 
 %start data_type
@@ -141,7 +140,6 @@ longdouble
 
 %%
 
-static void specifiers_error(YYLTYPE* yyllocp, TypeSpecifierList& unused, DataType*& output, const char *msg) {
-	fprintf(stderr, "Invalid Specifier: %s! [Line %d:%d]\n",
-		msg,yyllocp->first_line, yyllocp->first_column);
+static void specifiers_error(TypeSpecifierList& unused, DataType*& output, const char *msg) {
+	fprintf(stderr, "Invalid type specifier: %s!\n", msg);
 }
