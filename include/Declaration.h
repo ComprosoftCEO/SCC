@@ -2,6 +2,7 @@
 #define DECLARATION_HEADER
 
 #include <CTypes.h>
+#include <list>
 #include <string>
 #include <vector>
 
@@ -86,6 +87,7 @@ class SpecifierQualifierBuilder final {
 
 public:
   SpecifierQualifierBuilder();
+  SpecifierQualifierBuilder(const SpecifierQualifierBuilder& builder);
 
   // Alternate Constructor helpers
   SpecifierQualifierBuilder(TypeQualifier qualifier);
@@ -99,40 +101,39 @@ public:
   // Destructor
   ~SpecifierQualifierBuilder();
 
-  bool merge_tokens(const SpecifierQualifierBuilder& builder);
+  void merge_tokens(const SpecifierQualifierBuilder& builder);
 
   // Type specifier tokens
-  bool add_void();
-  bool add_char();
-  bool add_short();
-  bool add_int();
-  bool add_long();
-  bool add_float();
-  bool add_double();
-  bool add_signed();
-  bool add_unsigned();
-  bool add_bool();
+  void add_void();
+  void add_char();
+  void add_short();
+  void add_int();
+  void add_long();
+  void add_float();
+  void add_double();
+  void add_signed();
+  void add_unsigned();
+  void add_bool();
 
   // TODO: Add structs or enums
   // TODO: Add typedef type
 
   // Qualifiers and specifiers
-  bool add_type_qualifier(TypeQualifier qualifier);
-  bool add_storage_class_specifier(StorageClassSpecifier specifier);
-  bool add_function_specifier(FunctionSpecifier specifier);
+  void add_type_qualifier(TypeQualifier qualifier);
+  void add_storage_class_specifier(StorageClassSpecifier specifier);
+  void add_function_specifier(FunctionSpecifier specifier);
 
   // Builds a new clone of the internal data type
+  //   Returns nullptr on failure
   DataType* get_data_type() const;
 
 private:
-  bool inside_complex_state() const;
+  std::list<TypeSpecifier> type_specifiers;
+  std::list<TypeQualifier> type_qualifiers;
+  std::list<StorageClassSpecifier> storage_specifiers;
+  std::list<FunctionSpecifier> function_specifiers;
 
-private:
-  SpecifierQualifierState state; // Current state
-  union {
-    PrimitiveType primitive_type; // Current type
-    DataType* complex_type;       // For struct or union types
-  };
+  // TOOD: Complex data types
 };
 
 #endif /* Declaration Header Included */

@@ -1,50 +1,118 @@
 #include <DataType.h>
 #include <Declaration.h>
 
-// Store the state transition diagram
-
-//
-// Constructor
-//
-SpecifierQualifierBuilder::SpecifierQualifierBuilder(): state(SpecifierQualifierState::START) {}
-
-//
-// Test state
-//
-bool SpecifierQualifierBuilder::inside_complex_state() const {
-  return this->state == SpecifierQualifierState::COMPLEX_TYPE;
+template<typename L1, typename L2> static inline void append_list(L1& list1, const L2& list2) {
+  list1.insert(list1.end(), list2.begin(), list2.end());
 }
 
-bool SpecifierQualifierBuilder::add_void() {
-  if (this->inside_complex_state()) { return false; }
-  if (this->state != SpecifierQualifierState::START) { return false; }
+//
+// Constructors
+//
+SpecifierQualifierBuilder::SpecifierQualifierBuilder() = default;
+SpecifierQualifierBuilder::SpecifierQualifierBuilder(const SpecifierQualifierBuilder& builder) =
+    default;
 
-  this->state          = SpecifierQualifierState::PRIMITIVE;
-  this->primitive_type = PrimitiveType::VOID;
-  return true;
+// Type qualifiers
+SpecifierQualifierBuilder::SpecifierQualifierBuilder(TypeQualifier qualifier):
+  type_qualifiers{qualifier} {}
+
+SpecifierQualifierBuilder::SpecifierQualifierBuilder(TypeQualifier qualifier,
+                                                     const SpecifierQualifierBuilder& builder):
+  SpecifierQualifierBuilder{builder} {
+  this->type_qualifiers.push_front(qualifier);
 }
 
-bool SpecifierQualifierBuilder::add_char() {
-  if (this->inside_complex_state()) { return false; }
-  if (this->state == SpecifierQualifierState::START) {
-    this->state          = SpecifierQualifierState::PRIMITIVE;
-    this->primitive_type = PrimitiveType::CHAR;
-    return true;
-  }
+// Storage class specifiers
+SpecifierQualifierBuilder::SpecifierQualifierBuilder(StorageClassSpecifier specifier):
+  storage_specifiers{specifier} {}
+
+SpecifierQualifierBuilder::SpecifierQualifierBuilder(StorageClassSpecifier specifier,
+                                                     const SpecifierQualifierBuilder& builder):
+  SpecifierQualifierBuilder{builder} {
+  this->storage_specifiers.push_front(specifier);
 }
 
-bool SpecifierQualifierBuilder::add_short() {}
+// Functions
+SpecifierQualifierBuilder::SpecifierQualifierBuilder(FunctionSpecifier specifier):
+  function_specifiers{specifier} {}
 
-bool SpecifierQualifierBuilder::add_int() {}
+SpecifierQualifierBuilder::SpecifierQualifierBuilder(FunctionSpecifier specifier,
+                                                     const SpecifierQualifierBuilder& builder):
+  SpecifierQualifierBuilder{builder} {
+  this->function_specifiers.push_front(specifier);
+}
 
-bool SpecifierQualifierBuilder::add_long() {}
+//
+// Destructor
+//
+SpecifierQualifierBuilder::~SpecifierQualifierBuilder() {
+  return;
+}
 
-bool SpecifierQualifierBuilder::add_float() {}
+//
+// Merge the tokens
+//
+void SpecifierQualifierBuilder::merge_tokens(const SpecifierQualifierBuilder& builder) {
+  append_list(this->type_specifiers, builder.type_specifiers);
+  append_list(this->type_qualifiers, builder.type_qualifiers);
+  append_list(this->storage_specifiers, builder.storage_specifiers);
+  append_list(this->function_specifiers, builder.function_specifiers);
+}
 
-bool SpecifierQualifierBuilder::add_double() {}
+//
+// Add type specifier tokens
+//
+void SpecifierQualifierBuilder::add_void() {
+  this->type_specifiers.push_back(TypeSpecifier::VOID);
+}
 
-bool SpecifierQualifierBuilder::add_signed() {}
+void SpecifierQualifierBuilder::add_char() {
+  this->type_specifiers.push_back(TypeSpecifier::CHAR);
+}
 
-bool SpecifierQualifierBuilder::add_unsigned() {}
+void SpecifierQualifierBuilder::add_short() {
+  this->type_specifiers.push_back(TypeSpecifier::SHORT);
+}
 
-bool SpecifierQualifierBuilder::add_bool() {}
+void SpecifierQualifierBuilder::add_int() {
+  this->type_specifiers.push_back(TypeSpecifier::INT);
+}
+
+void SpecifierQualifierBuilder::add_long() {
+  this->type_specifiers.push_back(TypeSpecifier::LONG);
+}
+
+void SpecifierQualifierBuilder::add_float() {
+  this->type_specifiers.push_back(TypeSpecifier::FLOAT);
+}
+
+void SpecifierQualifierBuilder::add_double() {
+  this->type_specifiers.push_back(TypeSpecifier::DOUBLE);
+}
+
+void SpecifierQualifierBuilder::add_signed() {
+  this->type_specifiers.push_back(TypeSpecifier::SIGNED);
+}
+
+void SpecifierQualifierBuilder::add_unsigned() {
+  this->type_specifiers.push_back(TypeSpecifier::UNSIGNED);
+}
+
+void SpecifierQualifierBuilder::add_bool() {
+  this->type_specifiers.push_back(TypeSpecifier::BOOL);
+}
+
+//
+// Qualifiers and specifiers
+//
+void SpecifierQualifierBuilder::add_type_qualifier(TypeQualifier qualifier) {
+  this->type_qualifiers.push_back(qualifier);
+}
+
+void SpecifierQualifierBuilder::add_storage_class_specifier(StorageClassSpecifier specifier) {
+  this->storage_specifiers.push_back(specifier);
+}
+
+void SpecifierQualifierBuilder::add_function_specifier(FunctionSpecifier specifier) {
+  this->function_specifiers.push_back(specifier);
+}

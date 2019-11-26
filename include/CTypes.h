@@ -37,6 +37,22 @@ typedef float C_FLOAT;
 typedef double C_DOUBLE;
 typedef long double C_LONGDOUBLE;
 
+// List of all type specifiers
+enum class TypeSpecifier {
+  VOID,
+  CHAR,
+  SHORT,
+  INT,
+  LONG,
+  FLOAT,
+  DOUBLE,
+  SIGNED,
+  UNSIGNED,
+  BOOL,
+  // COMPLEX,
+  // IMAGINARY,
+};
+
 // List of all type qualifiers
 enum class TypeQualifier { CONST, RESTRICT, VOLATILE, ATOMIC };
 
