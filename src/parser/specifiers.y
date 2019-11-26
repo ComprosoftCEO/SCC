@@ -28,19 +28,24 @@
 %%
 
 data_type
-  : char
-  | uchar
-  | short
-  | ushort
-  | int
-  | uint
-  | long
-  | ulong
-  | longlong
-  | ulonglong
-  | float
-  | double
-  | longdouble
+  : void        { dt = new VoidDataType(); }
+  | char        { dt = new CharDataType(); }
+  | uchar       { dt = new UnsignedCharDataType(); }
+  | short       { dt = new ShortDataType(); }
+  | ushort      { dt = new UnsignedShortDataType(); }
+  | int         { dt = new IntDataType(); }
+  | uint        { dt = new UnsignedIntDataType(); }
+  | long        { dt = new LongDataType(); }
+  | ulong       { dt = new UnsignedLongDataType(); }
+  | longlong    { dt = new LongLongDataType(); }
+  | ulonglong   { dt = new UnsignedLongLongDataType(); }
+  | float       { dt = new FloatDataType(); }
+  | double      { dt = new DoubleDataType(); }
+  | longdouble  { dt = new LongDoubleDataType(); }
+  ;
+
+void
+  : VOID
   ;
 
 char
