@@ -16,6 +16,7 @@ class Expression;
 
 typedef std::vector<Declarator*> DeclaratorList;
 typedef std::vector<Declaration*> DeclarationList;
+typedef std::list<TypeSpecifier> TypeSpecifierList;
 
 /**
  * @class Declaration

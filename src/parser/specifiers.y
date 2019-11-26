@@ -2,22 +2,19 @@
 %name-prefix "specifiers_"
 %locations
 
-%parse-param { specifiers_t scanner } 
-%lex-param { specifiers_t scanner }
-%parse-param {DataType*& dt}
+%parse-param { TypeSpecifierList& specifiers } 
+%lex-param { TypeSpecifierList& specifiers }
+%parse-param { DataType*& dt }
 
 %code requires {
-
 	#include <DataType.h>
-
-	// Declare stuff from Flex that Bison needs to know about:
-	typedef void* specifiers_t;
+  #include <Declaration.h>
 }
 
 %code {
 	// Let Bison know about tokenization methods
-	static int specifiers_lex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, specifiers_t scanner);
-	static void specifiers_error(YYLTYPE* yyllocp, specifiers_t unused, DataType*& dt, const char* msg);
+	extern int specifiers_lex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, TypeSpecifierList& specifiers);
+	static void specifiers_error(YYLTYPE* yyllocp, TypeSpecifierList& unused, DataType*& dt, const char* msg);
 }
 
 
@@ -144,12 +141,7 @@ longdouble
 
 %%
 
-
-static int specifiers_lex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, specifiers_t scanner) {
-  // TODO: Implement this method
-}
-
-static void specifiers_error(YYLTYPE* yyllocp, specifiers_t unused, DataType*& output, const char *msg) {
-	fprintf(stderr, "%s! [Line %d:%d]\n",
+static void specifiers_error(YYLTYPE* yyllocp, TypeSpecifierList& unused, DataType*& output, const char *msg) {
+	fprintf(stderr, "Invalid Specifier: %s! [Line %d:%d]\n",
 		msg,yyllocp->first_line, yyllocp->first_column);
 }

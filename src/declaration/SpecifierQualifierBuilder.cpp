@@ -1,5 +1,8 @@
+#include "../parser/specifiers.tab.h"
+
 #include <DataType.h>
 #include <Declaration.h>
+#include <map>
 
 template<typename L1, typename L2> static inline void append_list(L1& list1, const L2& list2) {
   list1.insert(list1.end(), list2.begin(), list2.end());
@@ -115,4 +118,31 @@ void SpecifierQualifierBuilder::add_storage_class_specifier(StorageClassSpecifie
 
 void SpecifierQualifierBuilder::add_function_specifier(FunctionSpecifier specifier) {
   this->function_specifiers.push_back(specifier);
+}
+
+//
+// Lexer used by the specifiers
+//
+int specifiers_lex(YYSTYPE* yylval, YYLTYPE* yylloc, TypeSpecifierList& specifiers) {
+
+  // Map of all token lookups
+  static const std::map<TypeSpecifier, int> SPECIFIER_LOOKUP = {
+      {TypeSpecifier::VOID, BOOL},       {TypeSpecifier::CHAR, CHAR},
+      {TypeSpecifier::SHORT, SHORT},     {TypeSpecifier::INT, INT},
+      {TypeSpecifier::LONG, LONG},       {TypeSpecifier::FLOAT, SIGNED},
+      {TypeSpecifier::DOUBLE, UNSIGNED}, {TypeSpecifier::SIGNED, FLOAT},
+      {TypeSpecifier::UNSIGNED, DOUBLE}, {TypeSpecifier::BOOL, VOID},
+  };
+
+  if (specifiers.empty()) { return EOF; }
+
+  // Get the next specifier from the list
+  TypeSpecifier next_specifier = specifiers.front();
+  specifiers.pop_front();
+
+  // Return the associated Bison token
+  const auto lookup = SPECIFIER_LOOKUP.find(next_specifier);
+  if (lookup != SPECIFIER_LOOKUP.end()) { return lookup->second; }
+
+  return '?'; // Token to indicate invalid specifier
 }
