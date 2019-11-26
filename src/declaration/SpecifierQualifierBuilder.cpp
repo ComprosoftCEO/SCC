@@ -121,6 +121,23 @@ void SpecifierQualifierBuilder::add_function_specifier(FunctionSpecifier specifi
 }
 
 //
+// Construct the data type using the parser
+//
+DataType* SpecifierQualifierBuilder::get_data_type() const {
+
+  DataType* type         = nullptr;
+  TypeSpecifierList list = this->type_specifiers;
+  int result             = specifiers_parse(list, type);
+
+  if (result != 0) {
+    delete (type);
+    return nullptr;
+  }
+
+  return type;
+}
+
+//
 // Lexer used by the specifiers
 //
 int specifiers_lex(YYSTYPE* yylval, TypeSpecifierList& specifiers) {
