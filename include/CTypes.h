@@ -68,5 +68,7 @@ enum class StorageClassSpecifier { TYPEDEF, EXTERN, STATIC, THREAD_LOCAL, AUTO, 
 
 // Helper Functions
 bool is_unsigned_type(PrimitiveType type);
+bool is_integer_type(PrimitiveType type);
+bool is_float_type(PrimitiveType type);
 
 #endif /* C Types Header Included */
