@@ -43,6 +43,7 @@
   std::string* str;                     // Identifier, string, type, etc.
 
   Expression* expr;                     // Expression interface
+  CommaExpression* comma_expr;          // Specific for comma expressions
   std::vector<Expression*>* expr_list;  // List of expressions
 
   DataType* dt;                         // Data type object
@@ -72,7 +73,7 @@
 //====================================
 // Destructors
 //====================================
-%destructor {delete($$);} <str> <expr> <dt> <stmt>
+%destructor {delete($$);} <str> <expr> <comma_expr> <dt> <stmt>
 %destructor {delete($$);} <tqlist> <builder>
 %destructor {delete($$);} <declr> <fact> <pfact>
 %destructor {delete($$);} <param> <param_list> <func> <unit>
@@ -148,7 +149,9 @@
 %type <expr> relational_expression equality_expression
 %type <expr> and_expression exclusive_or_expression inclusive_or_expression
 %type <expr> logical_and_expression logical_or_expression conditional_expression
-%type <expr> assignment_expression expression constant_expression
+%type <expr> assignment_expression
+%type <comma_expr> comma_expression
+%type <expr> expression constant_expression
 %type <expr_list> argument_expression_list
 
 // Type specifiers and qualifiers
@@ -329,9 +332,14 @@ assignment_expression
   // | unary_expression "|=" assignment_expression
   ;
 
+comma_expression
+  : comma_expression ',' assignment_expression       { $$ = $1; $$->add_expression($3); }
+  | assignment_expression ',' assignment_expression  { $$ = new CommaExpression(); $$->add_expression($1); $$->add_expression($3); }
+  ;
+
 expression
-  : assignment_expression                 { $$ = new CommaExpression(); ((CommaExpression*) $$)->add_expression($1); }
-  | expression ',' assignment_expression  { $$ = $1; ((CommaExpression*) $$)->add_expression($3); }
+  : assignment_expression   { $$ = $1; }
+  | comma_expression        { $$ = $1; }
   ;
 
 constant_expression
