@@ -38,3 +38,6 @@
 *.tab.*
 *.yy.*
 *.output
+
+# Test code files
+test*.c

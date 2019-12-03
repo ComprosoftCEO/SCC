@@ -20,6 +20,5 @@ FunctionFactory::FunctionFactory(DataTypeFactory* sub_factory, const ParameterLi
 // Build the aggregate type
 //
 DataType* FunctionFactory::build_aggregate(DataType* internal_type) {
-  DataType* new_type = new FunctionDataType(this->parameters, internal_type);
-  return new_type;
+  return new FunctionDataType(this->parameters, internal_type);
 }

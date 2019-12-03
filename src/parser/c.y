@@ -647,7 +647,7 @@ translation_unit
   ;
 
 function_definition
-  : declaration_specifiers declarator compound_statement  { $$ = new FunctionDefinition($2->build_declaration($1->get_data_type()), $3); delete($1); }
+  : declaration_specifiers declarator compound_statement  { $$ = new FunctionDefinition($2->build_declaration($1->get_data_type()), $3); delete($1); delete($2); }
   ;
 
 /* We aren't supporting the K&R syntax */

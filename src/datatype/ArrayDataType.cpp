@@ -11,6 +11,14 @@ ArrayDataType::ArrayDataType(DataType* type, class Expression* array_size):
   DataType(ConcreteDataType::ARRAY), type(type), array_size(array_size) {}
 
 //
+// Destructor
+//
+ArrayDataType::~ArrayDataType() {
+  delete (this->type);
+  delete (this->array_size);
+}
+
+//
 // Getters
 //
 DataType* ArrayDataType::get_array_type() const {

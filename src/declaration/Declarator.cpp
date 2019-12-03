@@ -57,7 +57,7 @@ Declaration* Declarator::build_declaration(DataType* internal_type) const {
 DataType* Declarator::build_data_type(DataType* internal_type) const {
   if (this->sub_factory != nullptr) {
     // Tail-end recursion
-    this->sub_factory->build_data_type(internal_type);
+    return this->sub_factory->build_data_type(internal_type);
   }
 
   return internal_type;

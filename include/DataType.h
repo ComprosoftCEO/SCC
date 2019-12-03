@@ -290,6 +290,7 @@ class ArrayDataType final: public DataType {
 public:
   ArrayDataType(DataType* type);
   ArrayDataType(DataType* type, class Expression* array_size);
+  ~ArrayDataType();
 
   DataType* get_array_type() const;
   Expression* get_array_size() const;
