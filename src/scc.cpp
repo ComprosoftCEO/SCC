@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
 
   if (argc < 2) {
     fprintf(stderr, "scc: Error! No input file given!\n");
-    fprintf(stderr, "Usage: %s <infile> [outfile]\n", argv[0]);
+    fprintf(stderr, "Usage: %s <infile>\n", argv[0]);
     return 3;
   }
 

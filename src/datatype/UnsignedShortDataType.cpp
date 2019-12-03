@@ -1,4 +1,5 @@
 #include <DataType.h>
+#include <visitor.h>
 
 //
 // Constructor
@@ -10,6 +11,13 @@ UnsignedShortDataType::UnsignedShortDataType(): PrimitiveDataType(PrimitiveType:
 //
 size_t UnsignedShortDataType::size() const {
   return sizeof(C_USHORT);
+}
+
+//
+// Visit
+//
+void UnsignedShortDataType::visit(DataTypeVisitor& visitor) {
+  visitor.accept(*this);
 }
 
 //

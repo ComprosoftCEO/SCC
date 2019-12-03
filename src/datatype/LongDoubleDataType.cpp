@@ -1,4 +1,5 @@
 #include <DataType.h>
+#include <Visitor.h>
 
 //
 // Constructor
@@ -12,6 +13,12 @@ size_t LongDoubleDataType::size() const {
   return sizeof(C_LONGDOUBLE);
 }
 
+//
+// Visit
+//
+void LongDoubleDataType::visit(DataTypeVisitor& visitor) {
+  visitor.accept(*this);
+}
 //
 // Clone
 //

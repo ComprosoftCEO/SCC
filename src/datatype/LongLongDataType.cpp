@@ -1,4 +1,5 @@
 #include <DataType.h>
+#include <Visitor.h>
 
 //
 // Constructor
@@ -10,6 +11,13 @@ LongLongDataType::LongLongDataType(): PrimitiveDataType(PrimitiveType::LONGLONG)
 //
 size_t LongLongDataType::size() const {
   return sizeof(C_LONGLONG);
+}
+
+//
+// Visit
+//
+void LongLongDataType::visit(DataTypeVisitor& visitor) {
+  visitor.accept(*this);
 }
 
 //

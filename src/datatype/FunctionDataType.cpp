@@ -1,4 +1,5 @@
 #include <DataType.h>
+#include <Visitor.h>
 
 //
 // Constructor
@@ -26,6 +27,13 @@ const ParameterList& FunctionDataType::get_parameter_list() const {
 
 size_t FunctionDataType::size() const {
   return 0;
+}
+
+//
+// Visit
+//
+void FunctionDataType::visit(DataTypeVisitor& visitor) {
+  visitor.accept(*this);
 }
 
 //

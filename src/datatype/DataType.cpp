@@ -13,6 +13,13 @@ ConcreteDataType DataType::get_concrete_type() const {
 }
 
 //
+// Static visit method
+//
+void DataType::visit(DataType* dt, DataTypeVisitor& visitor) {
+  if (dt != nullptr) { dt->visit(visitor); }
+}
+
+//
 // Static clone method
 //
 DataType* DataType::clone(DataType* type) {

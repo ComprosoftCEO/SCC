@@ -1,5 +1,6 @@
 #include <DataType.h>
 #include <Expression.h>
+#include <Visitor.h>
 
 //
 // Constructor
@@ -22,6 +23,13 @@ Expression* ArrayDataType::get_array_size() const {
 
 size_t ArrayDataType::size() const {
   return 0;
+}
+
+//
+// Visit
+//
+void ArrayDataType::visit(DataTypeVisitor& visitor) {
+  visitor.accept(*this);
 }
 
 //

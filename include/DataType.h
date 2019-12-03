@@ -3,11 +3,18 @@
 
 #include <CTypes.h>
 #include <Parameter.h>
+#include <set>
 #include <string>
 #include <vector>
 
 // List of all concrete data types
 enum class ConcreteDataType { PRIMITIVE, POINTER, ARRAY, FUNCTION };
+
+typedef std::set<FunctionSpecifier> FunctionSpecifierSet;
+typedef std::set<TypeQualifier> TypeQualifierSet;
+
+// Forward declare classes
+class DataTypeVisitor;
 
 /**
  * @class DataType
@@ -24,6 +31,9 @@ public:
   // Getter methods
   virtual size_t size() const = 0;
   ConcreteDataType get_concrete_type() const;
+
+  virtual void visit(DataTypeVisitor& visitor) = 0;
+  static void visit(DataType* dt, DataTypeVisitor& visitor);
 
   virtual DataType* clone() const = 0;
   static DataType* clone(DataType* type);
@@ -62,6 +72,7 @@ public:
   VoidDataType();
 
   size_t size() const;
+  void visit(DataTypeVisitor& visitor);
   VoidDataType* clone() const;
 };
 
@@ -75,6 +86,7 @@ public:
   CharDataType();
 
   size_t size() const;
+  void visit(DataTypeVisitor& visitor);
   CharDataType* clone() const;
 };
 
@@ -88,6 +100,7 @@ public:
   UnsignedCharDataType();
 
   size_t size() const;
+  void visit(DataTypeVisitor& visitor);
   UnsignedCharDataType* clone() const;
 };
 
@@ -101,6 +114,7 @@ public:
   ShortDataType();
 
   size_t size() const;
+  void visit(DataTypeVisitor& visitor);
   ShortDataType* clone() const;
 };
 
@@ -114,6 +128,7 @@ public:
   UnsignedShortDataType();
 
   size_t size() const;
+  void visit(DataTypeVisitor& visitor);
   UnsignedShortDataType* clone() const;
 };
 
@@ -127,6 +142,7 @@ public:
   IntDataType();
 
   size_t size() const;
+  void visit(DataTypeVisitor& visitor);
   IntDataType* clone() const;
 };
 
@@ -140,6 +156,7 @@ public:
   UnsignedIntDataType();
 
   size_t size() const;
+  void visit(DataTypeVisitor& visitor);
   UnsignedIntDataType* clone() const;
 };
 
@@ -153,6 +170,7 @@ public:
   LongDataType();
 
   size_t size() const;
+  void visit(DataTypeVisitor& visitor);
   LongDataType* clone() const;
 };
 
@@ -166,6 +184,7 @@ public:
   UnsignedLongDataType();
 
   size_t size() const;
+  void visit(DataTypeVisitor& visitor);
   UnsignedLongDataType* clone() const;
 };
 
@@ -179,6 +198,7 @@ public:
   LongLongDataType();
 
   size_t size() const;
+  void visit(DataTypeVisitor& visitor);
   LongLongDataType* clone() const;
 };
 
@@ -192,6 +212,7 @@ public:
   UnsignedLongLongDataType();
 
   size_t size() const;
+  void visit(DataTypeVisitor& visitor);
   UnsignedLongLongDataType* clone() const;
 };
 
@@ -205,6 +226,7 @@ public:
   FloatDataType();
 
   size_t size() const;
+  void visit(DataTypeVisitor& visitor);
   FloatDataType* clone() const;
 };
 
@@ -218,6 +240,7 @@ public:
   DoubleDataType();
 
   size_t size() const;
+  void visit(DataTypeVisitor& visitor);
   DoubleDataType* clone() const;
 };
 
@@ -231,6 +254,7 @@ public:
   LongDoubleDataType();
 
   size_t size() const;
+  void visit(DataTypeVisitor& visitor);
   LongDoubleDataType* clone() const;
 };
 
@@ -247,6 +271,7 @@ public:
   DataType* get_point_type() const;
   size_t size() const;
 
+  void visit(DataTypeVisitor& visitor);
   PointerDataType* clone() const;
 
 private:
@@ -267,6 +292,7 @@ public:
   Expression* get_array_size() const;
   size_t size() const;
 
+  void visit(DataTypeVisitor& visitor);
   DataType* clone() const;
 
 private:
@@ -286,8 +312,9 @@ public:
 
   DataType* get_return_type() const;
   const ParameterList& get_parameter_list() const;
-  size_t size() const;
 
+  size_t size() const;
+  void visit(DataTypeVisitor& visitor);
   DataType* clone() const;
 
 private:

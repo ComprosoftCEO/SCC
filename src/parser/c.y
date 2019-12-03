@@ -375,8 +375,8 @@ init_declarator
   ;
 
 storage_class_specifier
-  // : TYPEDEF         { $$ = StorageClassSpecifier::TYPEDEF; }
-  : EXTERN          { $$ = StorageClassSpecifier::EXTERN; }
+  : TYPEDEF         { $$ = StorageClassSpecifier::TYPEDEF; }
+  | EXTERN          { $$ = StorageClassSpecifier::EXTERN; }
   | STATIC          { $$ = StorageClassSpecifier::STATIC; }
   | THREAD_LOCAL    { $$ = StorageClassSpecifier::THREAD_LOCAL; }
   | AUTO            { $$ = StorageClassSpecifier::AUTO; }

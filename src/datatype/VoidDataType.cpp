@@ -1,4 +1,5 @@
 #include <DataType.h>
+#include <Visitor.h>
 
 //
 // Constructor
@@ -10,6 +11,13 @@ VoidDataType::VoidDataType(): PrimitiveDataType(PrimitiveType::VOID) {}
 //
 size_t VoidDataType::size() const {
   return VOID_SIZE; // Void has no size
+}
+
+//
+// Visit
+//
+void VoidDataType::visit(DataTypeVisitor& visitor) {
+  visitor.accept(*this);
 }
 
 //

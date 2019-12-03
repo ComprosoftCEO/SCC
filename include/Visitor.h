@@ -55,6 +55,25 @@ class ContinueStatement;
 class BreakStatement;
 class ReturnStatement;
 
+// Forward declare all of the data type classes
+class VoidDataType;
+class CharDataType;
+class UnsignedCharDataType;
+class ShortDataType;
+class UnsignedShortDataType;
+class IntDataType;
+class UnsignedIntDataType;
+class LongDataType;
+class UnsignedLongDataType;
+class LongLongDataType;
+class UnsignedLongLongDataType;
+class FloatDataType;
+class DoubleDataType;
+class LongDoubleDataType;
+class PointerDataType;
+class ArrayDataType;
+class FunctionDataType;
+
 /**
  * @class ExpressionVisitor
  * Visitor interface for all expression objects. Has a default
@@ -127,6 +146,34 @@ public:
   virtual void accept(ContinueStatement& stmt);
   virtual void accept(BreakStatement& stmt);
   virtual void accept(ReturnStatement& stmt);
+};
+
+/**
+ * @class DataTypeVisitor
+ * Visitor interface for the DataType objects
+ */
+class DataTypeVisitor {
+
+public:
+  virtual ~DataTypeVisitor() = default;
+
+  virtual void accept(VoidDataType& dt);
+  virtual void accept(CharDataType& dt);
+  virtual void accept(UnsignedCharDataType& dt);
+  virtual void accept(ShortDataType& dt);
+  virtual void accept(UnsignedShortDataType& dt);
+  virtual void accept(IntDataType& dt);
+  virtual void accept(UnsignedIntDataType& dt);
+  virtual void accept(LongDataType& dt);
+  virtual void accept(UnsignedLongDataType& dt);
+  virtual void accept(LongLongDataType& dt);
+  virtual void accept(UnsignedLongLongDataType& dt);
+  virtual void accept(FloatDataType& dt);
+  virtual void accept(DoubleDataType& dt);
+  virtual void accept(LongDoubleDataType& dt);
+  virtual void accept(PointerDataType& dt);
+  virtual void accept(ArrayDataType& dt);
+  virtual void accept(FunctionDataType& dt);
 };
 
 #endif /* Visitor Header Included */

@@ -1,4 +1,5 @@
 #include <DataType.h>
+#include <Visitor.h>
 
 //
 // Constructor
@@ -10,6 +11,13 @@ CharDataType::CharDataType(): PrimitiveDataType(PrimitiveType::CHAR) {}
 //
 size_t CharDataType::size() const {
   return sizeof(C_CHAR);
+}
+
+//
+// Visit
+//
+void CharDataType::visit(DataTypeVisitor& visitor) {
+  visitor.accept(*this);
 }
 
 //

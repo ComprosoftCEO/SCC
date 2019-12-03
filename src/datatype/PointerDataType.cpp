@@ -1,4 +1,5 @@
 #include <DataType.h>
+#include <Visitor.h>
 
 //
 // Constructor
@@ -22,6 +23,13 @@ DataType* PointerDataType::get_point_type() const {
 
 size_t PointerDataType::size() const {
   return POINTER_SIZE;
+}
+
+//
+// Visit
+//
+void PointerDataType::visit(DataTypeVisitor& visitor) {
+  visitor.accept(*this);
 }
 
 //

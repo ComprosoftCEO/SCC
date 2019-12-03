@@ -1,6 +1,6 @@
 # Makefile for Insanity C Compiler
 CC=g++
-CFLAGS=-std=c++11 -Iinclude
+CFLAGS=-std=c++11 -Iinclude -g
 
 PROGRAM=scc.out
 
@@ -88,6 +88,7 @@ OBJECTS=\
 	\
 	visitor/ExpressionVisitor.o \
 	visitor/StatementVisitor.o \
+	visitor/DataTypeVisitor.o \
 	\
 	declaration/Declaration.o \
 	declaration/Declarator.o \

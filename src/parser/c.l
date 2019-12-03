@@ -134,7 +134,7 @@ ESC       (\\(['"\?\\abfnrtv]|[0-7]{1,3}|x[a-fA-F0-9]+))
 "_Thread_local"   { return(THREAD_LOCAL); }
 "__func__"        { return(FUNC_NAME); }
 
-{LTR}{ALNUM}*     { return check_type(); }
+{LTR}{ALNUM}*     { yylval->str = new std::string(yytext, yyleng); return check_type(); }
 
  /* Integers */
 {DEC_INT}               { yylval->ival   = std::stoi(yytext);   return INT_CONSTANT; }
