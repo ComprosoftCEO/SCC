@@ -24,6 +24,9 @@ public:
   virtual void visit(StatementVisitor& visitor) = 0;
   virtual Statement* clone() const              = 0;
 
+  // Does not visit if nullptr
+  static void visit(Statement* stmt, StatementVisitor& visitor);
+
   // Clone method that clones or returns null
   static Statement* clone(Statement* stmt);
 };

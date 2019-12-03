@@ -6,18 +6,15 @@ void StatementVisitor::accept(EmptyStatement& stmt) {
 }
 
 void StatementVisitor::accept(LabelStatement& stmt) {
-  Statement* s = stmt.get_statement();
-  if (s != nullptr) { s->visit(*this); }
+  Statement::visit(stmt.get_statement(), *this);
 }
 
 void StatementVisitor::accept(CaseStatement& stmt) {
-  Statement* s = stmt.get_statement();
-  if (s != nullptr) { s->visit(*this); }
+  Statement::visit(stmt.get_statement(), *this);
 }
 
 void StatementVisitor::accept(DefaultCaseStatement& stmt) {
-  Statement* s = stmt.get_statement();
-  if (s != nullptr) { s->visit(*this); }
+  Statement::visit(stmt.get_statement(), *this);
 }
 
 void StatementVisitor::accept(DeclarationStatement& stmt) {
@@ -25,9 +22,7 @@ void StatementVisitor::accept(DeclarationStatement& stmt) {
 }
 
 void StatementVisitor::accept(CompoundStatement& stmt) {
-  for (auto s: stmt.get_statement_list()) {
-    if (s != nullptr) { s->visit(*this); }
-  }
+  for (auto s: stmt.get_statement_list()) { Statement::visit(s, *this); }
 }
 
 void StatementVisitor::accept(ExpressionStatement& stmt) {
@@ -35,14 +30,12 @@ void StatementVisitor::accept(ExpressionStatement& stmt) {
 }
 
 void StatementVisitor::accept(IfStatement& stmt) {
-  Statement *then_stmt = stmt.get_then_statement(), *else_stmt = stmt.get_else_statement();
-  if (then_stmt != nullptr) { then_stmt->visit(*this); }
-  if (else_stmt != nullptr) { else_stmt->visit(*this); }
+  Statement::visit(stmt.get_then_statement(), *this);
+  Statement::visit(stmt.get_else_statement(), *this);
 }
 
 void StatementVisitor::accept(SwitchStatement& stmt) {
-  Statement* s = stmt.get_statement();
-  if (s != nullptr) { s->visit(*this); }
+  Statement::visit(stmt.get_statement(), *this);
 }
 
 void StatementVisitor::accept(GotoStatement& stmt) {
@@ -50,21 +43,16 @@ void StatementVisitor::accept(GotoStatement& stmt) {
 }
 
 void StatementVisitor::accept(WhileStatement& stmt) {
-  Statement* s = stmt.get_statement();
-  if (s != nullptr) { s->visit(*this); }
+  Statement::visit(stmt.get_statement(), *this);
 }
 
 void StatementVisitor::accept(DoWhileStatement& stmt) {
-  Statement* s = stmt.get_statement();
-  if (s != nullptr) { s->visit(*this); }
+  Statement::visit(stmt.get_statement(), *this);
 }
 
 void StatementVisitor::accept(ForStatement& stmt) {
-  Statement* init = stmt.get_init_statement();
-  Statement* s    = stmt.get_statement();
-
-  if (init != nullptr) { init->visit(*this); }
-  if (s != nullptr) { s->visit(*this); }
+  Statement::visit(stmt.get_init_statement(), *this);
+  Statement::visit(stmt.get_statement(), *this);
 }
 
 void StatementVisitor::accept(ContinueStatement& stmt) {

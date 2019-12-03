@@ -2,34 +2,28 @@
 #include <Visitor.h>
 
 static inline void visit_unary_expression(UnaryExpression& expr, ExpressionVisitor& visitor) {
-  Expression* e = expr.get_expression();
-  if (e != nullptr) { e->visit(visitor); }
+  Expression::visit(expr.get_expression(), visitor);
 }
 
 static inline void visit_binary_expression(BinaryExpression& expr, ExpressionVisitor& visitor) {
-  Expression *left = expr.get_left_expression(), *right = expr.get_right_expression();
-  if (left != nullptr) { left->visit(visitor); }
-  if (right != nullptr) { right->visit(visitor); }
+  Expression::visit(expr.get_left_expression(), visitor);
+  Expression::visit(expr.get_right_expression(), visitor);
 }
 
 //
 // Default implementations
 //
 void ExpressionVisitor::accept(CommaExpression& expr) {
-  for (auto e: expr.get_expression_list()) {
-    if (e != nullptr) { e->visit(*this); }
-  }
+  for (auto e: expr.get_expression_list()) { Expression::visit(e, *this); }
 }
 
 void ExpressionVisitor::accept(AssignmentExpression& expr) {
-  Expression *src = expr.get_source(), *dest = expr.get_destination();
-  if (src != nullptr) { src->visit(*this); }
-  if (dest != nullptr) { dest->visit(*this); }
+  Expression::visit(expr.get_source(), *this);
+  Expression::visit(expr.get_destination(), *this);
 }
 
 void ExpressionVisitor::accept(CastExpression& expr) {
-  Expression* cast = expr.get_expression();
-  if (cast != nullptr) { cast->visit(*this); }
+  Expression::visit(expr.get_expression(), *this);
 }
 
 void ExpressionVisitor::accept(ConstantExpression& expr) {
@@ -45,18 +39,13 @@ void ExpressionVisitor::accept(IdentifierExpression& expr) {
 }
 
 void ExpressionVisitor::accept(BracketExpression& expr) {
-  Expression *e = expr.get_expression(), *index = expr.get_index();
-  if (e != nullptr) { e->visit(*this); }
-  if (index != nullptr) { index->visit(*this); }
+  Expression::visit(expr.get_expression(), *this);
+  Expression::visit(expr.get_index(), *this);
 }
 
 void ExpressionVisitor::accept(FunctionCallExpression& expr) {
-  Expression* func_expr = expr.get_expression();
-  if (func_expr != nullptr) { func_expr->visit(*this); }
-
-  for (auto e: expr.get_parameters_list()) {
-    if (e != nullptr) { e->visit(*this); }
-  }
+  Expression::visit(expr.get_expression(), *this);
+  for (auto e: expr.get_parameters_list()) { Expression::visit(e, *this); }
 }
 
 void ExpressionVisitor::accept(MinusExpression& expr) {
@@ -161,11 +150,7 @@ void ExpressionVisitor::accept(LogicalOrExpression& expr) {
 }
 
 void ExpressionVisitor::accept(ConditionalExpression& expr) {
-  Expression* cond       = expr.get_condition();
-  Expression* true_expr  = expr.get_true_expression();
-  Expression* false_expr = expr.get_false_expression();
-
-  if (cond != nullptr) { cond->visit(*this); }
-  if (true_expr != nullptr) { true_expr->visit(*this); }
-  if (false_expr != nullptr) { false_expr->visit(*this); }
+  Expression::visit(expr.get_condition(), *this);
+  Expression::visit(expr.get_true_expression(), *this);
+  Expression::visit(expr.get_false_expression(), *this);
 }

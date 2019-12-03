@@ -32,10 +32,13 @@ public:
   virtual size_t size() const = 0;
   ConcreteDataType get_concrete_type() const;
 
+  virtual DataType* clone() const              = 0;
   virtual void visit(DataTypeVisitor& visitor) = 0;
+
+  // Does not visit if dt is null
   static void visit(DataType* dt, DataTypeVisitor& visitor);
 
-  virtual DataType* clone() const = 0;
+  // Returns nullptr if type is null
   static DataType* clone(DataType* type);
 
 private:

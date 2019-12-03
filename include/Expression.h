@@ -20,8 +20,10 @@ public:
   //  virtual ConstantValue evaluate() = 0;
 
   virtual void visit(ExpressionVisitor& visitor) = 0;
+  virtual Expression* clone() const              = 0;
 
-  virtual Expression* clone() const = 0;
+  // Does not visit if expr is null
+  static void visit(Expression* expr, ExpressionVisitor& visitor);
 
   // Clone, or return a nullptr
   static Expression* clone(Expression* expr);
