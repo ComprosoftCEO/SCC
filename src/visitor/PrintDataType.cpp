@@ -74,11 +74,11 @@ void PrintDataType::accept(PointerDataType& dt) {
 // Visit an array
 //
 void PrintDataType::accept(ArrayDataType& dt) {
-  Expression* size = dt.get_array_size();
+
+  static PrintExpression PRINT_EXPRESSION;
+
   printf("[");
-  if (size != nullptr) {
-    // TODO: print array size
-  }
+  Expression::visit(dt.get_array_size(), PRINT_EXPRESSION);
   printf("]");
   DataType::visit(dt.get_array_type(), *this);
 }
