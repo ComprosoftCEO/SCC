@@ -36,13 +36,7 @@ void PrintStatement::accept(DeclarationStatement& stmt) {
   if (decl == nullptr) { return; }
 
   print_tabs(this->tabs);
-  DataType::visit(decl->get_type(), PRINT_DATA_TYPE);
-  printf(" %s", decl->get_name().c_str());
-
-  if (decl->has_initializer()) {
-    printf(" = ");
-    Expression::visit(decl->get_initializer(), PRINT_EXPRESSION);
-  }
+  decl->print();
   printf(";\n");
 }
 

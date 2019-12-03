@@ -34,6 +34,9 @@ public:
   bool has_initializer() const;
   Expression* get_initializer() const;
 
+  // Print a string to represent the declaration
+  void print() const;
+
   Declaration* clone() const;
 
 protected:

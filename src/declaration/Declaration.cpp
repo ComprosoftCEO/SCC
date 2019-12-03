@@ -1,6 +1,8 @@
 #include <DataType.h>
 #include <Declaration.h>
 #include <Expression.h>
+#include <PrintVisitor.h>
+#include <cstdio>
 
 //
 // Constructor
@@ -36,6 +38,23 @@ bool Declaration::has_initializer() const {
 
 Expression* Declaration::get_initializer() const {
   return this->init;
+}
+
+//
+// Print as a string to standard output
+//
+void Declaration::print() const {
+
+  static PrintDataType PRINT_DATA_TYPE;
+  static PrintExpression PRINT_EXPRESSION;
+
+  DataType::visit(this->type, PRINT_DATA_TYPE);
+  printf(" %s", this->name.c_str());
+
+  if (this->has_initializer()) {
+    printf(" = ");
+    Expression::visit(this->get_initializer(), PRINT_EXPRESSION);
+  }
 }
 
 //

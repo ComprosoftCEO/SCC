@@ -1,5 +1,10 @@
+#include <DataType.h>
 #include <Declaration.h>
+#include <Expression.h>
+#include <PrintVisitor.h>
+#include <Statement.h>
 #include <TranslationUnit.h>
+#include <cstdio>
 
 //
 // Constructor
@@ -30,4 +35,34 @@ void TranslationUnit::add_declarations(const DeclarationList& decl_list) {
   // Append to the end of the declarations
   this->global_declarations.insert(this->global_declarations.end(), decl_list.begin(),
                                    decl_list.end());
+}
+
+//
+// Print everything to standard output
+//
+void TranslationUnit::print_code() const {
+
+  // Stateless classes
+  static PrintExpression PRINT_EXPRESSION;
+  static PrintDataType PRINT_DATA_TYPE;
+  PrintStatement PRINT_STATEMENT;
+
+  // First print global variables
+  for (auto decl: this->global_declarations) {
+    if (decl == nullptr) { continue; }
+    decl->print();
+    printf(";\n");
+  }
+
+  printf("\n");
+
+  // Next print the functions, one at a time
+  for (auto def: this->functions) {
+    if (def == nullptr) { continue; }
+
+    def->get_declaration()->print();
+    printf("\n");
+    Statement::visit(def->get_statement(), PRINT_STATEMENT);
+    printf("\n\n");
+  }
 }

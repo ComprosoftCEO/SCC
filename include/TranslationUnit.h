@@ -54,6 +54,9 @@ public:
   void add_function_definition(FunctionDefinition* func_def);
   void add_declarations(const DeclarationList& decl_list); // Takes ownership
 
+  // Print everything to standard output
+  void print_code() const;
+
 private:
   // TODO: Store the order of declarations
   std::vector<FunctionDefinition*> functions;

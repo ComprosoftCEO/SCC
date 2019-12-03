@@ -33,8 +33,8 @@ int main(int argc, char** argv) {
   cclex_destroy(scanner);
   fclose(file);
 
+  if (unit) { unit->print_code(); }
   delete (unit);
-  // if (result != 0) { return delete (program), 1; }
 
   // Output the program to the file
   // string outfile = argv[1];
