@@ -91,6 +91,7 @@ OBJECTS=\
 	visitor/DataTypeVisitor.o \
 	visitor/PrintDataType.o \
 	visitor/PrintExpression.o \
+	visitor/PrintStatement.o \
 	\
 	declaration/Declaration.o \
 	declaration/Declarator.o \

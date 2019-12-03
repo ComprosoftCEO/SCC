@@ -72,4 +72,34 @@ public:
   void accept(ConditionalExpression& expr);
 };
 
+/**
+ * @class PrintStatement
+ * Print the code stored in a statement
+ */
+class PrintStatement final: public StatementVisitor {
+
+public:
+  PrintStatement();
+
+  void accept(EmptyStatement& stmt);
+  void accept(DeclarationStatement& stmt);
+  void accept(LabelStatement& stmt);
+  void accept(CaseStatement& stmt);
+  void accept(DefaultCaseStatement& stmt);
+  void accept(CompoundStatement& stmt);
+  void accept(ExpressionStatement& stmt);
+  void accept(IfStatement& stmt);
+  void accept(SwitchStatement& stmt);
+  void accept(GotoStatement& stmt);
+  void accept(WhileStatement& stmt);
+  void accept(DoWhileStatement& stmt);
+  void accept(ForStatement& stmt);
+  void accept(ContinueStatement& stmt);
+  void accept(BreakStatement& stmt);
+  void accept(ReturnStatement& stmt);
+
+private:
+  int tabs;
+};
+
 #endif /* Print Visitor Header Included */
