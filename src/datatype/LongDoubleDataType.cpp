@@ -19,6 +19,7 @@ size_t LongDoubleDataType::size() const {
 void LongDoubleDataType::visit(DataTypeVisitor& visitor) {
   visitor.accept(*this);
 }
+
 //
 // Clone
 //
