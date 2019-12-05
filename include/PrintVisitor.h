@@ -98,8 +98,12 @@ public:
   void accept(BreakStatement& stmt);
   void accept(ReturnStatement& stmt);
 
+  // Used for formatting with compound statements
+  void visitIgnoreBrackets(class Statement* stmt);
+
 private:
   int tabs;
+  bool ignore_brackets; // For compound statements
 };
 
 #endif /* Print Visitor Header Included */

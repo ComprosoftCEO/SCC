@@ -220,7 +220,7 @@ postfix_expression
   : primary_expression                                    { $$ = $1; }
   | postfix_expression '[' expression ']'                 { $$ = new BracketExpression($1, $3); }
   | postfix_expression '(' ')'                            { $$ = new FunctionCallExpression($1); }
-  | postfix_expression '(' argument_expression_list ')'   { $$ = new FunctionCallExpression($1, *$3); }
+  | postfix_expression '(' argument_expression_list ')'   { $$ = new FunctionCallExpression($1, *$3); delete($3); }
   // | postfix_expression '.' IDENTIFIER
   // | postfix_expression "->" IDENTIFIER
   // | postfix_expression "++"

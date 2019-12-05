@@ -14,10 +14,15 @@ static inline void print_tabs(int tabs) {
   for (int i = 0; i < tabs; ++i) { printf("  "); }
 }
 
+// Test if a statement is compound (for bracket formatting)
+static inline bool is_compound_statement(Statement* stmt) {
+  return dynamic_cast<CompoundStatement*>(stmt) != nullptr;
+}
+
 //
 // Constructor
 //
-PrintStatement::PrintStatement(): tabs(1) {}
+PrintStatement::PrintStatement(): tabs(1), ignore_brackets(false) {}
 
 //
 // Statement with no code
@@ -73,16 +78,24 @@ void PrintStatement::accept(DefaultCaseStatement& stmt) {
 // Print a block statement
 //
 void PrintStatement::accept(CompoundStatement& stmt) {
-  print_tabs(this->tabs);
-  printf("{\n");
-  this->tabs += 1;
+
+  const bool ignore_brackets = this->ignore_brackets;
+  this->ignore_brackets      = false;
+
+  if (!ignore_brackets) {
+    print_tabs(this->tabs);
+    printf("{\n");
+    this->tabs += 1;
+  }
 
   auto list = stmt.get_statement_list();
   for (auto stmt: list) { Statement::visit(stmt, *this); }
 
-  this->tabs -= 1;
-  print_tabs(this->tabs);
-  printf("}\n");
+  if (!ignore_brackets) {
+    this->tabs -= 1;
+    print_tabs(this->tabs);
+    printf("}\n");
+  }
 }
 
 //
@@ -95,26 +108,42 @@ void PrintStatement::accept(ExpressionStatement& stmt) {
 }
 
 //
-// Print an if statement
+// Print an if statement (ugly then-else logic)
 //
 void PrintStatement::accept(IfStatement& stmt) {
+
+  Statement* then_stmt     = stmt.get_then_statement();
+  Statement* else_stmt     = stmt.get_else_statement();
+  const bool then_compound = is_compound_statement(then_stmt);
+  const bool else_compound = is_compound_statement(else_stmt);
+
+  // If expression
   print_tabs(this->tabs);
   printf("if (");
   Expression::visit(stmt.get_expression(), PRINT_EXPRESSION);
-  printf(")\n");
+  printf(") %c\n", then_compound ? '{' : '\0');
 
+  // Then statement
   this->tabs += 1;
-  Statement::visit(stmt.get_then_statement(), *this);
+  this->visitIgnoreBrackets(stmt.get_then_statement());
   this->tabs -= 1;
 
-  print_tabs(this->tabs);
-
-  if (stmt.has_else_statement()) {
-    printf("else");
-    this->tabs += 1;
-    Statement::visit(stmt.get_else_statement(), *this);
-    this->tabs -= 1;
+  if (then_compound) {
     print_tabs(this->tabs);
+    printf("} ");
+  }
+
+  // Else statement
+  if (stmt.has_else_statement()) {
+    if (!then_compound) { print_tabs(this->tabs); }
+    printf("else %c\n", else_compound ? '{' : '\0');
+
+    this->tabs += 1;
+    this->visitIgnoreBrackets(stmt.get_else_statement());
+    this->tabs -= 1;
+
+    print_tabs(this->tabs);
+    printf("%c", else_compound ? '}' : '\0');
   }
 
   printf("\n");
@@ -124,14 +153,25 @@ void PrintStatement::accept(IfStatement& stmt) {
 // Print a switch statement
 //
 void PrintStatement::accept(SwitchStatement& stmt) {
+
+  Statement* s           = stmt.get_statement();
+  const bool is_compound = is_compound_statement(s);
+
+  // Switch expression
   print_tabs(this->tabs);
   printf("switch(");
   Expression::visit(stmt.get_expression(), PRINT_EXPRESSION);
-  printf(")\n");
+  printf(") %c\n", is_compound ? '{' : '\0');
 
-  this->tabs += 1;
-  Statement::visit(stmt.get_statement(), *this);
-  this->tabs -= 1;
+  // Indent by 2 so that case labels are indented by 1
+  this->tabs += 2;
+  this->visitIgnoreBrackets(s);
+  this->tabs -= 2;
+
+  if (is_compound) {
+    print_tabs(this->tabs);
+    printf("}\n");
+  }
 }
 
 //
@@ -146,63 +186,99 @@ void PrintStatement::accept(GotoStatement& stmt) {
 // Print a while loop
 //
 void PrintStatement::accept(WhileStatement& stmt) {
+
+  Statement* s           = stmt.get_statement();
+  const bool is_compound = is_compound_statement(s);
+
+  // While expression
   print_tabs(this->tabs);
   printf("while(");
   Expression::visit(stmt.get_expression(), PRINT_EXPRESSION);
-  printf(")\n");
+  printf(") %c\n", is_compound ? '{' : '\0');
 
+  // Statement
   this->tabs += 1;
-  Statement::visit(stmt.get_statement(), *this);
+  this->visitIgnoreBrackets(s);
   this->tabs -= 1;
+
+  if (is_compound) {
+    print_tabs(this->tabs);
+    printf("}\n");
+  }
 }
 
 //
 // Print a do-while loop
 //
 void PrintStatement::accept(DoWhileStatement& stmt) {
-  print_tabs(this->tabs);
-  printf("do\n");
+  Statement* s           = stmt.get_statement();
+  const bool is_compound = is_compound_statement(s);
 
+  // Do header
+  print_tabs(this->tabs);
+  printf("do %c\n", is_compound ? '{' : '\0');
+
+  // Statement
   this->tabs += 1;
-  Statement::visit(stmt.get_statement(), *this);
+  this->visitIgnoreBrackets(s);
   this->tabs -= 1;
 
+  // While expression
   print_tabs(this->tabs);
-  printf("while(");
+  printf("%c while(", is_compound ? '}' : '\0');
   Expression::visit(stmt.get_expression(), PRINT_EXPRESSION);
   printf(");\n");
 }
 
 //
-// Print a for-loop
+// Print a for-loop (ugly complicated logic)
 //
 void PrintStatement::accept(ForStatement& stmt) {
 
-  print_tabs(this->tabs);
-  printf("for (\n");
+  Statement* s           = stmt.get_statement();
+  const bool is_compound = is_compound_statement(s);
 
   Statement* init  = stmt.get_init_statement();
   Expression* cond = stmt.get_cond_expression();
   Expression* loop = stmt.get_loop_expression();
 
-  print_tabs(this->tabs + 1);
-  if (init == nullptr) { printf(";\n"); }
+  // For keyword
+  print_tabs(this->tabs);
+  printf("for (\n");
+
+  // Init statement (might be compound)
+  this->tabs += 1;
+  if (init == nullptr) {
+    print_tabs(this->tabs);
+    printf(";\n");
+  }
   Statement::visit(init, *this);
+  this->tabs -= 1;
 
+  // Condition expression
   print_tabs(this->tabs + 1);
-  if (cond == nullptr) { printf(";\n"); }
   Expression::visit(cond, PRINT_EXPRESSION);
+  printf(";\n");
 
-  print_tabs(this->tabs + 1);
-  Expression::visit(loop, PRINT_EXPRESSION);
-  if (loop != nullptr) { printf("\n"); }
+  // Loop expression
+  if (loop != nullptr) {
+    print_tabs(this->tabs + 1);
+    Expression::visit(loop, PRINT_EXPRESSION);
+    printf("\n");
+  }
 
   print_tabs(this->tabs);
-  printf(")");
+  printf(") %c\n", is_compound ? '{' : '\0');
 
+  // Statement
   this->tabs += 1;
-  Statement::visit(stmt.get_statement(), *this);
+  this->visitIgnoreBrackets(s);
   this->tabs -= 1;
+
+  if (is_compound) {
+    print_tabs(this->tabs);
+    printf("}\n");
+  }
 }
 
 //
@@ -234,4 +310,13 @@ void PrintStatement::accept(ReturnStatement& stmt) {
   }
 
   printf(";\n");
+}
+
+//
+// Special case for bracket formatting
+//
+void PrintStatement::visitIgnoreBrackets(Statement* stmt) {
+  this->ignore_brackets = true;
+  Statement::visit(stmt, *this);
+  this->ignore_brackets = false;
 }

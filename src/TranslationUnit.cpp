@@ -54,15 +54,15 @@ void TranslationUnit::print_code() const {
     printf(";\n");
   }
 
-  printf("\n");
+  if (this->global_declarations.size() > 0) { printf("\n"); }
 
   // Next print the functions, one at a time
   for (auto def: this->functions) {
     if (def == nullptr) { continue; }
 
     def->get_declaration()->print();
-    printf("\n");
-    Statement::visit(def->get_statement(), PRINT_STATEMENT);
-    printf("\n\n");
+    printf(" {\n");
+    PRINT_STATEMENT.visitIgnoreBrackets(def->get_statement());
+    printf("}\n\n");
   }
 }

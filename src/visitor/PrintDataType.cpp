@@ -87,6 +87,8 @@ void PrintDataType::accept(ArrayDataType& dt) {
 // Visit a function
 //
 void PrintDataType::accept(FunctionDataType& dt) {
+  DataType::visit(dt.get_return_type(), *this);
+
   printf("(");
 
   // Print parameters
@@ -99,6 +101,4 @@ void PrintDataType::accept(FunctionDataType& dt) {
   }
 
   printf(")");
-
-  DataType::visit(dt.get_return_type(), *this);
 }
