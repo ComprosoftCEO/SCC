@@ -1,5 +1,5 @@
 #include <DataType.h>
-#include <visitor.h>
+#include <Visitor.h>
 
 //
 // Constructor
