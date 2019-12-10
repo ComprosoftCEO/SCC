@@ -144,11 +144,11 @@ int specifiers_lex(YYSTYPE* yylval, TypeSpecifierList& specifiers) {
 
   // Map of all token lookups
   static const std::map<TypeSpecifier, int> SPECIFIER_LOOKUP = {
-      {TypeSpecifier::VOID, VOID},       {TypeSpecifier::CHAR, CHAR},
-      {TypeSpecifier::SHORT, SHORT},     {TypeSpecifier::INT, INT},
-      {TypeSpecifier::LONG, LONG},       {TypeSpecifier::FLOAT, SIGNED},
-      {TypeSpecifier::DOUBLE, UNSIGNED}, {TypeSpecifier::SIGNED, FLOAT},
-      {TypeSpecifier::UNSIGNED, DOUBLE}, {TypeSpecifier::BOOL, BOOL},
+      {TypeSpecifier::VOID, VOID},         {TypeSpecifier::CHAR, CHAR},
+      {TypeSpecifier::SHORT, SHORT},       {TypeSpecifier::INT, INT},
+      {TypeSpecifier::LONG, LONG},         {TypeSpecifier::FLOAT, FLOAT},
+      {TypeSpecifier::DOUBLE, DOUBLE},     {TypeSpecifier::SIGNED, SIGNED},
+      {TypeSpecifier::UNSIGNED, UNSIGNED}, {TypeSpecifier::BOOL, BOOL},
   };
 
   if (specifiers.empty()) { return EOF; }
