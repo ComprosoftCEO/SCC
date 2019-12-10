@@ -85,6 +85,8 @@ ESC       (\\(['"\?\\abfnrtv]|[0-7]{1,3}|x[a-fA-F0-9]+))
 
 "/*"              { BEGIN(COMMENT); }
 <COMMENT>"*/"     { BEGIN(INITIAL); }
+<COMMENT>.        { /* Consume Comment */ }
+<COMMENT>{WHTSP}+ { /* Consume Comment */ }
 "//".*            { /* Consume Comment */ }
 
 "auto"            { return(AUTO); }
