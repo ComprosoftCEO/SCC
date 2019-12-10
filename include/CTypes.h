@@ -49,8 +49,8 @@ enum class TypeSpecifier {
   SIGNED,
   UNSIGNED,
   BOOL,
-  // COMPLEX,
-  // IMAGINARY,
+  COMPLEX,
+  IMAGINARY,
 };
 
 // List of all type qualifiers

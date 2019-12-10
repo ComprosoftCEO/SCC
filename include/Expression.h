@@ -2,7 +2,6 @@
 #define EXPRESSION_HEADER
 
 #include <CTypes.h>
-#include <ConstantValue.h>
 #include <string>
 #include <vector>
 
