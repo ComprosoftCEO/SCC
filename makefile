@@ -29,6 +29,9 @@ OBJECTS=\
 	datatype/PointerDataType.o \
 	datatype/ArrayDataType.o \
 	datatype/FunctionDataType.o \
+	datatype/CollectionDataType.o \
+	datatype/StructDataType.o \
+	datatype/UnionDataType.o \
 	\
 	expression/Expression.o \
 	expression/CommaExpression.o \

@@ -73,6 +73,8 @@ class LongDoubleDataType;
 class PointerDataType;
 class ArrayDataType;
 class FunctionDataType;
+class StructDataType;
+class UnionDataType;
 
 /**
  * @class ExpressionVisitor
@@ -174,6 +176,8 @@ public:
   virtual void accept(PointerDataType& dt);
   virtual void accept(ArrayDataType& dt);
   virtual void accept(FunctionDataType& dt);
+  virtual void accept(StructDataType& dt);
+  virtual void accept(UnionDataType& dt);
 };
 
 #endif /* Visitor Header Included */

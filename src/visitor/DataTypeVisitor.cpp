@@ -34,3 +34,13 @@ void DataTypeVisitor::accept(FunctionDataType& dt) {
   for (auto param: dt.get_parameter_list()) { DataType::visit(param.get_type(), *this); }
   DataType::visit(dt.get_return_type(), *this);
 }
+
+void DataTypeVisitor::accept(StructDataType& dt) {
+  const auto members = dt.get_members();
+  for (auto member: members) { member.get_type()->visit(*this); }
+}
+
+void DataTypeVisitor::accept(UnionDataType& dt) {
+  const auto members = dt.get_members();
+  for (auto member: members) { member.get_type()->visit(*this); }
+}

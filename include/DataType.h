@@ -2,13 +2,15 @@
 #define DATA_TYPE_HEADER
 
 #include <CTypes.h>
+#include <Member.h>
 #include <Parameter.h>
 #include <set>
 #include <string>
 #include <vector>
 
 // List of all concrete data types
-enum class ConcreteDataType { PRIMITIVE, POINTER, ARRAY, FUNCTION };
+enum class ConcreteDataType { PRIMITIVE, POINTER, ARRAY, FUNCTION, COLLECTION };
+enum class CollectionType { UNION, STRUCT };
 
 typedef std::set<FunctionSpecifier> FunctionSpecifierSet;
 typedef std::set<TypeQualifier> TypeQualifierSet;
@@ -297,7 +299,7 @@ public:
   size_t size() const;
 
   void visit(DataTypeVisitor& visitor);
-  DataType* clone() const;
+  ArrayDataType* clone() const;
 
 private:
   DataType* type;
@@ -319,11 +321,81 @@ public:
 
   size_t size() const;
   void visit(DataTypeVisitor& visitor);
-  DataType* clone() const;
+  FunctionDataType* clone() const;
 
 private:
   ParameterList parameters;
   DataType* return_type;
+};
+
+/**
+ * @class CollectionDataType
+ * Parent class for structs and unions
+ */
+class CollectionDataType: public DataType {
+
+protected:
+  CollectionDataType(CollectionType type, const MemberList& members); // Anonymous collection
+  CollectionDataType(CollectionType type, const std::string& name);   // Incomplete collection
+  CollectionDataType(CollectionType type, const MemberList& members, const std::string& name);
+
+public:
+  // Getters
+  bool has_name() const;
+  bool is_anonymous_struct() const; // Alias for has_name()
+  const std::string& get_name() const;
+
+  bool is_incomplete_type() const;
+  const MemberList& get_members() const;
+
+  // Collection type
+  CollectionType get_collection_type() const;
+  bool is_struct() const;
+  bool is_union() const;
+
+  // Update struct type to non-anonymous type
+  void set_member_list(const MemberList& members);
+  void set_name(const std::string& name);
+
+private:
+  CollectionType type; // Concrete type
+
+protected:
+  bool incomplete_type;
+  MemberList members;
+  std::string name; // May be empty
+};
+
+/**
+ * @class Struct
+ * Stores a structure data type
+ */
+class StructDataType final: public CollectionDataType {
+
+public:
+  StructDataType(const MemberList& members); // Anonymous struct
+  StructDataType(const std::string& name);   // Incomplete struct
+  StructDataType(const MemberList& members, const std::string& name);
+
+  size_t size() const;
+  void visit(DataTypeVisitor& visitor);
+  StructDataType* clone() const;
+};
+
+/**
+ * @class UnionDataType
+ * Stores a union data type
+ */
+class UnionDataType final: public CollectionDataType {
+
+public:
+  UnionDataType(const MemberList& members); // Anonymous union
+  UnionDataType(const std::string& name);   // Incomplete union
+  UnionDataType(const MemberList& members, const std::string& name);
+
+  size_t size() const;
+  void visit(DataTypeVisitor& visitor);
+  UnionDataType* clone() const;
 };
 
 #endif /* Data Type Header Included */
