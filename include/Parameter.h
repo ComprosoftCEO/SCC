@@ -24,6 +24,7 @@ public:
   Parameter(const Parameter& other);
   Parameter& operator=(const Parameter& other);
 
+  // Getters
   DataType* get_type() const;
 
   bool has_name() const;

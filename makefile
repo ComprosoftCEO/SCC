@@ -96,6 +96,7 @@ OBJECTS=\
 	declaration/Declaration.o \
 	declaration/Declarator.o \
 	declaration/Parameter.o \
+	declaration/Member.o \
 	declaration/FunctionDefinition.o \
 	declaration/SpecifierQualifierBuilder.o \
 	\

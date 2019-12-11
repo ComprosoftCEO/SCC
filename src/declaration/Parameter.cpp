@@ -23,12 +23,12 @@ Parameter::~Parameter() {
 }
 
 //
-// Copy constructor and move constructor
+// Copy constructor
 //
 Parameter::Parameter(const Parameter& other): type(DataType::clone(other.type)), name(other.name) {}
 
 //
-// Assignment and moving
+// Assignment
 //
 Parameter& Parameter::operator=(const Parameter& other) {
   Parameter new_param(other);
