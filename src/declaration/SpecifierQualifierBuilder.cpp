@@ -49,7 +49,7 @@ SpecifierQualifierBuilder::SpecifierQualifierBuilder(FunctionSpecifier specifier
 // Destructor
 //
 SpecifierQualifierBuilder::~SpecifierQualifierBuilder() {
-  return;
+  for (auto type: this->complex_types) { delete (type); }
 }
 
 //
@@ -60,6 +60,12 @@ void SpecifierQualifierBuilder::merge_tokens(const SpecifierQualifierBuilder& bu
   append_list(this->type_qualifiers, builder.type_qualifiers);
   append_list(this->storage_specifiers, builder.storage_specifiers);
   append_list(this->function_specifiers, builder.function_specifiers);
+
+  // Append complex type
+  for (auto type: builder.complex_types) {
+    // Clone the type
+    this->complex_types.push_back(DataType::clone(type));
+  }
 }
 
 //
@@ -103,6 +109,13 @@ void SpecifierQualifierBuilder::add_unsigned() {
 
 void SpecifierQualifierBuilder::add_bool() {
   this->type_specifiers.push_back(TypeSpecifier::BOOL);
+}
+
+//
+// Complex types
+//
+void SpecifierQualifierBuilder::add_complex_type(DataType* type) {
+  this->complex_types.push_back(type);
 }
 
 //

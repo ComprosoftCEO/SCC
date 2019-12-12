@@ -47,6 +47,7 @@
   std::vector<Expression*>* expr_list;  // List of expressions
 
   DataType* dt;                         // Data type object
+  EnumConstantList* ec_list;            // Enumeration constant list
 
   TypeQualifier tq;                     // Type qualifier (const, volatile, etc.)
   FunctionSpecifier fs;                 // Function specifier (inline, noreturn, etc.)
@@ -141,7 +142,7 @@
 //====================================
 //Nonterminal types
 //====================================
-%type <str> string
+%type <str> string enumeration_constant
 
 // Expressions
 %type <expr> primary_expression constant postfix_expression unary_expression cast_expression
@@ -160,6 +161,8 @@
 %type <scs> storage_class_specifier
 %type <fs> function_specifier
 %type <builder> type_specifier declaration_specifiers specifier_qualifier_list
+%type <ec_list> enumerator_list
+%type <dt> enum_specifier
 
 // Declarations and declarators
 %type <decl_list> declaration
@@ -203,12 +206,12 @@ constant
   | F_CONSTANT          { $$ = new ConstantExpression((C_FLOAT) $1); }
   | D_CONSTANT          { $$ = new ConstantExpression((C_DOUBLE) $1); }
   | LD_CONSTANT         { $$ = new ConstantExpression((C_LONGDOUBLE) $1); }
-  // | ENUMERATION_CONSTANT  /* after it has been defined as such */
+  | ENUMERATION_CONSTANT  /* after it has been defined as such */
   ;
 
-// enumeration_constant    /* before it has been defined as such */
-//   : IDENTIFIER
-//   ;
+enumeration_constant    /* before it has been defined as such */
+  : IDENTIFIER          { $$ = $1; }
+  ;
 
 string
   : STRING_LITERAL          { $$ = $1; }
@@ -406,7 +409,7 @@ type_specifier
   // | IMAGINARY      /* non-mandated extension */
   // | atomic_type_specifier
   // | struct_or_union_specifier
-  // | enum_specifier
+  | enum_specifier  { $$ = new SpecifierQualifierBuilder(); $$->add_complex_type($1); }
   // | TYPEDEF_NAME    /* after it has been defined as such */
   ;
 
@@ -449,23 +452,20 @@ specifier_qualifier_list
 //   | declarator
 //   ;
 
-// enum_specifier
-//   : ENUM '{' enumerator_list '}'
-//   | ENUM '{' enumerator_list ',' '}'
-//   | ENUM IDENTIFIER '{' enumerator_list '}'
-//   | ENUM IDENTIFIER '{' enumerator_list ',' '}'
-//   | ENUM IDENTIFIER
-//   ;
+enum_specifier
+  : ENUM '{' enumerator_list '}'                  { $$ = new EnumDataType(*$3); delete($3); }
+  | ENUM '{' enumerator_list ',' '}'              { $$ = new EnumDataType(*$3); delete($3); }
+  | ENUM IDENTIFIER '{' enumerator_list '}'       { $$ = new EnumDataType(*$4, *$2); delete($4); delete($2); }
+  | ENUM IDENTIFIER '{' enumerator_list ',' '}'   { $$ = new EnumDataType(*$4, *$2); delete($4); delete($2); }
+  | ENUM IDENTIFIER                               { $$ = new EnumDataType(*$2); delete($2); }
+  ;
 
-// enumerator_list
-//   : enumerator
-//   | enumerator_list ',' enumerator
-//   ;
-
-// enumerator  /* identifiers must be flagged as ENUMERATION_CONSTANT */
-//   : enumeration_constant '=' constant_expression
-//   | enumeration_constant
-//   ;
+enumerator_list    /* identifiers must be flagged as ENUMERATION_CONSTANT */
+  : enumeration_constant                                               { $$ = new EnumConstantList{EnumConstant(*$1, new ConstantExpression((C_INT) 0))}; delete($1); }
+  | enumeration_constant '=' constant_expression                       { $$ = new EnumConstantList{EnumConstant(*$1, $3)}; delete($1); }
+  | enumerator_list ',' enumeration_constant                           { $$ = $1; $1->emplace_back(*$3, $1->back().get_next_value()); delete($3); }
+  | enumerator_list ',' enumeration_constant '=' constant_expression   { $$ = $1; $1->emplace_back(*$3, $5); delete($3); }
+  ;
 
 // atomic_type_specifier
 //   : ATOMIC '(' type_name ')'

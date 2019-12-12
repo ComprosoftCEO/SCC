@@ -24,6 +24,9 @@ public:
   const std::string& get_name() const;
   const Expression* get_value() const;
 
+  // Get the next sequenial value as a new expression
+  Expression* get_next_value() const;
+
 private:
   static void swap(EnumConstant& one, EnumConstant& two);
 

@@ -119,8 +119,8 @@ public:
   void add_unsigned();
   void add_bool();
 
-  // TODO: Add structs or enums
-  // TODO: Add typedef type
+  // Use to add structs, unions, and enums
+  void add_complex_type(DataType* type);
 
   // Qualifiers and specifiers
   void add_type_qualifier(TypeQualifier qualifier);
@@ -136,6 +136,7 @@ private:
   std::list<TypeQualifier> type_qualifiers;
   std::list<StorageClassSpecifier> storage_specifiers;
   std::list<FunctionSpecifier> function_specifiers;
+  std::list<DataType*> complex_types;
 
   // TOOD: Complex data types
 };

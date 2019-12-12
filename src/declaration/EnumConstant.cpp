@@ -41,6 +41,13 @@ const Expression* EnumConstant::get_value() const {
 }
 
 //
+// Get the next value in the sequence
+//
+Expression* EnumConstant::get_next_value() const {
+  return new AdditionExpression(this->value, new ConstantExpression((C_INT) 1));
+}
+
+//
 // Swap two enum constants
 //
 void EnumConstant::swap(EnumConstant& one, EnumConstant& two) {
