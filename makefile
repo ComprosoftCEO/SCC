@@ -71,6 +71,7 @@ OBJECTS=\
 	expression/LogicalAndExpression.o \
 	expression/LogicalOrExpression.o \
 	expression/ConditionalExpression.o \
+	expression/OperatorEvaluator.o \
 	\
 	statement/Statement.o \
 	statement/EmptyStatement.o \
