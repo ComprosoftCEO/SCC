@@ -100,6 +100,7 @@ OBJECTS=\
 	declaration/Declarator.o \
 	declaration/Parameter.o \
 	declaration/Member.o \
+	declaration/EnumConstant.o \
 	declaration/FunctionDefinition.o \
 	declaration/SpecifierQualifierBuilder.o \
 	\
