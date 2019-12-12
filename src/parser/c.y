@@ -1,4 +1,6 @@
 %define api.pure full
+%define parse.error verbose
+%define parse.lac full
 %name-prefix "cc"
 %locations
 
@@ -27,6 +29,8 @@
   // Let Bison know about Flex methods
   int cclex(YYSTYPE* yylvalp, YYLTYPE* yyllocp, yyscan_t scanner);
   static void ccerror(YYLTYPE* yyllocp, yyscan_t unused, TranslationUnit*& unit, const char *msg);
+
+  #define YYERROR_MSG(msg) { ccerror(&yylloc, scanner, unit, msg); YYERROR; }
 }
 
 
