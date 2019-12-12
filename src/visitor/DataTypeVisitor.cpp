@@ -44,3 +44,7 @@ void DataTypeVisitor::accept(UnionDataType& dt) {
   const auto members = dt.get_members();
   for (auto member: members) { member.get_type()->visit(*this); }
 }
+
+void DataTypeVisitor::accept(EnumDataType& dt) {
+  DataType::visit(dt.get_underlying_type(), *this);
+}

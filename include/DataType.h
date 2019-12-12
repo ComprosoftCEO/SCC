@@ -2,6 +2,7 @@
 #define DATA_TYPE_HEADER
 
 #include <CTypes.h>
+#include <EnumConstant.h>
 #include <Member.h>
 #include <Parameter.h>
 #include <set>
@@ -9,7 +10,7 @@
 #include <vector>
 
 // List of all concrete data types
-enum class ConcreteDataType { PRIMITIVE, POINTER, ARRAY, FUNCTION, COLLECTION };
+enum class ConcreteDataType { PRIMITIVE, POINTER, ARRAY, FUNCTION, COLLECTION, ENUM };
 enum class CollectionType { UNION, STRUCT };
 
 typedef std::set<FunctionSpecifier> FunctionSpecifierSet;
@@ -396,6 +397,43 @@ public:
   size_t size() const;
   void visit(DataTypeVisitor& visitor);
   UnionDataType* clone() const;
+};
+
+/**
+ * @class EnumDataType
+ * Stores an enumeration type in memory
+ */
+class EnumDataType final: public DataType {
+
+public:
+  EnumDataType(const EnumConstantList& values); // Anonymous enum
+  EnumDataType(const std::string& name);        // Incomplete enum
+  EnumDataType(const EnumConstantList& values, const std::string& name);
+
+  // Getters
+  bool has_name() const;
+  bool is_anonymous() const;
+  const std::string& get_name() const;
+
+  bool is_incomplete_type() const;
+  const EnumConstantList& get_enum_constants() const;
+  size_t num_constants() const;
+
+  // Gets internal type of enum (Do NOT free)
+  DataType* get_underlying_type() const;
+
+  // Update
+  void set_enum_constants(const EnumConstantList& values);
+  void set_name(const std::string& name);
+
+  size_t size() const;
+  void visit(DataTypeVisitor& visitor);
+  EnumDataType* clone() const;
+
+private:
+  bool incomplete_type;
+  EnumConstantList values;
+  std::string name;
 };
 
 #endif /* Data Type Header Included */

@@ -75,6 +75,7 @@ class ArrayDataType;
 class FunctionDataType;
 class StructDataType;
 class UnionDataType;
+class EnumDataType;
 
 /**
  * @class ExpressionVisitor
@@ -178,6 +179,7 @@ public:
   virtual void accept(FunctionDataType& dt);
   virtual void accept(StructDataType& dt);
   virtual void accept(UnionDataType& dt);
+  virtual void accept(EnumDataType& dt);
 };
 
 #endif /* Visitor Header Included */

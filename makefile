@@ -32,6 +32,7 @@ OBJECTS=\
 	datatype/CollectionDataType.o \
 	datatype/StructDataType.o \
 	datatype/UnionDataType.o \
+	datatype/EnumDataType.o \
 	\
 	expression/Expression.o \
 	expression/CommaExpression.o \

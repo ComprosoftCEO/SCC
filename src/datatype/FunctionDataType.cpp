@@ -39,6 +39,6 @@ void FunctionDataType::visit(DataTypeVisitor& visitor) {
 //
 // Clone
 //
-DataType* FunctionDataType::clone() const {
+FunctionDataType* FunctionDataType::clone() const {
   return new FunctionDataType(parameters, this->return_type->clone());
 }

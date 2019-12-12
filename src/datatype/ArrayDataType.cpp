@@ -43,7 +43,7 @@ void ArrayDataType::visit(DataTypeVisitor& visitor) {
 //
 // Clone
 //
-DataType* ArrayDataType::clone() const {
+ArrayDataType* ArrayDataType::clone() const {
   return new ArrayDataType(this->type->clone(),
                            this->array_size ? this->array_size->clone() : nullptr);
 }
