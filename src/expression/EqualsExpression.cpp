@@ -20,3 +20,17 @@ EqualsExpression* EqualsExpression::clone() const {
 void EqualsExpression::visit(ExpressionVisitor& visitor) {
   visitor.accept(*this);
 }
+
+//
+// Get binary operator
+//
+template<typename T> struct EqualsOperator {
+  static inline ConstantExpression* evaluate(T left, T right) {
+    return new ConstantExpression((C_INT)(left == right));
+  }
+};
+
+const BinaryOperatorEvaluator& EqualsExpression::get_evaluator() const {
+  static const ConcreteBinaryOperatorEvaluator<EqualsOperator> evaluator;
+  return evaluator;
+}

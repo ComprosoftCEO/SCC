@@ -22,7 +22,11 @@ Expression* UnaryExpression::get_expression() const {
 //
 // Evaluate
 //
-/*ConstantValue UnaryExpression::evaluate() {
-  // Might throw an exception
-  return this->unary_operator(this->expr->evaluate());
-}*/
+ConstantExpression* UnaryExpression::evaluate() const {
+  ConstantExpression* eval = Expression::evaluate(this->expr);
+
+  ConstantExpression* retval = this->get_evaluator().evaluate(eval);
+  delete (eval); // Might be NULL
+
+  return retval;
+}

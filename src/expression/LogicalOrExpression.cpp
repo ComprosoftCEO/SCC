@@ -20,3 +20,17 @@ LogicalOrExpression* LogicalOrExpression::clone() const {
 void LogicalOrExpression::visit(ExpressionVisitor& visitor) {
   visitor.accept(*this);
 }
+
+//
+// Get binary operator
+//
+template<typename T> struct LogicalOrOperator {
+  static inline ConstantExpression* evaluate(T left, T right) {
+    return new ConstantExpression((C_INT)(left || right));
+  }
+};
+
+const BinaryOperatorEvaluator& LogicalOrExpression::get_evaluator() const {
+  static const ConcreteBinaryOperatorEvaluator<LogicalOrOperator> evaluator;
+  return evaluator;
+}

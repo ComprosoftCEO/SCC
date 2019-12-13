@@ -33,6 +33,20 @@ Expression* ConditionalExpression::get_false_expression() const {
 }
 
 //
+// Evaluate
+//
+ConstantExpression* ConditionalExpression::evaluate() const {
+  ConstantExpression* condition = Expression::evaluate(this->condition);
+  if (condition == nullptr) { return nullptr; }
+
+  Expression* to_evaluate       = condition->is_true() ? this->cond_true : this->cond_false;
+  ConstantExpression* evaluated = Expression::evaluate(to_evaluate);
+
+  delete (condition);
+  return evaluated;
+}
+
+//
 // Clone
 //
 ConditionalExpression* ConditionalExpression::clone() const {

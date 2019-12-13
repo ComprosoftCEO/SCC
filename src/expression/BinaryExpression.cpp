@@ -27,8 +27,13 @@ Expression* BinaryExpression::get_right_expression() const {
 //
 // Evaluate
 //
-// ConstantValue BinaryExpression::evaluate() {
-//   ConstantValue one = this->left->evaluate();
-//   ConstantValue two = this->right->evaluate();
-//   return this->binary_operator(one, two);
-// }
+ConstantExpression* BinaryExpression::evaluate() const {
+  ConstantExpression* left_eval  = Expression::evaluate(this->left);
+  ConstantExpression* right_eval = Expression::evaluate(this->right);
+
+  ConstantExpression* retval = this->get_evaluator().evaluate(left_eval, right_eval);
+  delete (left_eval);  // Might be NULL
+  delete (right_eval); // Might be NULL
+
+  return retval;
+}

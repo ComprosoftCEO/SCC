@@ -19,3 +19,17 @@ NotExpression* NotExpression::clone() const {
 void NotExpression::visit(ExpressionVisitor& visitor) {
   visitor.accept(*this);
 }
+
+//
+// Get unary operator
+//
+template<typename T> struct NotOperator {
+  static inline ConstantExpression* evaluate(T input) {
+    return new ConstantExpression((C_INT)(!input));
+  }
+};
+
+const UnaryOperatorEvaluator& NotExpression::get_evaluator() const {
+  static const ConcreteUnaryOperatorEvaluator<NotOperator> evaluator;
+  return evaluator;
+}

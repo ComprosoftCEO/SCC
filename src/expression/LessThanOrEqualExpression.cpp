@@ -20,3 +20,17 @@ LessThanOrEqualExpression* LessThanOrEqualExpression::clone() const {
 void LessThanOrEqualExpression::visit(ExpressionVisitor& visitor) {
   visitor.accept(*this);
 }
+
+//
+// Get binary operator
+//
+template<typename T> struct LessThanOrEqualOperator {
+  static inline ConstantExpression* evaluate(T left, T right) {
+    return new ConstantExpression((C_INT)(left <= right));
+  }
+};
+
+const BinaryOperatorEvaluator& LessThanOrEqualExpression::get_evaluator() const {
+  static const ConcreteBinaryOperatorEvaluator<LessThanOrEqualOperator> evaluator;
+  return evaluator;
+}

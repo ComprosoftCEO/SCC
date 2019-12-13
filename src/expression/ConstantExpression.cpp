@@ -100,6 +100,95 @@ C_LONGDOUBLE ConstantExpression::to_longdouble() const {
 }
 
 //
+// Convert internal representation
+//
+void ConstantExpression::convert_int() {
+  this->value.ival = cast_union<C_INT>(this->value, this->type);
+}
+
+void ConstantExpression::convert_uint() {
+  this->value.uival = cast_union<C_UINT>(this->value, this->type);
+}
+
+void ConstantExpression::convert_long() {
+  this->value.lval = cast_union<C_LONG>(this->value, this->type);
+}
+
+void ConstantExpression::convert_ulong() {
+  this->value.ulval = cast_union<C_ULONG>(this->value, this->type);
+}
+
+void ConstantExpression::convert_longlong() {
+  this->value.llval = cast_union<C_LONGLONG>(this->value, this->type);
+}
+
+void ConstantExpression::convert_ulonglong() {
+  this->value.ullval = cast_union<C_ULONGLONG>(this->value, this->type);
+}
+
+void ConstantExpression::convert_float() {
+  this->value.fval = cast_union<C_FLOAT>(this->value, this->type);
+}
+
+void ConstantExpression::convert_double() {
+  this->value.dval = cast_union<C_DOUBLE>(this->value, this->type);
+}
+
+void ConstantExpression::convert_longdouble() {
+  this->value.ldval = cast_union<C_LONGDOUBLE>(this->value, this->type);
+}
+
+//
+// Convert type from a parameter
+//
+void ConstantExpression::convert_type(PrimitiveType type) {
+  // clang-format off
+  switch (type) {
+    case PrimitiveType::INT:        this->convert_int();
+    case PrimitiveType::UINT:       this->convert_uint();
+    case PrimitiveType::LONG:       this->convert_long();
+    case PrimitiveType::ULONG:      this->convert_ulong();
+    case PrimitiveType::LONGLONG:   this->convert_longlong();
+    case PrimitiveType::ULONGLONG:  this->convert_ulonglong();
+    case PrimitiveType::FLOAT:      this->convert_float();
+    case PrimitiveType::DOUBLE:     this->convert_double();
+    case PrimitiveType::LONGDOUBLE: this->convert_longdouble();
+    default:
+      return;
+  }
+  // clang-format on
+}
+
+//
+// Get the "truthiness" of the expression
+//
+bool ConstantExpression::is_true() const {
+  if (is_float_type(this->type)) { return true; }
+  if (is_unsigned_type(this->type)) { return this->to_ulonglong() != 0; }
+  return this->to_longlong() != 0;
+}
+
+bool ConstantExpression::is_false() const {
+  return !this->is_true();
+}
+
+//
+// Upcasting rules
+//
+void ConstantExpression::upcast_values(ConstantExpression& one, ConstantExpression& two) {
+  PrimitiveType upcast = upcast_type(one.get_type(), two.get_type());
+  one.convert_type(upcast);
+  two.convert_type(upcast);
+}
+
+//
+// Evaluate
+//
+ConstantExpression* ConstantExpression::evaluate() const {
+  return this->clone();
+}
+
+//
 // Visit
 //
 void ConstantExpression::visit(ExpressionVisitor& visitor) {

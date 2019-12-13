@@ -27,6 +27,13 @@ Expression* AssignmentExpression::get_destination() const {
 }
 
 //
+// Evaluate
+//
+ConstantExpression* AssignmentExpression::evaluate() const {
+  return Expression::evaluate(this->src);
+}
+
+//
 // Clone
 //
 AssignmentExpression* AssignmentExpression::clone() const {

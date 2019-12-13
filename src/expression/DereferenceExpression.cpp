@@ -4,13 +4,27 @@
 //
 // Constructor
 //
-DereferenceExpression::DereferenceExpression(Expression* expr): UnaryExpression(expr) {}
+DereferenceExpression::DereferenceExpression(Expression* expr): expr(expr) {}
+
+//
+// Destructor
+//
+DereferenceExpression::~DereferenceExpression() {
+  delete (this->expr);
+}
+
+//
+// Getters
+//
+Expression* DereferenceExpression::get_expression() const {
+  return this->expr;
+}
 
 //
 // Clone
 //
 DereferenceExpression* DereferenceExpression::clone() const {
-  return new DereferenceExpression(this->expr->clone());
+  return new DereferenceExpression(Expression::clone(this->expr));
 }
 
 //

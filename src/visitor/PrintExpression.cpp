@@ -3,6 +3,9 @@
 #include <PrintVisitor.h>
 #include <cstdio>
 
+// Data type printer to use for all expressions
+static PrintDataType PRINT_DATA_TYPE;
+
 //
 // Print a unary expression with parenthesis
 //
@@ -55,9 +58,6 @@ void PrintExpression::accept(AssignmentExpression& expr) {
 // Print a cast expression
 //
 void PrintExpression::accept(CastExpression& expr) {
-  // Data type printer to use for all expressions
-  static PrintDataType PRINT_DATA_TYPE;
-
   printf("((");
   DataType::visit(expr.get_cast_type(), PRINT_DATA_TYPE);
   printf(") ");
@@ -149,19 +149,31 @@ void PrintExpression::accept(ComplementExpression& expr) {
 }
 
 void PrintExpression::accept(DereferenceExpression& expr) {
-  print_unary("*", expr, *this);
+  printf("(*");
+  Expression::visit(expr.get_expression(), *this);
+  printf(")");
 }
 
 void PrintExpression::accept(AddressOfExpression& expr) {
-  print_unary("&", expr, *this);
+  printf("(&");
+  Expression::visit(expr.get_expression(), *this);
+  printf(")");
 }
 
 void PrintExpression::accept(SizeofExpression& expr) {
-  print_unary("sizeof ", expr, *this);
+  printf("(sizeof ");
+  if (expr.stores_data_type()) {
+    DataType::visit(expr.get_data_type(), PRINT_DATA_TYPE);
+  } else {
+    Expression::visit(expr.get_expression(), *this);
+  }
+  printf(")");
 }
 
 void PrintExpression::accept(AlignofExpression& expr) {
-  print_unary("alignof ", expr, *this);
+  printf("(alignof ");
+  DataType::visit(expr.get_data_type(), PRINT_DATA_TYPE);
+  printf(")");
 }
 
 //

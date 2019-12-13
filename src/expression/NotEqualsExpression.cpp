@@ -20,3 +20,17 @@ NotEqualsExpression* NotEqualsExpression::clone() const {
 void NotEqualsExpression::visit(ExpressionVisitor& visitor) {
   visitor.accept(*this);
 }
+
+//
+// Get binary operator
+//
+template<typename T> struct NotEqualsOperator {
+  static inline ConstantExpression* evaluate(T left, T right) {
+    return new ConstantExpression((C_INT)(left != right));
+  }
+};
+
+const BinaryOperatorEvaluator& NotEqualsExpression::get_evaluator() const {
+  static const ConcreteBinaryOperatorEvaluator<NotEqualsOperator> evaluator;
+  return evaluator;
+}

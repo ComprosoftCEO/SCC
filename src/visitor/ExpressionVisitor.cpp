@@ -61,19 +61,19 @@ void ExpressionVisitor::accept(ComplementExpression& expr) {
 }
 
 void ExpressionVisitor::accept(DereferenceExpression& expr) {
-  visit_unary_expression(expr, *this);
+  Expression::visit(expr.get_expression(), *this);
 }
 
 void ExpressionVisitor::accept(AddressOfExpression& expr) {
-  visit_unary_expression(expr, *this);
+  Expression::visit(expr.get_expression(), *this);
 }
 
 void ExpressionVisitor::accept(SizeofExpression& expr) {
-  visit_unary_expression(expr, *this);
+  if (expr.stores_expression()) { Expression::visit(expr.get_expression(), *this); }
 }
 
 void ExpressionVisitor::accept(AlignofExpression& expr) {
-  visit_unary_expression(expr, *this);
+  return;
 }
 
 void ExpressionVisitor::accept(AdditionExpression& expr) {

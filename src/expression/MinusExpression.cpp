@@ -19,3 +19,17 @@ MinusExpression* MinusExpression::clone() const {
 void MinusExpression::visit(ExpressionVisitor& visitor) {
   visitor.accept(*this);
 }
+
+//
+// Get unary operator
+//
+template<typename T> struct MinusOperator {
+  static ConstantExpression* evaluate(T input) {
+    return new ConstantExpression((T)(-input));
+  }
+};
+
+const UnaryOperatorEvaluator& MinusExpression::get_evaluator() const {
+  static const ConcreteUnaryOperatorEvaluator<MinusOperator> evaluator;
+  return evaluator;
+}

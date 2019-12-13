@@ -20,3 +20,17 @@ LogicalAndExpression* LogicalAndExpression::clone() const {
 void LogicalAndExpression::visit(ExpressionVisitor& visitor) {
   visitor.accept(*this);
 }
+
+//
+// Get binary operator
+//
+template<typename T> struct LogicalAndOperator {
+  static inline ConstantExpression* evaluate(T left, T right) {
+    return new ConstantExpression((C_INT)(left && right));
+  }
+};
+
+const BinaryOperatorEvaluator& LogicalAndExpression::get_evaluator() const {
+  static const ConcreteBinaryOperatorEvaluator<LogicalAndOperator> evaluator;
+  return evaluator;
+}

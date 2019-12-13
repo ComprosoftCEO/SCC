@@ -20,3 +20,18 @@ DivisionExpression* DivisionExpression::clone() const {
 void DivisionExpression::visit(ExpressionVisitor& visitor) {
   visitor.accept(*this);
 }
+
+//
+// Get binary operator
+//
+template<typename T> struct DivisionOperator {
+  static inline ConstantExpression* evaluate(T left, T right) {
+    if (right == 0) { return nullptr; }
+    return new ConstantExpression((T)(left / right));
+  }
+};
+
+const BinaryOperatorEvaluator& DivisionExpression::get_evaluator() const {
+  static const ConcreteBinaryOperatorEvaluator<DivisionOperator> evaluator;
+  return evaluator;
+}

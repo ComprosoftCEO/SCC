@@ -20,3 +20,17 @@ SubtractionExpression* SubtractionExpression::clone() const {
 void SubtractionExpression::visit(ExpressionVisitor& visitor) {
   visitor.accept(*this);
 }
+
+//
+// Get binary operator
+//
+template<typename T> struct SubtractionOperator {
+  static inline ConstantExpression* evaluate(T left, T right) {
+    return new ConstantExpression((T)(left - right));
+  }
+};
+
+const BinaryOperatorEvaluator& SubtractionExpression::get_evaluator() const {
+  static const ConcreteBinaryOperatorEvaluator<SubtractionOperator> evaluator;
+  return evaluator;
+}

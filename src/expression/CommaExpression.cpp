@@ -30,6 +30,14 @@ const std::vector<Expression*>& CommaExpression::get_expression_list() const {
 }
 
 //
+// Evaluate
+//
+ConstantExpression* CommaExpression::evaluate() const {
+  if (this->expr_list.size() == 0) { return nullptr; }
+  return Expression::evaluate(this->expr_list.back());
+}
+
+//
 // Clone
 //
 CommaExpression* CommaExpression::clone() const {

@@ -4,13 +4,27 @@
 //
 // Constructor
 //
-AddressOfExpression::AddressOfExpression(Expression* expr): UnaryExpression(expr) {}
+AddressOfExpression::AddressOfExpression(Expression* expr): expr(expr) {}
+
+//
+// Destructor
+//
+AddressOfExpression::~AddressOfExpression() {
+  delete (this->expr);
+}
+
+//
+// Getters
+//
+Expression* AddressOfExpression::get_expression() const {
+  return this->expr;
+}
 
 //
 // Clone
 //
 AddressOfExpression* AddressOfExpression::clone() const {
-  return new AddressOfExpression(this->expr->clone());
+  return new AddressOfExpression(Expression::clone(this->expr));
 }
 
 //

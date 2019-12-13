@@ -2,21 +2,27 @@
 #define EXPRESSION_HEADER
 
 #include <CTypes.h>
+#include <OperatorEvaluator.h>
 #include <string>
 #include <vector>
 
 // Forward declare classes
 class ExpressionVisitor;
 class DataType;
+class ConstantExpression;
 
+/**
+ * @class Expression
+ * Represents a generic expression in C
+ */
 class Expression {
 
 public:
   virtual ~Expression() = default;
 
   // Attempt to do compile-time evaluation of the expression
-  //  Throws an exception on error
-  //  virtual ConstantValue evaluate() = 0;
+  //  Returns nullptr on failure
+  virtual ConstantExpression* evaluate() const;
 
   virtual void visit(ExpressionVisitor& visitor) = 0;
   virtual Expression* clone() const              = 0;
@@ -24,8 +30,9 @@ public:
   // Does not visit if expr is null
   static void visit(Expression* expr, ExpressionVisitor& visitor);
 
-  // Clone, or return a nullptr
+  // Clone/evaluate or return a nullptr
   static Expression* clone(Expression* expr);
+  static ConstantExpression* evaluate(Expression* expr);
 };
 
 /**
@@ -42,6 +49,7 @@ public:
 
   const std::vector<Expression*>& get_expression_list() const;
 
+  ConstantExpression* evaluate() const;
   void visit(ExpressionVisitor& visitor);
   CommaExpression* clone() const;
 
@@ -61,6 +69,7 @@ public:
   Expression* get_source() const;
   Expression* get_destination() const;
 
+  ConstantExpression* evaluate() const;
   void visit(ExpressionVisitor& visitor);
   AssignmentExpression* clone() const;
 
@@ -81,6 +90,7 @@ public:
   Expression* get_expression();
   DataType* get_cast_type();
 
+  ConstantExpression* evaluate() const;
   void visit(ExpressionVisitor& visitor);
   CastExpression* clone() const;
 
@@ -120,6 +130,26 @@ public:
   C_DOUBLE to_double() const;
   C_LONGDOUBLE to_longdouble() const;
 
+  // Convert the internal representation
+  void convert_int();
+  void convert_uint();
+  void convert_long();
+  void convert_ulong();
+  void convert_longlong();
+  void convert_ulonglong();
+  void convert_float();
+  void convert_double();
+  void convert_longdouble();
+  void convert_type(PrimitiveType type);
+
+  // Test the "truthiness" of this value
+  bool is_true() const;
+  bool is_false() const;
+
+  // Follow C integer casting rules
+  static void upcast_values(ConstantExpression& one, ConstantExpression& two);
+
+  ConstantExpression* evaluate() const;
   void visit(ExpressionVisitor& visitor);
   ConstantExpression* clone() const;
 
@@ -216,6 +246,7 @@ private:
 };
 
 /**
+ * @class UnaryExpression
  * Unary operators, like -, +, and !
  */
 class UnaryExpression: public Expression {
@@ -224,11 +255,12 @@ public:
   UnaryExpression(Expression* expr);
   ~UnaryExpression();
 
-  // ConstantValue evaluate();
   Expression* get_expression() const;
 
+  ConstantExpression* evaluate() const final;
+
 private:
-  //  virtual ConstantValue unary_operator(ConstantValue value) = 0;
+  virtual const UnaryOperatorEvaluator& get_evaluator() const = 0;
 
 protected:
   Expression* expr;
@@ -244,6 +276,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   MinusExpression* clone() const;
+
+private:
+  const UnaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -256,6 +291,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   NotExpression* clone() const;
+
+private:
+  const UnaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -268,54 +306,91 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   ComplementExpression* clone() const;
+
+private:
+  const UnaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
  * Dereferencing a pointer
  */
-class DereferenceExpression final: public UnaryExpression {
+class DereferenceExpression final: public Expression {
 
 public:
   DereferenceExpression(Expression* expr);
+  ~DereferenceExpression();
+
+  Expression* get_expression() const;
 
   void visit(ExpressionVisitor& visitor);
   DereferenceExpression* clone() const;
+
+private:
+  Expression* expr;
 };
 
 /**
  * Get the address of a given variable
  */
-class AddressOfExpression final: public UnaryExpression {
+class AddressOfExpression final: public Expression {
 
 public:
   AddressOfExpression(Expression* expr);
+  ~AddressOfExpression();
+
+  Expression* get_expression() const;
 
   void visit(ExpressionVisitor& visitor);
   AddressOfExpression* clone() const;
+
+private:
+  Expression* expr;
 };
 
 /**
  * Get the size of a variable
  */
-class SizeofExpression final: public UnaryExpression {
+class SizeofExpression final: public Expression {
 
 public:
   SizeofExpression(Expression* expr);
+  SizeofExpression(DataType* dt);
+  ~SizeofExpression();
+
+  bool stores_expression() const;
+  bool stores_data_type() const;
+  Expression* get_expression() const;
+  DataType* get_data_type() const;
+
+  ConstantExpression* evaluate() const;
 
   void visit(ExpressionVisitor& visitor);
   SizeofExpression* clone() const;
+
+private:
+  bool is_data_type;
+  Expression* expr;
+  DataType* dt;
 };
 
 /**
  * Get the alignment of a variable
  */
-class AlignofExpression final: public UnaryExpression {
+class AlignofExpression final: public Expression {
 
 public:
-  AlignofExpression(Expression* expr);
+  AlignofExpression(DataType* dt);
+  ~AlignofExpression();
+
+  DataType* get_data_type() const;
+
+  ConstantExpression* evaluate() const;
 
   void visit(ExpressionVisitor& visitor);
   AlignofExpression* clone() const;
+
+private:
+  DataType* dt;
 };
 
 /**
@@ -330,11 +405,10 @@ public:
   Expression* get_left_expression() const;
   Expression* get_right_expression() const;
 
-  //  ConstantValue evaluate();
+  ConstantExpression* evaluate() const;
 
 private:
-  // Compute a stored binary operator at runtime
-  // virtual ConstantValue binary_operator(ConstantValue left, ConstantValue right) = 0;
+  virtual const BinaryOperatorEvaluator& get_evaluator() const = 0;
 
 protected:
   Expression* left;
@@ -351,6 +425,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   AdditionExpression* clone() const;
+
+private:
+  const BinaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -363,6 +440,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   SubtractionExpression* clone() const;
+
+private:
+  const BinaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -375,6 +455,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   MultiplicationExpression* clone() const;
+
+private:
+  const BinaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -387,6 +470,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   DivisionExpression* clone() const;
+
+private:
+  const BinaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -399,6 +485,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   ModulusExpression* clone() const;
+
+private:
+  const BinaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -411,6 +500,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   LeftShiftExpression* clone() const;
+
+private:
+  const BinaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -423,6 +515,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   RightShiftExpression* clone() const;
+
+private:
+  const BinaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -435,6 +530,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   LessThanExpression* clone() const;
+
+private:
+  const BinaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -447,6 +545,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   GreaterThanExpression* clone() const;
+
+private:
+  const BinaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -459,6 +560,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   LessThanOrEqualExpression* clone() const;
+
+private:
+  const BinaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -471,6 +575,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   GreaterThanOrEqualExpression* clone() const;
+
+private:
+  const BinaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -483,6 +590,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   EqualsExpression* clone() const;
+
+private:
+  const BinaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -495,6 +605,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   NotEqualsExpression* clone() const;
+
+private:
+  const BinaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -507,6 +620,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   BitwiseAndExpression* clone() const;
+
+private:
+  const BinaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -519,6 +635,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   BitwiseOrExpression* clone() const;
+
+private:
+  const BinaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -531,6 +650,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   BitwiseXorExpression* clone() const;
+
+private:
+  const BinaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -543,6 +665,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   LogicalAndExpression* clone() const;
+
+private:
+  const BinaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -555,6 +680,9 @@ public:
 
   void visit(ExpressionVisitor& visitor);
   LogicalOrExpression* clone() const;
+
+private:
+  const BinaryOperatorEvaluator& get_evaluator() const;
 };
 
 /**
@@ -570,6 +698,7 @@ public:
   Expression* get_true_expression() const;
   Expression* get_false_expression() const;
 
+  ConstantExpression* evaluate() const;
   void visit(ExpressionVisitor& visitor);
   ConditionalExpression* clone() const;
 
