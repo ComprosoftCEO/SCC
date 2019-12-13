@@ -252,8 +252,8 @@ unary_expression
   | '~' cast_expression         { $$ = new ComplementExpression($2); }
   | '!' cast_expression         { $$ = new NotExpression($2); }
   | SIZEOF unary_expression     { $$ = new SizeofExpression($2); }
-  // | SIZEOF '(' type_name ')'    { $$ = new SizeofExpression($3); }
-  // | ALIGNOF '(' type_name ')'   { $$ = new AlignofExpression($3); }
+  | SIZEOF '(' type_name ')'    { $$ = new SizeofExpression($3); }
+  | ALIGNOF '(' type_name ')'   { $$ = new AlignofExpression($3); }
   ;
 
 cast_expression
