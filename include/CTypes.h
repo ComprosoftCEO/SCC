@@ -71,4 +71,6 @@ bool is_unsigned_type(PrimitiveType type);
 bool is_integer_type(PrimitiveType type);
 bool is_float_type(PrimitiveType type);
 
+PrimitiveType upcast_type(PrimitiveType one, PrimitiveType two);
+
 #endif /* C Types Header Included */
